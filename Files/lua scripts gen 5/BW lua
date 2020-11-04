@@ -1,0 +1,7 @@
+The lua has following features:
+press C to swap through overworld freecams, shift + arrow keys to use.
+press B to swap through overworld freecams, shift + arrow keys to use.
+    known issue^ can cause crashes if used in overworld. Will be fixed at some point.
+
+press space + arrow keys to walk through walls at high speed.
+press L in battle to end battle instantly (counts as a win).
