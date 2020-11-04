@@ -10,21 +10,20 @@ Pokemon DP Scripts: https://whoturgled.com/dp_scripts.html
 
 Files:
 
-What is the Void/Void Guide: ./Files/CompleteVoidGuide.pdf
-WIP new Void Guide: ./Files/Pokemon_Diamond_and_Pearl.pdf
-Tweaking Map: ./Files/beta_tweaking_map.png
-Tweaking Gif: ./Files/tweak.gif
-Mapdata: ./Files/Mapdata_v2.0.docx
-DP Cascading Gif: ./Files/Cascading.gif
-Matrix Map: ./Files/Matrix_map_correspondance.txt
-RSFDCollision3: ./Files/RSFDCollision3.lua
-Gen 4 RNG Script: ./Files/ultimateRNG.lua
-Void lua: ./Files/void.lua
-Better Void lua: ./Files/map7.lua
-Lua51 (x64) (64 bit version for Desmume lua scripts, rename the file to lua51): ./Files/lua51 (x64).dll
-Lua51 (x86) (32 bit version for Desmume lua scripts, rename the file to lua51): ./Files/lua51 (x86).dll
-ASC: ./Files/Arbitrary_Script_Calling_wip.pdf
-
+What is the Void/Void Guide: ./Files/documentation/CompleteVoidGuide.pdf
+WIP new Void Guide: ./Files/documentation/Pokemon_Diamond_and_Pearl.pdf
+Matrix Map: ./Files/documentation/Matrix_map_correspondance.txt
+Mapdata: ./Files/documentation/Mapdata_v2.0.docx
+ASC: ./Files/documentation/Arbitrary_Script_Calling_wip.pdf
+RSFDCollision: ./Files/lua scripts gen 4/RSFD oct 26.lua
+Gen 4 RNG Script: ./Files/lua scripts gen 4/ultimateRNG.lua
+Lua51 (x64) (64 bit version for Desmume lua scripts, rename the file to lua51): ./Files/lua scripts gen 4/lua51 (x64).dll
+Lua51 (x86) (32 bit version for Desmume lua scripts, rename the file to lua51): ./Files/lua scripts gen 4/lua51 (x86).dll
+BW Lua Script functions: ./Files/lua scripts gen 5/BW lua.txt
+BW Lua Script: ./Files/lua scripts gen 5/BW.lua
+Tweaking Map: ./Files/other/beta_tweaking_map.png
+Tweaking Gif: ./Files/other/tweak.gif
+DP Cascading Gif: ./Files/other/Cascading.gif
 
 YouTube Channels:
 
@@ -34,17 +33,3 @@ RETIRE:https://www.youtube.com/channel/UCOoXjfeeK2LGFSN97aX_2Fg
 TheZZAZZGlitch: https://www.youtube.com/user/TheZZAZZGlitch
 Yem: (Old): https://www.youtube.com/channel/UCVDWajoY1w0hVZLrctPzYqg
 Yem (New): https://www.youtube.com/channel/UCez4vz-T5yfAO-yDgt3hUkg
-
-
-To add a new resource to this document, put the file or link under the correct category, and give a name for file or link with this following format:
-Files:
-
-Example: ./Files
-
-Links:
-
-Link: https://
-
-YouTube Channel:
-
-Channel: https://youtube.com/user/
