@@ -1,5 +1,7 @@
+--not entirely functional yet, no battle cam.
+
 update_sprite = False --if set to true pressing hotkey Z will increment sprite index, after which opening and closing a menu will change the player sprite.
-hotkey_cam = "C"
+hotkey_cam = "C" 
 hotkeys_battle_cam = {"B","L"} --B is for the camera, L will end a battle.
 hotkeys_npc = {"M","Z"}
 hotkey_gui = "G"
