@@ -8,17 +8,11 @@ colls = 0
 change_map = false
 gui_mode = true 
 
-key_list = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R",
-"S","T","U","V","W","X","Y","Z",}
-
 top_screen = -200
 key = {}
 last_key = {}
 index_cams = 0
 index_battle_cams = 0
-
-printstatement = ""
-
 
 function debug_inputs()
     btn = input.get()
@@ -27,11 +21,11 @@ end
 
 --general camera 2148B98
 --overworld camera data
-cam_pan = {4000,0,0,0x228af28,0x228af24}
-cam_slide = {4,0x45,0xffff,0x228af5c,0x228af54}
-cam_rotate = {100,0,0xffff,0x228af3c,0x228af3e}
-cam_rotate_self = {8000,0,0xffff,0x228af2c,0x228af2e} 
-cam_zoom = {-8000,0,0xffff,0x228af40,0x228af40}
+cam_pan = {4000,0,0,0x228ad88,0x228ad8c}
+cam_slide = {4,0x45,0xffff,0x228adbc,0x228adb4}
+cam_rotate = {100,0,0xffff,0x228ad9C,0x228ad9E}
+cam_rotate_self = {8000,0,0xffff,0x228ad8c,0x228ad8e} 
+cam_zoom = {-8000,0,0xffff,0x228ada0,0x228ada0}
 cam_setting = {"Off","Smooth move","Rotate focus","Rotate self","Slide (indoors only)","Zoom/Pan"}
 cams_array = {cam_pan,cam_rotate,cam_rotate_self,cam_slide,cam_zoom}
 
@@ -52,6 +46,32 @@ battle_cam_zoom2_text = {"Up","Down","Up","Down"}
 battle_cam_rotate_text = {"Up","Down","Up","Down"}
 battle_cams_text = {battle_cam_pan_text,battle_cam_zoom_text,battle_cam_zoom2_text,battle_cam_rotate_text}
 battle_cam_timer = 0x22A637C
+
+chunk_tile_ptr = 0x2FE3264
+chunk_tile_data = 0x22F04C0--memory.readdword(chunk_tile_ptr) + 0x60 --0x22F04C0
+
+tiles = {
+    Tall_Grass = {
+        color = '#4f7f4f',
+        id = {0x6}
+    },
+    Grass = {
+        color = '#4fdf3f',
+        id = {0x4}
+    },
+    Road = {
+        color ='#ff8f3f',
+        id = {0x1F,0x03}
+    },
+    Water = {
+        color = '#0xaef',
+        id = {0x3D}
+    },
+    Cave = {
+        color = 'red',
+        id = {0x0A}
+    }
+}
 
 maps = {
     Mystery_zone = {
@@ -183,9 +203,9 @@ function end_battle(hotkey)
 end
 
 function controll_pos(hotkeys)
-    current_map_id_a = 0x224F90C -- 0x0224FFE0
+    current_map_id_a = 0x224f76c -- 0x0224FFE0
     current_map_id = memory.readword(current_map_id_a)
-    player_pos = memory.readdword(0x227589C)
+    player_pos = memory.readdword(0x22756FC)
 
     vis_pos = {vis_x,vis_y,vis_z}--one npc is 0x200 bytes
     vis_pos_addr = {player_pos+0,player_pos+8,player_pos+16}
@@ -195,7 +215,7 @@ function controll_pos(hotkeys)
     phys_pos_addr = {player_pos-8,player_pos-4}
     phys_pos = {phys_x = memory.readword(phys_pos_addr[1]); phys_y= memory.readword(phys_pos_addr[2])}
 
-    true_pos_addr = {0x224F912,0x224F91A}
+    true_pos_addr = {0x224f772,0x224f77A}
     true_pos = {true_x = memory.readword(true_pos_addr[1]),true_y = memory.readword(true_pos_addr[2])}
     player_sprite = 0xB0
 
@@ -237,22 +257,13 @@ function controll_pos(hotkeys)
     end
 end
 
-function show_chunks(chunk_pointer)
-    memory.readword(chunk_pointer)
-    for i = 0,31, 1 do
-        for j = 0,31, 1 do
-            tile = current_tile + 2*i
-        end
-    end
-end 
-
-function drawsquare(a,b,c,d)
-    gui.box(a,b,a+4,b+4,c,d)
+function drawsquare(sa,sb,a,b,c,d)
+    gui.box(a,b,a+sa,b+sb,c,d)
 end
 
 function load_map()
     gui.box(0,0,260,200,"#0000009")
-    start_mapdata = 0x2250C2C
+    start_mapdata = 0x2250a8c
     map_x_offset = math.modf(true_pos["true_x"] / 32) - 4
     map_y_offset = math.modf(true_pos["true_y"] / 32) - 9
     
@@ -276,7 +287,7 @@ function load_map()
             end 
             
             gui.text(4+ (vertical - map_x_offset) *28, 3+ (horizontal-map_y_offset) * 10, fmt(2,current_map),map_color)
-            --drawsquare(4+ (vertical - colls) *8, 3+ (horizontal-row) * 8,map_color)
+            --drawsquare(2,4+ (vertical - colls) *8, 3+ (horizontal-row) * 8,map_color)
         end
     end 
 end
@@ -285,12 +296,42 @@ function get_map_color(map_id)
     for k,v in pairs(maps) do
         for i=1,#maps[k]['number'] do
             if maps[k]['number'][i] == map_id then 
-                return mapId[k]['color']
+                return maps[k]['color']
             end
         end
     end
     return 'white'
 end
+
+function get_tile_color(tile)
+    for k,v in pairs(tiles) do
+        for i=1,#tiles[k]['id'] do
+            if tiles[k]['id'][i] == tile then 
+                return tiles[k]['color']
+            end
+        end
+    end
+    return 'white'
+end
+
+
+function load_chunks()
+    current_chunk = 0
+    for w = 0,1 do 
+        for h = 0,1 do 
+            for i = 0,31 do
+                for j = 0,31 do
+                    current_chunk_addr = chunk_tile_data + i*8 + j*8*32 + current_chunk*(8*32+32*32*8)
+                    tile = memory.readbyte(current_chunk_addr)
+                    chunkcolor = get_tile_color(tile)
+                    drawsquare(2,2,i*4 +w*(32*4),j *3+h*(32*3),chunkcolor)
+                end
+            end 
+           current_chunk = current_chunk + 1
+        end
+    end
+end
+
 
 function show_gui(hotkey)
     if check_key(hotkey) then 
@@ -298,6 +339,7 @@ function show_gui(hotkey)
     end
     if gui_mode then 
     load_map()
+    --load_chunks()
     --gui.text(5,5,"BW freecam lua by RETIRE",white)
     gui.text(5,top_screen+15,"OW Cam: "..cam_setting[index_cams+1],"red")
     gui.text(5,top_screen+25,"Battle Cam: "..battle_cam_setting[index_battle_cams+1],"red")
@@ -307,37 +349,14 @@ function show_gui(hotkey)
     end 
 end
 
-function get_full_input()
-    for i= 1,#key_list do
-        if check_key(key_list[i]) then return key_list[i] end end 
-    
-    for i = 1,9 do
-        numpadv = "numpad"..i
-        if check_key(numpadv) then return i end
-    end 
-
-    if check_key("0") or check_key("numpad0") then return 0 end 
-    if key.space and not last_key.space then return " " end 
-    return nil
-end 
-
-function user_input()
-    state = get_full_input()
-    if state ~= nil then printstatement = printstatement..state end 
-    if key.backspace then printstatement = printstatement:sub(1, -2) end 
-    gui.text(5,top_screen + 70,"Text: "..printstatement)
-end
-
 function setup_loop()
     get_keys()
     --debug_inputs()
-    --show_chunks()
     controll_battle_cam(hotkeys_battle_cam[1])
     end_battle(hotkeys_battle_cam[2])
     controll_cam(hotkey_cam)
     controll_pos(hotkeys_npc)
     show_gui(hotkey_gui)
-    user_input()
 end
 
 gui.register(setup_loop)

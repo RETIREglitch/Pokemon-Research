@@ -1679,16 +1679,12 @@ function Customvalue()
         for i, v in ipairs({0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF}) do
             if check_key(string.format("%X", i)) then writemap(v) break end
             if check_key("0") or check_key("numpad0") then writemap(0) break end
-            if check_key("numpad1") then writemap(1) break end 
-            if check_key("numpad2") then writemap(2) break end
-            if check_key("numpad3") then writemap(3) break end
-            if check_key("numpad4") then writemap(4) break end
-            if check_key("numpad5") then writemap(5) break end
-            if check_key("numpad6") then writemap(6) break end
-            if check_key("numpad7") then writemap(7) break end
-            if check_key("numpad8") then writemap(8) break end
-            if check_key("numpad9") then writemap(9) break end
-	   end
+		for i = 1,9 do
+			numpadv = "numpad"..i
+			print(numpadv)
+			if check_key(numpadv) then print(i.."Has been found")
+			end
+		end 
 end 
 
 function flycursorfunc()
