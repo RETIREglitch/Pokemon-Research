@@ -16,8 +16,11 @@ class App(QWidget):
         self.top = 120
         self.width = 640
         self.height = 480
+
         self.sq_sz = 40
+        self.hex = True
         self.boxes = []
+
         self.initUI()
 
 
@@ -26,10 +29,14 @@ class App(QWidget):
         self.setGeometry(self.left, self.top, self.width, self.height)
         self.draw_boxes()
         self.show()
+        
 
     def draw_boxes(self):
         for i in range(len(mapdata.ram_section)):
-            self.boxes.append(QPushButton(str(hex(mapdata.ram_section[i])), self))
+            if self.hex == True:
+                self.boxes.append(QPushButton(str(hex(mapdata.ram_section[i])), self))
+            else: 
+                self.boxes.append(QPushButton(str(mapdata.ram_section[i]), self))
             self.boxes[i].resize(self.sq_sz,self.sq_sz)
             self.boxes[i].move(self.sq_sz*(i%30)+5,5+self.sq_sz*(i//30))
             # print(self.map_id_to_color(self.ram_section[i]))
