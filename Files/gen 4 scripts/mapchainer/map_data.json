@@ -1,4 +1,11 @@
 {
+  "0": {
+    "map_code": "EVERYTHING",
+    "map_name": "EVERYTHING",
+    "matrix_data": {
+      "matrix_id": 0
+    }
+  },
   "1": {
     "map_code": "NOTHING",
     "map_name": "NOTHING ",
