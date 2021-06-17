@@ -1,7 +1,7 @@
 ---------------------------------------------
 ---- RSFD - Routing Script For Dummies ------
 ---------------------------------------------
--------- Version update 11/01/2021 ----------
+
 ---------------------------------------------
 --Original versions 'void.lua' and 'loadline.lua' created by MKdasher, 
 --Game version and Basepointer setup by Ganix
@@ -37,7 +37,7 @@ tilename = {"nothing","nothing","Grass","Grass","4","Cave","Cave/Tree","7","Cave
 local mapId = {
 	Highlight = {
 		color = '#f7bbf3',
-		number = {80,350,284,285,351}
+		number = {32}
 		},
 	Highlight2= {
 		color = '#DfA',
@@ -2221,6 +2221,26 @@ end
 end 
 end 
 
+function printmapdata()
+	if check_key("B") then
+		startmapdata = base + 0x23C6E
+		endmapdata = base + 0x2420E
+		map_address = 0
+		dump_maps = "["
+		print("Data for map:",LiveMapId)
+		while (startmapdata + map_address) < endmapdata do
+			-- print(startmapdata + map_address)
+			dump_maps = (dump_maps..memory.readword(startmapdata+map_address)..",")
+			map_address = map_address + 2
+		end 
+			dump_maps = dump_maps.."]"
+			print(dump_maps)
+
+	end
+end
+
+
+
 function fn()
 	base = memory.readdword(base_addr)
 	pointer = base 
@@ -2352,7 +2372,13 @@ function fn()
 	--memory.writeword(LiveMapIdAddr,LiveMapId+1)
 	end
 	end 
-	debuggerprint()
+	--debuggerprint()
+	printmapdata()
+
 end
 
 gui.register(fn)
+
+
+
+
