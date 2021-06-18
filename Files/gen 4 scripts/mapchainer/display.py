@@ -1,7 +1,8 @@
-import json
-import time
-
+# import json
+# import time
+from functools import lru_cache
 import sys
+
 from PyQt5.QtWidgets import QApplication, QWidget,QPushButton,QMessageBox
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import pyqtSlot
@@ -10,7 +11,6 @@ from PyQt5.QtGui import QIcon,QFont
 from mapdataRepository import mapdataRepository
 
 mapdata = mapdataRepository()
-
 
 class App(QWidget):
 
@@ -38,7 +38,7 @@ class App(QWidget):
         self.prepare_directions()
         self.prepare_settings()
         self.prepare_ram()
-        self.update_ram(False)
+        self.update_ram()
         self.setChildrenFocusPolicy(Qt.NoFocus)
         self.show()
 
@@ -60,7 +60,7 @@ class App(QWidget):
             self.direction_request("down")
 
         if event.key()  == 32:
-            self.load_selected_map()
+            self.load_selected_map(mapdata.pos_to_offset() - 2250)
 
     def prepare_ram(self):
         for i in range(len(mapdata.ram_section)):
@@ -71,7 +71,6 @@ class App(QWidget):
 
     def prepare_directions(self):
         directions = ["up","left","down","right"]
-        direction_signs = ["^","v",">","<"]
         for i in range(4):
             self.directions.append(QPushButton(directions[i],self))
             self.directions[i].resize(self.square_sizes[1],self.square_sizes[1])
@@ -92,31 +91,30 @@ class App(QWidget):
 
     def prepare_settings(self):
         options = ["steps","maps"]
-        
+   
     def direction_request(self,direction):
-        address = mapdata.pos_to_offset() - 2250
-        self.reset_map_color(address)
+        address1 = mapdata.pos_to_offset() - 2250
         mapdata.move_player(direction)
-        address = mapdata.pos_to_offset() - 2250
-        self.update_map_color(address)
+        address2 = mapdata.pos_to_offset() - 2250
         if self.update_on_move:
-            self.load_selected_map()
-
+            mapdata.prev_map_id = mapdata.current_map_id
+            mapdata.current_map_id = mapdata.ram_section[address2]
+            if mapdata.prev_map_id != mapdata.current_map_id:
+                self.load_selected_map(address2)
+                return
+        self.reset_map_color(address1)
+        self.update_map_color(address2)
+        
     def reset_map_color(self,address):
         if (address >= 0) & (address < len(self.ram_addresses)) :
             background_color = mapdata.map_id_to_color(mapdata.ram_section[address])
             self.ram_addresses[address].setStyleSheet(f"border-width: 0px; border-style: solid;background-color : {background_color}")
             self.ram_addresses[address].setFont(QFont("Arial", 6))
 
-    def load_selected_map(self):
-        address = mapdata.pos_to_offset() - 2250 
-        if (address >= 0) & (address < len(self.ram_addresses)):       
-                    mapdata.map_ids = [mapdata.ram_section[address]]
-                    mapdata.load_consecutive_maps(mapdata.map_ids)
+    def load_selected_map(self,address):
+        if (address >= 0) & (address < len(self.ram_addresses)):
+                    mapdata.load_ram_data(mapdata.current_map_id)
                     self.update_ram()
-            
-
-
 
     def update_map_color(self,address,background_color="white"):
         if (address >= 0) & (address < len(self.ram_addresses)):
@@ -124,37 +122,35 @@ class App(QWidget):
             self.ram_addresses[address].setStyleSheet(f"border-width: 0px; border-style: solid;background-color : {background_color}")
             self.ram_addresses[address].setFont(QFont("Arial", 6))
 
-    def update_ram(self,show=True):
-        with open("Files/gen 4 scripts/mapchainer/ramdumps.json","r") as file:
-            json_obj = json.load(file)
-            for i in range(len(mapdata.ram_section)):
+    def update_ram(self):
+        # with open("Files/gen 4 scripts/mapchainer/ramdumps.json","r") as file:
+        #     json_obj = json.load(file)
+        for i in range(len(mapdata.ram_section)):
 
-                # confirm_value = json_obj[str(0)][i]
-                # if mapdata.ram_section[i] != confirm_value:
-                #     if self.hex == True:
-                #         self.ram_addresses.append(QPushButton(f"{hex(mapdata.ram_section[i])},{confirm_value}|", self))
-                #     else: 
-                #         self.ram_addresses.append(QPushButton(f"{mapdata.ram_section[i]},{confirm_value}|", self))
-                # else:
+            # confirm_value = json_obj[str(0)][i]
+            # if mapdata.ram_section[i] != confirm_value:
+            #     if self.hex == True:
+            #         self.ram_addresses.append(QPushButton(f"{hex(mapdata.ram_section[i])},{confirm_value}|", self))
+            #     else: 
+            #        self.ram_addresses.append(QPushButton(f"{mapdata.ram_section[i]},{confirm_value}|", self))
+            # else: 
 
-                if self.hex == True:
-                    self.ram_addresses[i].setText(str(hex(mapdata.ram_section[i])))
-                else: 
-                    self.ram_addresses[i].setText(str(mapdata.ram_section[i]))
+            if self.hex == True:
+                self.ram_addresses[i].setText(str(hex(mapdata.ram_section[i])))
+            else: 
+                self.ram_addresses[i].setText(str(mapdata.ram_section[i]))
 
-                # print(self.map_id_to_color(self.ram_section[i]))
-                # if mapdata.ram_section[i] != confirm_value:
-                #     self.ram_addresses[i].setStyleSheet(f"border-width: 0px; border-style: solid;background-color : white")
-                # else:
-
+            # print(self.map_id_to_color(self.ram_section[i]))
+            # if mapdata.ram_section[i] != confirm_value:
+            #     self.ram_addresses[i].setStyleSheet(f"border-width: 0px; border-style: solid;background-color : white")
+            # else:
+            if i == mapdata.pos_to_offset()-2250:
+                background_color = "white"
+            else:
                 background_color = mapdata.map_id_to_color(mapdata.ram_section[i])
-                if i == mapdata.pos_to_offset()-2250:
-                    background_color = "white"
-                self.ram_addresses[i].setStyleSheet(f"border-width: 0px; border-style: solid;background-color : {background_color}")
-                self.ram_addresses[i].setFont(QFont("Arial", 6))
-        file.close()
-        if show:
-            self.show()
+            self.ram_addresses[i].setStyleSheet(f"border-width: 0px; border-style: solid;background-color : {background_color}")
+            self.ram_addresses[i].setFont(QFont("Arial", 6))
+        # file.close()
 
 
 

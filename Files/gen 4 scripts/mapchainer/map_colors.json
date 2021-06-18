@@ -1,4 +1,8 @@
 {   
+    "mystery_zones" : {
+    "color" : "#6F717C",
+    "map_ids" : [0]
+    },
     "goal" : {
         "color" : "#FF095B",
         "map_ids" : [284,293,125]
@@ -10,10 +14,6 @@
     "chain_2" : {
         "color" : "#DfA",
         "map_ids" : []
-    },
-    "mystery_zones" : {
-        "color" : "#6F717C",
-        "map_ids" : [0]
     },
     "jubilife" : {
         "color" : "#3183FF",

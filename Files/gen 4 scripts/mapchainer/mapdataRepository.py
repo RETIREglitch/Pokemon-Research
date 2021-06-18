@@ -1,5 +1,6 @@
 import json
 import time
+from functools import lru_cache
 
 class mapdataRepository():
     def __init__(self,path_map_data = "Files/gen 4 scripts/mapchainer/map_data.json",path_map_properties="Files/gen 4 scripts/mapchainer/map_colors.json",aslr=0x226D314):
@@ -11,15 +12,18 @@ class mapdataRepository():
         self.ram_section = [0]*(24*30) # assuming starting with clean data, and moving into a jubilife map as first id
         self.set_ram_header(self.aslr)
 
-        self.x_pos = 7
+        self.x_pos = 380
         self.y_pos = 2423
 
         self.steps = 1
         self.multiply_steps = True
 
         self.map_ids = [3]
+        self.current_map_id = self.pos_to_offset() - 2250
+        self.prev_map_id = -1
         self.load_consecutive_maps(self.map_ids)
 
+    @lru_cache
     def map_id_to_color(self,map_id):
         with open(self.path_map_properties,"r") as file:
             json_obj = json.load(file)
@@ -28,8 +32,8 @@ class mapdataRepository():
                 return json_obj["jubilife"]["color"]
 
             for group in json_obj:
-                file.close()
                 if map_id in json_obj[group]["map_ids"]:
+                    file.close()
                     return json_obj[group]["color"]
 
             file.close()
