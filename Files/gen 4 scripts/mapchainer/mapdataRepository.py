@@ -76,6 +76,7 @@ class mapdataRepository():
             self.length_added_ram = len(save_state["ram_section"])
             self.x_pos = save_state["x_pos"]
             self.y_pos = save_state["y_pos"]
+            
 
     def add_save_state(self,id,ram_section,x_pos,y_pos):
         self.save_states[id] = {"ram_section":ram_section,"x_pos":x_pos,"y_pos":y_pos}

@@ -184,10 +184,11 @@ class App(QWidget):
         sender = self.sender()
         if self.savestate_state_button.status[self.savestate_state_button.state] == "load":
             mapdata.load_save_state(sender.index)
-            print(mapdata.ram_section)
             address = mapdata.pos_to_offset()
 
             self.update_ram()
+            mapdata.prev_map_id = -1
+            mapdata.current_map_id = -1
             self.update_map_color(address)
             self.update_fields_from_data()
         else:
@@ -325,7 +326,6 @@ class App(QWidget):
     def update_ram(self):
         # with open("Files/gen 4 scripts/mapchainer/ramdumps.json","r") as file:
         #     json_obj = json.load(file)
-        print(mapdata.save_states[0])
         for i in range(mapdata.length_added_ram):
 
             # confirm_value = json_obj[str(0)][i]
