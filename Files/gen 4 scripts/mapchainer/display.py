@@ -37,10 +37,15 @@ class App(QWidget):
         self.setGeometry(self.left, self.top, self.width, self.height)
         self.prepare_directions()
         self.prepare_ram()
+        self.prepare_savestates()
+
         mapdata.length_added_ram = len(mapdata.ram_section)
         self.update_ram()
         self.prepare_settings()
+
         self.setChildrenFocusPolicy(Qt.NoFocus,Qt.ClickFocus)
+        self.update_map_color(mapdata.pos_to_offset())
+
         self.show()
 
     def setChildrenFocusPolicy (self, policy,policy2):
@@ -70,11 +75,13 @@ class App(QWidget):
             mapdata.prev_map_id = mapdata.current_map_id
             mapdata.current_map_id = mapdata.ram_section[address]
             self.load_selected_map(address)
+            self.update_map_color(address)
+            self.update_fields_from_data()
 
         if event.key() == 16777220: # enter
             self.setFocus()
-        if event.text() == 's':
-            mapdata.add_save_state(mapdata.ram_section,mapdata.x_pos,mapdata.y_pos)
+        # if event.text() == 's':
+        #     mapdata.add_save_state(0,mapdata.ram_section.copy(),mapdata.x_pos,mapdata.y_pos)
 
     def prepare_ram(self):
         for i in range(len(mapdata.ram_section)):
@@ -83,8 +90,8 @@ class App(QWidget):
             self.ram_addresses[i].move(10+self.square_sizes[0]*(i%30),10+self.square_sizes[0]*(i//30))
             self.ram_addresses[i].setFont(QFont("Arial", 10))
             self.ram_addresses[i].index = i
-            self.ram_addresses[i].clicked.connect(self.select_map_by_click) 
-
+            self.ram_addresses[i].clicked.connect(self.select_map_by_click)
+ 
     def prepare_directions(self):
         direction_txt = ["up","left","down","right"]
         for i in range(4):
@@ -142,6 +149,50 @@ class App(QWidget):
         self.step_type.toggled.connect(self.toggle_radio_button)
         self.step_type.index = 0
 
+    def prepare_savestates(self):
+        horizontal_offset = 960
+        vertical_offset = 300
+        self.savestate_button = []
+        spacing = 32
+        for i in range(mapdata.max_save_states):
+            self.savestate_button.append(QPushButton(f"State {i+1}",self))
+            self.savestate_button[i].resize(100,24)
+            self.savestate_button[i].move(horizontal_offset+(i//(mapdata.max_save_states//2))*140,vertical_offset+(i%(mapdata.max_save_states//2))*spacing)
+            self.savestate_button[i].setStyleSheet(f"border-width: 1px; border-style: solid;border-color: white;color:white;")
+            self.savestate_button[i].setFont(QFont("Arial", 10))
+            self.savestate_button[i].index = i
+            self.savestate_button[i].clicked.connect(self.handle_savestate)
+        
+        self.savestate_state_button = QPushButton("SAVE",self)
+        self.savestate_state_button.resize(66,24)
+        self.savestate_state_button.move(horizontal_offset+88,vertical_offset-40)
+        self.savestate_state_button.setStyleSheet(f"border-width: 1px; border-style: solid;border-color: white;color:white;")
+        self.savestate_state_button.setFont(QFont("Arial", 10))
+        self.savestate_state_button.status = ["save","load"]
+        self.savestate_state_button.state = 0
+        self.savestate_state_button.clicked.connect(self.change_state_loading)
+
+    @pyqtSlot()
+    def change_state_loading(self):
+        sender = self.sender()
+        new_state = (sender.state +1)%2
+        sender.state = new_state
+        sender.setText(sender.status[new_state].upper())
+
+    @pyqtSlot()
+    def handle_savestate(self):
+        sender = self.sender()
+        if self.savestate_state_button.status[self.savestate_state_button.state] == "load":
+            mapdata.load_save_state(sender.index)
+            print(mapdata.ram_section)
+            address = mapdata.pos_to_offset()
+
+            self.update_ram()
+            self.update_map_color(address)
+            self.update_fields_from_data()
+        else:
+            mapdata.add_save_state(sender.index,mapdata.ram_section.copy(),mapdata.x_pos,mapdata.y_pos)
+
     @pyqtSlot()
     def validate_input(self):
         sender = self.sender()
@@ -184,10 +235,8 @@ class App(QWidget):
             
     def update_data_from_fields(self):
         mapdata.steps = self.text_fields[0].value
-        if self.step_type.state == 1:
-            mapdata.multiply_steps = True
-        else:
-            mapdata.multiply_steps = False
+        mapdata.multiply_steps = [False,True][self.step_type.state]
+
 
         address1 = mapdata.pos_to_offset()
         mapdata.x_pos = self.text_fields[1].value
@@ -201,6 +250,25 @@ class App(QWidget):
             self.text_fields[i].setText(str(data[i]))
             self.text_fields[i].value = data[i]
 
+    # def set_x_pos(self,x,gui=False):
+    #     if gui:
+    #         self.text_fields[1].value = x
+    #         self.text_fields[1].setText(str(x))
+    #     mapdata.x_pos = x
+
+    # def set_y_pos(self,y,gui=False):
+    #     if gui:
+    #         self.text_fields[2].value = y
+    #         self.text_fields[2].setText(str(y))
+    #     mapdata.y_pos = y
+
+    # def set_pos(self,x,y,gui=False):
+    #     self.set_x_pos(x,gui)
+    #     self.set_y_pos(y,gui)
+
+    # def set_steps(self,steps):
+    #     self.text_fields[0] = steps
+    #     mapdata.steps = steps
 
     @pyqtSlot()
     def select_map_by_click(self):
@@ -257,6 +325,7 @@ class App(QWidget):
     def update_ram(self):
         # with open("Files/gen 4 scripts/mapchainer/ramdumps.json","r") as file:
         #     json_obj = json.load(file)
+        print(mapdata.save_states[0])
         for i in range(mapdata.length_added_ram):
 
             # confirm_value = json_obj[str(0)][i]
@@ -276,10 +345,10 @@ class App(QWidget):
             # if mapdata.ram_section[i] != confirm_value:
             #     self.ram_addresses[i].setStyleSheet(f"border-width: 0px; border-style: solid;background-color : white")
             # else:
-            if i == mapdata.pos_to_offset():
-                background_color = "white"
-            else:
-                background_color = mapdata.map_id_to_color(mapdata.ram_section[i])
+            # if i == mapdata.pos_to_offset():
+            #     background_color = "white"
+            # else:
+            background_color = mapdata.map_id_to_color(mapdata.ram_section[i])
             self.ram_addresses[i].setStyleSheet(f"border-width: 0px; border-style: solid;background-color : {background_color}")
             self.ram_addresses[i].setFont(QFont("Arial", 6))
         # file.close()

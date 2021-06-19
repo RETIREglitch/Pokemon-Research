@@ -10,6 +10,7 @@ class mapdataRepository():
         self.aslr = aslr
         self.start_mapdata = self.aslr + 0x23C6E
         self.address = 0
+        self.max_save_states = 16
 
         self.init_json()
         self.init_ram_section()
@@ -51,7 +52,6 @@ class mapdataRepository():
     def init_ram_section(self):
         self.ram_section = [0]*(30*30) # assuming starting with clean data, and moving into a jubilife map as first id
         self.set_ram_header(self.aslr)
-        self.save_states = []
 
     def init_data(self):
         self.x_pos = 380
@@ -64,20 +64,21 @@ class mapdataRepository():
         self.prev_map_id = -1
 
         self.load_ram_data(self.current_map_id)
-        self.add_save_state(self.ram_section,self.x_pos,self.y_pos)
+        
+        self.save_states = [{"ram_section":[0]*(30*30),"x_pos":0,"y_pos":0}]*self.max_save_states
+        self.add_save_state(0,self.ram_section.copy(),self.x_pos,self.y_pos)
 
 
     def load_save_state(self,id):
-        self.ram_section = self.save_states[id]
+        if id <= len(self.save_states):
+            save_state = self.save_states[id]
+            self.ram_section = save_state["ram_section"].copy()
+            self.length_added_ram = len(save_state["ram_section"])
+            self.x_pos = save_state["x_pos"]
+            self.y_pos = save_state["y_pos"]
 
-    def add_save_state(self,ram_section,x_pos,y_pos):
-        count_states = len(self.save_states)
-        if count_states >= 32: #amount of savestates
-            self.save_states.pop(0)
-        self.save_states.append({"ram_section":ram_section,"x_pos":x_pos,"y_pos":y_pos})
-
-        # print(self.save_states[count_states-1])
-        # print(count_states)
+    def add_save_state(self,id,ram_section,x_pos,y_pos):
+        self.save_states[id] = {"ram_section":ram_section,"x_pos":x_pos,"y_pos":y_pos}
 
 
     @lru_cache
