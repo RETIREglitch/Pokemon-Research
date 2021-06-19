@@ -16,13 +16,14 @@ Mapdata: ./Files/documentation/Mapdata_v2.0.docx
 Matrix Map: ./Files/documentation/Matrix_map_correspondance.txt
 WIP new Void Guide: ./Files/documentation/Pokemon_Diamond_and_Pearl.pdf
 
-RSFDCollision: ./Files/lua scripts gen 4/RSFD oct 26.lua
-Lua51 (x64) (64 bit version for Desmume lua scripts, rename the file to lua51): ./Files/lua scripts gen 4/lua51 (x64).dll
-Lua51 (x86) (32 bit version for Desmume lua scripts, rename the file to lua51): ./Files/lua scripts gen 4/lua51 (x86).dll
-Gen 4 RNG Script: ./Files/lua scripts gen 4/ultimateRNG.lua
+WIP automated Void Router: .Files/gen 4 scripts/mapchainer
+Memory to ingame character view: .Files/gen 4 scripts/characterreaderformatted.lua
+Gen 4 glitch and routing script: .Files/gen 4 scripts/RSFD.lua
+Lua51 (x64) (64 bit version for Desmume lua scripts, rename the file to lua51): ./Files/gen 4 scripts/lua51 (x64).dll
+Lua51 (x86) (32 bit version for Desmume lua scripts, rename the file to lua51): ./Files/gen 4 scripts/lua51 (x86).dll
 
-BW Lua Script functions: ./Files/lua scripts gen 5/BW lua.txt
-BW Lua Script: ./Files/lua scripts gen 5/BW.lua
+BW Lua Script functions: ./Files/gen 5 scripts/BW lua.txt
+BW Lua Script: ./Files/gen 5 scripts/BW.lua
 
 Tweaking Map: ./Files/other/beta_tweaking_map.png
 Tweaking Gif: ./Files/other/tweak.gif
