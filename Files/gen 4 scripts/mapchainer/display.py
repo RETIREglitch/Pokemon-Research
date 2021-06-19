@@ -76,7 +76,6 @@ class App(QWidget):
         if event.text() == 's':
             mapdata.add_save_state(mapdata.ram_section,mapdata.x_pos,mapdata.y_pos)
 
-
     def prepare_ram(self):
         for i in range(len(mapdata.ram_section)):
             self.ram_addresses.append(QPushButton(str(i), self))
@@ -106,23 +105,24 @@ class App(QWidget):
     def prepare_settings(self):
         horizontal_offset = 950
         vertical_offset = 20
-        settings = [{'title':"Move by:",'input_type': int,'default':32},{'title':"placeholder",'input_type': str,'default':""}]
+        settings = [{'title':"Move by:",'input_type': int,'default':mapdata.steps},{'title':"X coordinate:",'input_type': int,'default':mapdata.x_pos},{'title':"Y coordinate:",'input_type': int,'default':mapdata.y_pos}]
         self.text_fields = []
         self.text_labels = []
-        spacing = 80
+        spacing = 72
+        inner_spacing = 40
         for i in range(len(settings)):
             self.text_labels.append(QLabel(settings[i].get('title'),self))
-            self.text_labels[i].resize(100,32)
+            self.text_labels[i].resize(200,32)
             self.text_labels[i].move(horizontal_offset,vertical_offset+i*spacing)
             self.text_labels[i].setStyleSheet(f"border-width: 0px; border-style: solid;color : white")
             self.text_labels[i].setFont(QFont("Arial", 12))
 
             self.text_fields.append(QLineEdit(self))
-            self.text_fields[i].resize(100,32)
-            self.text_fields[i].move(horizontal_offset,vertical_offset+40+i*spacing)
+            self.text_fields[i].resize(100,24)
+            self.text_fields[i].move(horizontal_offset,vertical_offset+inner_spacing+i*spacing)
 
             self.text_fields[i].setStyleSheet(f"border-width: 1px; border-style: solid;border-color: white;color:white;")
-            self.text_fields[i].setFont(QFont("Arial", 12))
+            self.text_fields[i].setFont(QFont("Arial", 10))
             self.text_fields[i].editingFinished.connect(self.send_input) # or textEdited
             self.text_fields[i].textEdited.connect(self.validate_input)
             self.text_fields[i].input_type = settings[i].get('input_type')
@@ -132,8 +132,8 @@ class App(QWidget):
             self.text_fields[i].index = i
 
         self.step_type = QRadioButton(self)
-        self.step_type.resize(100,32)
-        self.step_type.move(horizontal_offset+ 120,vertical_offset+40)
+        self.step_type.resize(100,24)
+        self.step_type.move(horizontal_offset+ 120,vertical_offset+inner_spacing)
         self.step_type.status = ["steps","maps"]
         self.step_type.state = 0
         self.step_type.setText(self.step_type.status[self.step_type.state])
@@ -146,7 +146,10 @@ class App(QWidget):
     def validate_input(self):
         sender = self.sender()
         if sender.input_type == int:
-            if not sender.text().isnumeric():
+            if len(sender.text()) == 1:
+                if sender.text()[0] == '-':
+                    return
+            if not self.is_digit(sender.text()):
                 # print(sender.text())
                 sender.setText(str(sender.text())[:-1])
 
@@ -155,11 +158,20 @@ class App(QWidget):
         sender = self.sender()
         text = sender.text()
         if text == "":
-            sender.setText(str(sender.default))
+            if sender.index in [0,2]:
+                sender.setText(str(sender.default))
+                sender.value = sender.default
+            else:
+                sender.setText(str(0))
+                sender.value = 0
             text = sender.text()
-        sender.value = int(text)
+        if text == "-":
+            sender.setText(str(0))
+            sender.value = 0
 
-        self.update_fields()
+            text = sender.text()
+        sender.value = int(text))
+        self.update_data_from_fields()
 
     @pyqtSlot()
     def toggle_radio_button(self):
@@ -168,24 +180,36 @@ class App(QWidget):
         sender.state = new_state
         sender.setText(sender.status[new_state])
 
-        self.update_fields()
+        self.update_data_from_fields()
             
-    def update_fields(self):
+    def update_data_from_fields(self):
         mapdata.steps = self.text_fields[0].value
         if self.step_type.state == 1:
             mapdata.multiply_steps = True
         else:
             mapdata.multiply_steps = False
 
+        address1 = mapdata.pos_to_offset()
+        mapdata.x_pos = self.text_fields[1].value
+        mapdata.y_pos = self.text_fields[2].value
+        address2 = mapdata.pos_to_offset()
+        self.reset_and_update_map_color(address1,address2)
 
-    
+    def update_fields_from_data(self):
+        data = [mapdata.steps,mapdata.x_pos,mapdata.y_pos]
+        for i in range(len(self.text_fields)):
+            self.text_fields[i].setText(str(data[i]))
+            self.text_fields[i].value = data[i]
+
 
     @pyqtSlot()
     def select_map_by_click(self):
         button_index = self.sender().index
-        self.reset_map_color(mapdata.pos_to_offset())
+        address1 = mapdata.pos_to_offset()
         self.button_to_pos(button_index)
-        self.update_map_color(mapdata.pos_to_offset())
+        address2 = mapdata.pos_to_offset()
+        self.reset_and_update_map_color(address1,address2)
+        self.update_fields_from_data()
 
     def button_to_pos(self,index,map_width=30):
         mapdata.x_pos = (index%30)*32
@@ -206,8 +230,8 @@ class App(QWidget):
                 mapdata.current_map_id = mapdata.ram_section[address2]
                 if mapdata.prev_map_id != mapdata.current_map_id:
                     self.load_selected_map(address2)
-        self.reset_map_color(address1)
-        self.update_map_color(address2)
+        self.reset_and_update_map_color(address1,address2)
+        self.update_fields_from_data()
         
     def reset_map_color(self,address):
         if  0 <= address < len(self.ram_addresses):
@@ -215,16 +239,20 @@ class App(QWidget):
             self.ram_addresses[address].setStyleSheet(f"border-width: 0px; border-style: solid;background-color : {background_color}")
             self.ram_addresses[address].setFont(QFont("Arial", 6))
 
-    def load_selected_map(self,address):
-        if  0 <= address < len(self.ram_addresses):
-            mapdata.load_ram_data(mapdata.current_map_id)
-            self.update_ram()
-
     def update_map_color(self,address,background_color="white"):
         if  0 <= address < len(self.ram_addresses):
 
             self.ram_addresses[address].setStyleSheet(f"border-width: 0px; border-style: solid;background-color : {background_color}")
             self.ram_addresses[address].setFont(QFont("Arial", 6))
+
+    def reset_and_update_map_color(self,address1,address2):
+        self.reset_map_color(address1)
+        self.update_map_color(address2)
+
+    def load_selected_map(self,address):
+        if  0 <= address < len(self.ram_addresses):
+            mapdata.load_ram_data(mapdata.current_map_id)
+            self.update_ram()
 
     def update_ram(self):
         # with open("Files/gen 4 scripts/mapchainer/ramdumps.json","r") as file:
@@ -256,6 +284,13 @@ class App(QWidget):
             self.ram_addresses[i].setFont(QFont("Arial", 6))
         # file.close()
 
+    @staticmethod
+    def is_digit(n):
+        try:
+            int(n)
+            return True
+        except ValueError:
+            return  False
 
 
     

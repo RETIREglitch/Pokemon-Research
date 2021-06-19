@@ -55,10 +55,10 @@ class mapdataRepository():
 
     def init_data(self):
         self.x_pos = 380
-        self.y_pos = 2423
+        self.y_pos = 2400
 
-        self.steps = 1
-        self.multiply_steps = True
+        self.steps = 32
+        self.multiply_steps = False
         self.map_ids = []
         self.current_map_id = 0
         self.prev_map_id = -1
