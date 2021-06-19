@@ -1,0 +1,6 @@
+Todo:
+add auto-movement from written input
+add toggles for auto-update
+add history 
+add auto-step-creator
+add option to remove steps 
