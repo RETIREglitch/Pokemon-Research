@@ -170,7 +170,7 @@ class App(QWidget):
             sender.value = 0
 
             text = sender.text()
-        sender.value = int(text))
+        sender.value = int(text)
         self.update_data_from_fields()
 
     @pyqtSlot()
