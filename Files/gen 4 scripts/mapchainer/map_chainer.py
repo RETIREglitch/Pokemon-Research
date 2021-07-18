@@ -1,6 +1,7 @@
 import json
+import pathlib
 
-file_path = "Files/gen 4 scripts/mapchainer/map_data.json" 
+file_path = str(pathlib.Path(__file__).parent.resolve()) + '/map_data.json'
 
 def search_maps(requested_map_ids,skip_map_list):
     return_map_id_list = {}
