@@ -3,7 +3,7 @@ import pathlib
 
 file_path = str(pathlib.Path(__file__).parent.resolve()) + '/map_data.json'
 
-def search_maps(requested_map_ids,skip_map_list):
+def search_maps(requested_map_ids):
     return_map_id_list = {}
     with open(file_path,"r") as file:
         json_obj = json.load(file)
@@ -16,8 +16,7 @@ def search_maps(requested_map_ids,skip_map_list):
                         for variable,value in element_obj.items():
                             if value > 558: # error handler makes invalid id's into map id 3
                                 value = 3
-                            if (value in requested_map_ids) and (value not in skip_map_list):
-
+                            if (value in requested_map_ids):
                                 if return_map_id_list.get(map_id) == None:
                                     return_map_id_list[map_id] = []
                                 if value not in return_map_id_list[map_id]:
@@ -25,36 +24,38 @@ def search_maps(requested_map_ids,skip_map_list):
     file.close()
     return return_map_id_list
 
+def reverse_chain(chain):
+    reversed_chain = {}
+    for k,v in chain.items():
+        for value in v:
+            if value in reversed_chain.keys():
+                reversed_chain[value].append(k)
+            else:
+                reversed_chain[value] = [k]
+    return reversed_chain
+
+
 def get_chains(range_search,requested_map_ids):
-    chains = {}
-    chain_depth_list = []
-    search_map_list = requested_map_ids
-    skip_map_list = []
+    chains = []
+    for i in range(len(requested_map_ids)):
+        chains.append([{requested_map_ids[i]:[]}])
 
-    for i in range(range_search):
-        chain_depth_list.append({})
 
-        returned_chains = search_maps(search_map_list,skip_map_list)
-        for k,v_list in returned_chains.items():
-            if k not in search_map_list:
-                search_map_list.append(k)   
-            for v in v_list:
-                    if v not in skip_map_list:
-                        skip_map_list.append(v)
-            if chains.get(k) != None:
-                for v in v_list:
-                    if v not in chains[k]:
-                        chains[k].append(v)
-            else:
-                chains[k] = v_list
+    print("Requested Map Ids:")
+    for map_request in chains:
+        for i in range(range_search):
+            map_request.append({})
+            maps_to_search = list(map_request[i].keys())
+            map_request[i+1] = search_maps(maps_to_search)
 
-            if chain_depth_list[i].get(k) != None:
-                chain_depth_list[i][k].append(v)
-            else:
-                chain_depth_list[i][k] = v_list
-                
-    return chain_depth_list
+        print("\nRequest")
 
+        for i in range(len(map_request)):
+            if i != 0:
+                print(f"Chain {i}:")
+                reversed_chain = reverse_chain(map_request[i])
+                for k,v in reversed_chain.items():
+                    print(f"\tMap ID {k} is written by: {v}")
 
 
 input_map_ids = [int(i) for i in input("Give the map ids to search for, seperated by a comma > ").strip(" ").split(",")]
@@ -69,31 +70,3 @@ else:
     range_search = 1
 
 chain_depth_list = get_chains(range_search,requested_map_ids)
-comma_seperated_map_ids = {}
-main_chain_txt = ""
-
-print("\nChain Request:")
-for i in range(len(input_map_ids)):
-    print(f"\tMap {i}:> {input_map_ids[i]}")
-
-
-comma_seperated_map_ids[0] = [i for i in input_map_ids]
-
-for r in range(range_search):
-    comma_seperated_map_ids[r+1] = []
-
-    current_chain = chain_depth_list[r]
-    sorted_chain_keys = sorted(current_chain)
-    print(f"\nChain {r+1}:")
-    for i in range(len(sorted_chain_keys)):
-        v_list = sorted(current_chain[sorted_chain_keys[i]])
-        print(f"\tchain {i}:> {sorted_chain_keys[i]} writes {v_list}")
-        comma_seperated_map_ids[r+1].append(sorted_chain_keys[i])
-
-print("\n")
-for i in range(range_search+1):
-    if i == 0:
-        print("Requested map ids:")
-    else:
-        print(f"Chain {i}")
-    print(f"\t{comma_seperated_map_ids[i]}")
