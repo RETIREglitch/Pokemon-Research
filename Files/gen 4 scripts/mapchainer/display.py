@@ -27,7 +27,10 @@ class App(QWidget):
         self.ram_addresses = []
         self.directions = []
         self.update_on_move = True
-
+        self.row_position = 0
+        self.col_position = 0
+        self.follow_cam = True
+        self.calc_range()
         self.initUI()
 
 
@@ -38,8 +41,6 @@ class App(QWidget):
         self.prepare_directions()
         self.prepare_ram()
         self.prepare_savestates()
-
-        mapdata.length_added_ram = len(mapdata.ram_section)
         self.update_ram()
         self.prepare_settings()
 
@@ -62,12 +63,28 @@ class App(QWidget):
     def keyPressEvent (self, event):
         # print(event.key())
         if event.key() == 16777234: # left arrow
+            if self.follow_cam:
+                self.col_position -= 1
+            self.calc_range()
             self.direction_request("left")
+
         if event.key()  == 16777235: # up arrow
+            if self.follow_cam:
+                self.row_position -= 1
+            self.calc_range()
             self.direction_request("up")
+
         if event.key() == 16777236: # right arrow
+            if self.follow_cam:
+                self.col_position += 1
+            self.calc_range()
             self.direction_request("right")
+
         if event.key()  == 16777237: # down arrow
+            if self.follow_cam:
+                self.row_position += 1
+                # print(self.global_address)
+            self.calc_range()
             self.direction_request("down")
 
         if event.key()  == 32: # spacebar
@@ -78,18 +95,33 @@ class App(QWidget):
             self.update_map_color(address)
             self.update_fields_from_data()
 
+
+
         if event.key() == 16777220: # enter
             self.setFocus()
         # if event.text() == 's':
         #     mapdata.add_save_state(0,mapdata.ram_section.copy(),mapdata.x_pos,mapdata.y_pos)
 
+    def calc_range(self):
+        self.range_start = self.return_row() * mapdata.map_width
+        if self.range_start > len(mapdata.ram_section) - 900:
+            self.range_start = len(mapdata.ram_section) - 900
+        if 0 > self.range_start: 
+            self.range_start = 0
+
+    def return_row(self):
+        if mapdata.multiply_steps:
+            return self.row_position * mapdata.steps
+        return (self.row_position*mapdata.steps)//32
+        
     def prepare_ram(self):
-        for i in range(len(mapdata.ram_section)):
+        for i in range(30*30):
             self.ram_addresses.append(QPushButton(str(i), self))
             self.ram_addresses[i].resize(self.square_sizes[0],self.square_sizes[0])
             self.ram_addresses[i].move(10+self.square_sizes[0]*(i%30),10+self.square_sizes[0]*(i//30))
             self.ram_addresses[i].setFont(QFont("Arial", 10))
             self.ram_addresses[i].index = i
+            self.ram_addresses[i].value = i
             self.ram_addresses[i].clicked.connect(self.select_map_by_click)
  
     def prepare_directions(self):
@@ -251,26 +283,6 @@ class App(QWidget):
             self.text_fields[i].setText(str(data[i]))
             self.text_fields[i].value = data[i]
 
-    # def set_x_pos(self,x,gui=False):
-    #     if gui:
-    #         self.text_fields[1].value = x
-    #         self.text_fields[1].setText(str(x))
-    #     mapdata.x_pos = x
-
-    # def set_y_pos(self,y,gui=False):
-    #     if gui:
-    #         self.text_fields[2].value = y
-    #         self.text_fields[2].setText(str(y))
-    #     mapdata.y_pos = y
-
-    # def set_pos(self,x,y,gui=False):
-    #     self.set_x_pos(x,gui)
-    #     self.set_y_pos(y,gui)
-
-    # def set_steps(self,steps):
-    #     self.text_fields[0] = steps
-    #     mapdata.steps = steps
-
     @pyqtSlot()
     def select_map_by_click(self):
         button_index = self.sender().index
@@ -282,7 +294,7 @@ class App(QWidget):
 
     def button_to_pos(self,index,map_width=30):
         mapdata.x_pos = (index%30)*32
-        mapdata.y_pos = ((index+2250)//map_width)*32
+        mapdata.y_pos = ((index)//map_width)*32
 
     @pyqtSlot()
     def direction_request_by_click(self):
@@ -290,68 +302,55 @@ class App(QWidget):
         self.direction_request(direction)
 
     def direction_request(self,direction):
+
         address1 = mapdata.pos_to_offset()
         mapdata.move_player(direction)
         address2 = mapdata.pos_to_offset()
+
+
         if self.update_on_move:
-            if  (0 <= address1 < len(self.ram_addresses)) & (0 <= address2 < len(self.ram_addresses)):
-                mapdata.prev_map_id = mapdata.current_map_id
-                mapdata.current_map_id = mapdata.ram_section[address2]
-                if mapdata.prev_map_id != mapdata.current_map_id:
-                    self.load_selected_map(address2)
-        self.reset_and_update_map_color(address1,address2)
+            if  0 <= address1 < len(mapdata.ram_section):
+                if 0 <= address2 < len(mapdata.ram_section):
+                    mapdata.prev_map_id = mapdata.current_map_id
+                    mapdata.current_map_id = mapdata.ram_section[mapdata.pos_to_offset()]
+                    self.load_selected_map(mapdata.pos_to_offset())
+                    self.update_ram()
+        self.update_map_color(address2)
         self.update_fields_from_data()
         
     def reset_map_color(self,address):
-        if  0 <= address < len(self.ram_addresses):
-            background_color = mapdata.map_id_to_color(mapdata.ram_section[address])
-            self.ram_addresses[address].setStyleSheet(f"border-width: 0px; border-style: solid;background-color : {background_color}")
-            self.ram_addresses[address].setFont(QFont("Arial", 6))
+        index = address - self.range_start
+        background_color = mapdata.map_id_to_color(self.ram_addresses[index].value)
+        self.ram_addresses[index].setStyleSheet(f"border-width: 0px; border-style: solid;background-color : {background_color}")
+        self.ram_addresses[index].setFont(QFont("Arial", 6))
 
     def update_map_color(self,address,background_color="white"):
-        if  0 <= address < len(self.ram_addresses):
-
-            self.ram_addresses[address].setStyleSheet(f"border-width: 0px; border-style: solid;background-color : {background_color}")
-            self.ram_addresses[address].setFont(QFont("Arial", 6))
+        index = address - self.range_start
+        print(self.range_start)
+        if 0 <= index <= len(mapdata.ram_section):
+            self.ram_addresses[index].setStyleSheet(f"border-width: 0px; border-style: solid;background-color : {background_color}")
+            self.ram_addresses[index].setFont(QFont("Arial", 6))
 
     def reset_and_update_map_color(self,address1,address2):
         self.reset_map_color(address1)
         self.update_map_color(address2)
 
     def load_selected_map(self,address):
-        if  0 <= address < len(self.ram_addresses):
+        if  0 <= address < len(mapdata.ram_section):
             mapdata.load_ram_data(mapdata.current_map_id)
-            self.update_ram()
 
     def update_ram(self):
-        # with open("Files/gen 4 scripts/mapchainer/ramdumps.json","r") as file:
-        #     json_obj = json.load(file)
-        for i in range(mapdata.length_added_ram):
-
-            # confirm_value = json_obj[str(0)][i]
-            # if mapdata.ram_section[i] != confirm_value:
-            #     if self.hex == True:
-            #         self.ram_addresses.append(QPushButton(f"{hex(mapdata.ram_section[i])},{confirm_value}|", self))
-            #     else: 
-            #        self.ram_addresses.append(QPushButton(f"{mapdata.ram_section[i]},{confirm_value}|", self))
-            # else: 
-
+        for i in range(self.range_start,self.range_start+900):
             if self.hex == True:
-                self.ram_addresses[i].setText(str(hex(mapdata.ram_section[i])))
-            else: 
-                self.ram_addresses[i].setText(str(mapdata.ram_section[i]))
+                self.ram_addresses[i-self.range_start].setText(str(hex(mapdata.ram_section[i])))
+            else:
+                self.ram_addresses[i-self.range_start].setText(str(mapdata.ram_section[i]))
+            self.ram_addresses[i-self.range_start].value = mapdata.ram_section[i]
+            self.ram_addresses[i-self.range_start].index = i
 
-            # print(self.map_id_to_color(self.ram_section[i]))
-            # if mapdata.ram_section[i] != confirm_value:
-            #     self.ram_addresses[i].setStyleSheet(f"border-width: 0px; border-style: solid;background-color : white")
-            # else:
-            # if i == mapdata.pos_to_offset():
-            #     background_color = "white"
-            # else:
             background_color = mapdata.map_id_to_color(mapdata.ram_section[i])
-            self.ram_addresses[i].setStyleSheet(f"border-width: 0px; border-style: solid;background-color : {background_color}")
-            self.ram_addresses[i].setFont(QFont("Arial", 6))
-        # file.close()
+            self.ram_addresses[i-self.range_start].setStyleSheet(f"border-width: 0px; border-style: solid;background-color : {background_color}")
+            self.ram_addresses[i-self.range_start].setFont(QFont("Arial", 6))
 
     @staticmethod
     def is_digit(n):

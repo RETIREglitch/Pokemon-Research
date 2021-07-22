@@ -1,16 +1,21 @@
 import json
 import time
 from functools import lru_cache
+import pathlib
+
+path = str(pathlib.Path(__file__).parent.resolve())
 
 class mapdataRepository():
-    def __init__(self,path_map_data = "Files/gen 4 scripts/mapchainer/map_data.json",path_map_properties="Files/gen 4 scripts/mapchainer/map_colors.json",aslr=0x226D314):
-        self.path_map_data = path_map_data
-        self.path_map_properties = path_map_properties
+    def __init__(self,aslr=0x226D314):
+        self.path_map_data = path + "/map_data.json"
+        self.path_map_properties = path +"/map_colors.json"
+        self.path_matrix_data = path + "/matrix_data.json"
 
         self.aslr = aslr
         self.start_mapdata = self.aslr + 0x23C6E
         self.address = 0
         self.max_save_states = 16
+        self.start_mapdata_address = 2250
 
         self.init_json()
         self.init_ram_section()
@@ -49,31 +54,41 @@ class mapdataRepository():
             self.map_data_json = json.load(file)
             file.close()
 
+        with open(self.path_matrix_data,"r") as file:
+            self.matrix_data_json = json.load(file)
+            file.close()
+
     def init_ram_section(self):
-        self.ram_section = [0]*(30*30) # assuming starting with clean data, and moving into a jubilife map as first id
+        # self.load_matrix_data()
+        self.ram_section = [0]*(30*105)# assuming starting with clean data, and moving into a jubilife map as first id
         self.set_ram_header(self.aslr)
 
     def init_data(self):
-        self.x_pos = 380
-        self.y_pos = 2400
+        self.x_pos = 0
+        self.y_pos = 0
 
         self.steps = 32
         self.multiply_steps = False
         self.map_ids = []
-        self.current_map_id = 0
+        self.current_map_id = 3
         self.prev_map_id = -1
+        self.matrix_map_id = self.current_map_id
+        self.map_width = 30
 
+        
+        self.load_matrix_data(self.matrix_map_id)
         self.load_ram_data(self.current_map_id)
         
-        self.save_states = [{"ram_section":[0]*(30*30),"x_pos":0,"y_pos":0}]*self.max_save_states
+        
+        self.save_states = [{"mapdata_ram_section":[0]*(30*30),"x_pos":0,"y_pos":0}]*self.max_save_states
         self.add_save_state(0,self.ram_section.copy(),self.x_pos,self.y_pos)
 
 
     def load_save_state(self,id):
         if id <= len(self.save_states):
             save_state = self.save_states[id]
-            self.ram_section = save_state["ram_section"].copy()
-            self.length_added_ram = len(save_state["ram_section"])
+            self.ram_section = save_state["mapdata_ram_section"].copy()
+            # self.length_added_ram = len(save_state["mapdata_ram_section"])
             self.x_pos = save_state["x_pos"]
             self.y_pos = save_state["y_pos"]
             
@@ -93,20 +108,25 @@ class mapdataRepository():
         return self.map_properties_json["default"]["color"]
         
 
+
     def set_ram_header(self,aslr):
-        header = [0x616d,0x70,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x5544,0x0,0xad8,0x0,0xfdc8,0x228,0x1a7c,0x229,0x0,0x0,0x0,0x0,0x0,0x0,0xb,0x0]
+        pointer = self.aslr + 0x22AB4
+        pointer1 = self.split_32_bit(pointer)
+        pointer = self.aslr + 0x24768
+        pointer2 = self.split_32_bit(pointer)
+        header = [0x616d,0x70,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x5544,0x0,0xad8,0x0,pointer1[0],pointer1[1],pointer2[0],pointer2[1],0x0,0x0,0x0,0x0,0x0,0x0,0xb,0x0]
         self.address_lengths_instance = len(header) # start of instance length declaration in header
         header.extend([0]*8) # add empty data for length of instances
         self.address_pointer_instances = len(header)
         header.extend([0]*8) # add empty data for pointers of instances
-        self.address = len(header) # start general data after header
+        self.address = len(header) + self.start_mapdata_address # start general data after header
 
         for i in range(len(header)):
-            self.ram_section[i] = header[i]
+            self.ram_section[i+self.start_mapdata_address] = header[i]
 
     def set_length_instance_in_header(self,instance_id,data):
-        self.ram_section[self.address_lengths_instance+2*instance_id] = data  # add length of instance in header
-        self.ram_section[self.address_lengths_instance+2*instance_id+1] = 0x0
+        self.ram_section[self.address_lengths_instance+2*instance_id+self.start_mapdata_address] = data  # add length of instance in header
+        self.ram_section[self.address_lengths_instance+2*instance_id+1+self.start_mapdata_address] = 0x0
 
     def set_pointer_instance_in_header(self,instance_id,address=None):
         if address == None:
@@ -114,8 +134,8 @@ class mapdataRepository():
         else:
             pointer = address*2 + self.start_mapdata + 0x4
         pointer_l,pointer_h = mapdataRepository.split_32_bit(pointer)
-        self.ram_section[self.address_pointer_instances +2*instance_id] = pointer_l  # add pointer of instance in header
-        self.ram_section[self.address_pointer_instances +2*instance_id+1] = pointer_h
+        self.ram_section[self.address_pointer_instances +2*instance_id+self.start_mapdata_address] = pointer_l  # add pointer of instance in header
+        self.ram_section[self.address_pointer_instances +2*instance_id+1+self.start_mapdata_address] = pointer_h
 
     @lru_cache
     def get_map_data(self,map_id):
@@ -124,6 +144,28 @@ class mapdataRepository():
 
         map_data = self.map_data_json[str(map_id)].items()
         return map_data
+
+    @lru_cache
+    def get_matrix_data(self,matrix_map_id):
+        if matrix_map_id > 558:
+            matrix_map_id = 3
+        
+        for matrix_type,matrix_data in self.matrix_data_json.items():
+            if matrix_map_id in matrix_data["maps"]:
+                return matrix_type,matrix_data
+
+    def load_matrix_data(self,matrix_id):
+        temp_map_data = self.ram_section.copy()[self.start_mapdata_address:]       
+        self.matrix_type,matrix_data = self.get_matrix_data(matrix_id)
+        self.matrix_section = matrix_data["matrix"]
+        self.matrix_chunk_section = matrix_data["matrix_chunks"]
+        self.ram_section = []
+        self.ram_section.extend(self.matrix_section)
+        self.ram_section.extend(self.matrix_chunk_section)
+        self.ram_section.extend(temp_map_data)
+        print(len(self.ram_section))
+
+        
 
     def load_ram_data(self,map_id):
         address = self.address
@@ -174,21 +216,21 @@ class mapdataRepository():
                 address += 1
             current_instance += 1
 
-        self.length_added_ram = address + 4*2 + 1
+        # self.length_added_ram = address + 4*2 + 1
 
     def load_consecutive_maps(self,map_id_list,waitperiod=0):
         for map_id in map_id_list:
             self.load_ram_data(map_id)
             time.sleep(waitperiod)
 
-    def pos_to_offset(self,start_pos=2250,map_width=30):
-        self.x_offs = (self.x_pos // 32)
-        self.y_offs = (self.y_pos //32)*map_width
-        return self.x_offs + self.y_offs - start_pos
+    def pos_to_offset(self):
+        self.x_offs = (self.x_pos //32)
+        self.y_offs = (self.y_pos //32)*self.map_width
+        return self.x_offs + self.y_offs
     
-    def offset_to_pos(self,map_width=30):
+    def offset_to_pos(self):
         self.x_pos = self.x_offs * 32
-        self.y_pos = self.y_offs * 32 // map_width
+        self.y_pos = self.y_offs * 32 // self.map_width
         return self.x_pos,self.y_pos
 
     def move_player(self,direction):
