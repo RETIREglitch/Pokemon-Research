@@ -19,7 +19,7 @@ changechunk = 0
 tilename = {"nothing","nothing","Grass","Grass","4","Cave","Cave/Tree","7","Cave","9","10", "HauntH","CaveW","13","14","15",
 			"Pond","Water","Water","WaterF","Water","Water","Puddle","ShallW","24","Water","26","27","28","29","30","31",
 			"Ice","Sand","Water","35","Cave","Cave","38","39","40","41","Water","43","44","45","46","47",
-			"OnesideW","OnesideW","OnesideW","OnesideW","52","53","54","55","LedgeR","LedgeL","LedgeU","LedgeD","60","61","62","LedgeCor",
+			"OnesideW","OnesideW","OnesideW","OnesideW","OnesideW","OnesideW","OnesideW","OnesideW","LedgeR","LedgeL","LedgeU","LedgeD","60","61","62","LedgeCor",
 			"SpinR","SpinL","SpinU","SpinD","68","69","70","71","72","Stair","Stair","RockCVert","RockCHor","77","78","79",
 			"Water","Water","Water","Water","84","85","HightM","HightM","HightM","HightM","90","91","92","93","Warp","Warp",
 			"Warp","Warp","Doormat","Doormat","Doormat","Doormat","Warp","Warp","Warp","Warp","Warp","Warp","Warp","Warp","Warp","Warp",
@@ -229,7 +229,7 @@ local CollisionId = {
     },
 	OnesidedWall = {
         color = '#a090f',
-       number = {0x30,0x31,0x32,0x33}
+       number = {0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37}
     },
 	Bikestalls = {
         color = '#0690a',
@@ -265,7 +265,7 @@ local CollisionId = {
     },
     Water = {
         color = '#8888f06',
-        number = {0x10,0x13,0x15,0x16,0x17,0x22}
+        number = {0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x19,0x22,0x2A}
     },
     Ice = {
         color = '#56b3e0',
@@ -1215,41 +1215,35 @@ end
 
 function tweak()
 	if key.shift then
-		if check_key("^") then
-		down (4)
-		right (1)
-		left (1)
-		up (1)
-		left (14)
-		down (1)
-		left (4)
-		down (3)
-		left (7)
-		up(2)
-		left (6)
-		up (2)
-		left (1)
-		right (1)
-		down (1)
-		right (7)
-		down (3)
-		right (5)
-		up (3)
-		right (4)
-		down (6)
-		right (16)
-		up (7)
-		left (1)
-		right (1)
-		down (1)
-		right (12)
-		down (8)
-		right (8)
+		if check_key("N") then
+		down(23)
+		left(3)
+		down(21)
+		right(4)
+		down(2)
+		left(2)
+		down(1)
+		up(1)
+		down(16)
+		right(1)
+		down(16)
+		left(1)
+		down(1)
+		up(1)
+		down(32)
+		right(1)
+		down(1)
+		up(1)
+		down(16)
+		left(5)
 		elseif check_key("Y") then 
-		right (15)
-		up (3)
-		right (8)
-		up (5)
+		up(2)
+		down(1)
+		up(1)
+		left(1)
+		right(1)
+		left(1)
+		down(1)
 		elseif check_key("^") then 
 		down (4)
 		left (1)
@@ -1509,11 +1503,12 @@ gui.text (100,-12,"Halt Loading:",'yellow')
                                 collisiontileAddr = (CurrentChunk + 2 * i + 32*2*j + btpos)
                                 collisiontile = memory.readword(collisiontileAddr)
 
-                                if collisiontileAddr == (StartChunk + X32bit*2 + Y32bit*64) then
-                                    color = '#ff00003'
-                                else 
-                                    color = get_tile_color(collisiontile)
-                                end 
+
+								if collisiontileAddr == (StartChunk + X32bit*2 + Y32bit*64) then
+										color = '#ff00003'
+								else 
+									color = get_tile_color(collisiontile)
+								end 
                             
                                 if memory.readword(base + mapAddrOffset) == 0x2 then 
                                     drawvsmallsquare((i)*2 + map_box[1] + displayoffsxbt[h+1],
@@ -1527,10 +1522,10 @@ gui.text (100,-12,"Halt Loading:",'yellow')
                     end 
             end 
     else
---gui.text (50,-60,"Chunkdat:"..bit.tohex(CurrentChunkv))
---gui.text(50,-70,fmt8(CurrentChunkvAddr))
---gui.text (50,-50,"Pointer:"..bit.tohex(CurrentChunkpointer))
---gui.text (50,-40,"Chunkdat:"..bit.tohex(CurrentChunk))
+gui.text (50,-60,"Chunkdat:"..bit.tohex(CurrentChunkv))
+gui.text(50,-70,fmt8(CurrentChunkvAddr))
+gui.text (50,-50,"Pointer:"..bit.tohex(CurrentChunkpointer))
+gui.text (50,-40,"Chunkdat:"..bit.tohex(CurrentChunk))
 
         if map_centered == true then
             x_paint = 1
@@ -1550,11 +1545,25 @@ gui.text (100,-12,"Halt Loading:",'yellow')
                             for j = 0 ,31, 1 do
                                 collisiontileAddr = (Chunkcalc + 2 * i + 32*2*j + c)
                                 collisiontile = memory.readword(collisiontileAddr)
+								-- found = false
+								-- if i == 27 and j == 8 then 
+								-- 	for i,warp in ipairs({0x69,68,0x6A,0x6B,0x6C,0x6D,0x6E}) do
+								-- 		if collisiontile%256 == warp then 
+								-- 			print("HELL AND FIRE WE FOUND IT HOLY SHIT")
+								-- 		end 
+								-- 	end
+								-- 	color = 'yellow'
+								-- 	found = true 
+									
+								-- end 
+								
+								-- if found == false then 
                                     if collisiontileAddr == (CurrentChunk + 2*chunktileposo) then
                                         color = '#ff00003'
                                     else 
                                         color = get_tile_color(collisiontile)
                                     end 
+								-- end 
                                     
                                 drawsmallsquare((i)*4 + map_box[1] + displayoffsx[h+1],
                                 (j)*3 + map_box[2] + displayoffsy[h+1],color)
@@ -2223,15 +2232,15 @@ end
 
 function printmapdata()
 	if check_key("B") then
-		startmapdata = base + 0x23C6E
-		endmapdata = base + 0x2420E
-		map_address = 0
+		startdata = base + 0x2321E --0x22ADA
+		enddata = base + 0x23C6E
+		current_address = 0
 		dump_maps = "["
-		print("Data for map:",LiveMapId)
-		while (startmapdata + map_address) < endmapdata do
+		-- print("Data for map:",LiveMapId)
+		while (startdata + current_address) < enddata do
 			-- print(startmapdata + map_address)
-			dump_maps = (dump_maps..memory.readword(startmapdata+map_address)..",")
-			map_address = map_address + 2
+			dump_maps = (dump_maps..memory.readword(startdata+current_address)..",")
+			current_address = current_address + 2
 		end 
 			dump_maps = dump_maps.."]"
 			print(dump_maps)
@@ -2373,7 +2382,7 @@ function fn()
 	end
 	end 
 	--debuggerprint()
-	printmapdata()
+	-- printmapdata()
 
 end
 
