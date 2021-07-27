@@ -1,50 +1,73 @@
 import json
-from os import stat
+# from os import stat
 import pathlib
-from typing import Type
+# from typing import Type
+from functools import lru_cache
 
 path = str(pathlib.Path(__file__).parent.resolve())
 
-class SimulateChunks():
-    def __init__(self,game_type=0):
+class ChunkSimulator():
+    def __init__(self,game_type=0,base_ptr=0x0226D360):
         self.game_type = game_type
+        self.base_ptr = base_ptr
+        self.texture_memory_offset = 0
+
+
         self.game = ["dp","pt","hgss"][self.game_type]
 
         self.path_chunk_data = path + "/chunk_data.json"
         self.json_chunk_data = self.load_json(self.path_chunk_data)
 
         self.game_data = self.json_chunk_data.get(self.game)
-        map_ids = self.return_data_from_texture_set(151,15,"map_ids")
-        print(map_ids)
-        
-        
-    def get_texture_data(self,d1,d2):
-        if (type(d1) is int) & (type(d2) is int):
-            texture_set_str = str(d1) + " " + str(d2)
-            if type(self.game_data) is dict:
-                texture_set_data = self.game_data["texture_sets"].get(texture_set_str)
-                if texture_set_data != None:
-                    return texture_set_data,texture_set_str
-                raise ValueError(f"Error: texture data not found for {texture_set_str}") 
-            raise TypeError("Application failed read game data.") 
-        raise TypeError("Error: invalid texture set")
+        # self.iterate_all_chunks([0xD8,0xD7])
+        self.create_simulated_memory()
+        print(self.simulated_memory_sets)
 
-    def return_data_from_texture_set(self,d1,d2,dtype):
-        try:
-            data = self.get_texture_data(d1,d2)
-            if data != None:
-                texture_set_data,texture_set_str = data
-                if type(dtype) is str:
-                    if dtype in ["map_ids","chunk_pointers","texture_data"]:
-                        data = texture_set_data.get(dtype)
-                        if data != None:
-                            return data
-                        raise ValueError(f"Error: data not found for texture set {texture_set_str}")
-                raise TypeError("Error: not a valid data request")
-        except Exception:
-            pass
-
+    def iterate_all_chunks(self,ids):
+        for c_id in self.game_data:
+            c_data = self.game_data[c_id]
+            c_ptrs = c_data["chunk_pointers"]
+            print(f"Creating chunks for texture set {c_id}")
             
+            for ptr_i in range(len(c_ptrs)):
+                ptr = c_ptrs[ptr_i]
+                print(f"{ptr_i}. {ptr}")
+
+                for prev_memory_state in self.simulated_memory_sets:
+                    self.simulate_tilewriting(prev_memory_state,ptr,)
+
+    def simulate_chunk(ptr):
+
+        pass
+
+    def create_simulated_memory_for_texture_set(self,texture_set):
+        texture_set_data = self.game_data.get(texture_set)
+        return texture_set_data
+
+    def create_simulated_memory(self):
+        simulated_memory_sets = {}
+        for texture_set in self.game_data:
+            simulated_memory_sets[texture_set] = self.create_simulated_memory_for_texture_set(texture_set)
+        self.simulated_memory_sets  = simulated_memory_sets
+
+    def load_chunks(self,id,d1,d2):
+        chunk_data,chunk_ptrs_offs = self.multi_get_data(d1,d2,chunk_dat=True,chunk_ptrs=True)
+        chunk_ptr_indexes = ChunkSimulator.multi_offset_to_array_index(chunk_ptrs_offs,self.base_ptr)
+
+    def multi_get_data():
+        pass
+
+    
+    def offset_to_array_index():
+        return None
+
+    @lru_cache
+    def multi_offset_to_array_index(offset_list,base_ptr):
+        return [ChunkSimulator.offset_to_array_index(offset,base_ptr) for offset in offset_list]
+
+    @lru_cache
+    def offset_to_address(offset,base_ptr):
+        return offset + base_ptr
 
     @staticmethod
     def load_json(file):
@@ -55,4 +78,4 @@ class SimulateChunks():
 
 
 if __name__ == '__main__':
-    chunksimulator = SimulateChunks()
+    chunksim = ChunkSimulator()
