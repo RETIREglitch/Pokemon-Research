@@ -1393,23 +1393,37 @@ elseif id == 0x43 then
 end 
 end 
 
-function writemap(value)
-if mapediting then 
-if in_edit then 
-	value = memory.readbyte(curptrmap) + value
-	memory.writebyte(curptrmap, value)
-	curptrmap = curptrmap - 1
-	in_edit = false
-else
-	memory.writebyte(curptrmap, value*0x10)
-	in_edit = true
+function get_full_input(key_list)
+    for i= 1,#key_list do
+        if check_key(key_list[i]) then return key_list[i] end end 
+    
+    for i = 1,9 do
+        numpadv = "numpad"..i
+        if check_key(numpadv) then return i end
+    end 
+
+    if check_key("0") or check_key("numpad0") then return 0 end 
+    if key.space and not last_key.space then return " " end 
+    return nil
 end 
 
-if curptrmap == LiveMapIdAddr -0x1 then 
-curptrmap = LiveMapIdAddr + 1
-mapediting = false 
-end 
-end 
+function writemap()
+if mapediting then 
+	value = get_full_input({"1", "2", "3", "4", "5", "6", "7", "8", "9"})
+	if value ~= nil then
+		mapedited_id = mapedited_id..value
+		memory.writeword(base +  LiveMapIdOffs,tonumber(mapedited_id))
+	end
+	
+	if (#mapedited_id > 4) or (key.enter) then
+		mapedited_id = tonumber(mapedited_id)
+		if mapedited_id > 65535 then
+			mapedited_id = 65535
+		end 
+		memory.writeword(base +  LiveMapIdOffs,mapedited_id)
+		mapediting = false
+	end
+end
 end 
  
 function CollisionMap()
@@ -1522,6 +1536,7 @@ gui.text (100,-12,"Halt Loading:",'yellow')
                     end 
             end 
     else
+
 gui.text (50,-60,"Chunkdat:"..bit.tohex(CurrentChunkv))
 gui.text(50,-70,fmt8(CurrentChunkvAddr))
 gui.text (50,-50,"Pointer:"..bit.tohex(CurrentChunkpointer))
@@ -1538,18 +1553,36 @@ gui.text (50,-40,"Chunkdat:"..bit.tohex(CurrentChunk))
                 else 
                     c = 0
                 end
-	
+				dump_txt = ""
                 for h = 0,3 do
                     Chunkcalc = memory.readdword(Tiledatapointer + 0x90+ 4*h)
+
+					if dump_tiles == true then
+						if h == 0 then
+							print(LiveMapId)
+						end
+					--print("0x"..bit.tohex(Chunkcalc-base)..",")
+						if h ~= 3 then
+							dump_txt = dump_txt..Chunkcalc-base..","
+						else
+							print(dump_txt..Chunkcalc-base)
+						end
+					end 
+
+					if h == 3 then
+						dump_tiles = false
+					end
                         for i = 0, 31, 1 do
                             for j = 0 ,31, 1 do
                                 collisiontileAddr = (Chunkcalc + 2 * i + 32*2*j + c)
                                 collisiontile = memory.readword(collisiontileAddr)
+								
+									
 								-- found = false
 								-- if i == 27 and j == 8 then 
 								-- 	for i,warp in ipairs({0x69,68,0x6A,0x6B,0x6C,0x6D,0x6E}) do
 								-- 		if collisiontile%256 == warp then 
-								-- 			print("HELL AND FIRE WE FOUND IT HOLY SHIT")
+								-- 			print("HELL AND FIRE WE FOUND IT") -- in case we find warp for darkrai room :)
 								-- 		end 
 								-- 	end
 								-- 	color = 'yellow'
@@ -1558,6 +1591,7 @@ gui.text (50,-40,"Chunkdat:"..bit.tohex(CurrentChunk))
 								-- end 
 								
 								-- if found == false then 
+
                                     if collisiontileAddr == (CurrentChunk + 2*chunktileposo) then
                                         color = '#ff00003'
                                     else 
@@ -1616,8 +1650,8 @@ end
 function Customvalue()
     LiveMapIdAddr = base +  LiveMapIdOffs
         if check_key("M") then
-            mapediting = not mapediting
-            curptrmap = LiveMapIdAddr + 1   
+            mapediting = not mapediting 
+			mapedited_id = ""
         end 
 
         if check_key("J") then
@@ -1687,21 +1721,6 @@ function Customvalue()
                     collisionediting = false 
                 end 
         end 
-
---gui.text(menu_box[1] + 20, menu_box[2] + 78, "curptr" .. bit.tohex(curptrmap),'yellow')
-        for i, v in ipairs({0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF}) do
-            if check_key(string.format("%X", i)) then writemap(v) break end
-            if check_key("0") or check_key("numpad0") then writemap(0) break end
-            if check_key("numpad1") then writemap(1) break end 
-            if check_key("numpad2") then writemap(2) break end
-            if check_key("numpad3") then writemap(3) break end
-            if check_key("numpad4") then writemap(4) break end
-            if check_key("numpad5") then writemap(5) break end
-            if check_key("numpad6") then writemap(6) break end
-            if check_key("numpad7") then writemap(7) break end
-            if check_key("numpad8") then writemap(8) break end
-            if check_key("numpad9") then writemap(9) break end
-	   end
 end 
 
 function flycursorfunc()
@@ -1788,7 +1807,7 @@ end
 
 function debuggerprint()
 if check_key("P") then  
-debugger = not debugger
+	debugger = not debugger
 end 
 if debugger == true then 
 		joy.up = false
@@ -2381,6 +2400,14 @@ function fn()
 	--memory.writeword(LiveMapIdAddr,LiveMapId+1)
 	end
 	end 
+
+	if check_key("B") then
+		dump_tiles = true
+	end 
+
+	if mapediting then
+		writemap()
+	end
 	--debuggerprint()
 	-- printmapdata()
 
