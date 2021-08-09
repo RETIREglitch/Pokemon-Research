@@ -1553,21 +1553,57 @@ gui.text (50,-40,"Chunkdat:"..bit.tohex(CurrentChunk))
                 else 
                     c = 0
                 end
-				dump_txt = ""
+				-- dump_txt = ""
+				
+				if dump_texture_data then
+					start_dump = 0x51920+base-130*32
+					end_dump = 0xbe64c-0x51920+130*32
+					bytes_texture_data = memory.readbyterange(start_dump,end_dump+2)
+					print(LiveMapId.."  "..(bit.tohex(start_dump).."-"..(bit.tohex(end_dump+base))))
+					
+					file = io.open("dump_"..LiveMapId.."_0x"..bit.tohex(base)..".txt", "w")
+					io.output(file)
+					-- io.write("map id: "..LiveMapId.."\n")
+					-- io.write("0x"..bit.tohex(start_dump).."- 0x"..bit.tohex(end_dump+start_dump.."\n").." with base: 0x"..bit.tohex(base).."\n")
+					-- -- io.write("bytes:")
+					
+					print_data = "["
+					i = 1
+					io.write(print_data)
+					str_size = 0
+					while i ~= #bytes_texture_data do
+						txt = bytes_texture_data[i]..","
+						io.write(txt)
+						i = i + 1
+						str_size = str_size + #txt
+						if str_size > 128 then
+							str_size = 0
+							io.write("\n")
+						end
+					end
+					print_data = "]"
+					io.write(print_data)
+					
+					
+					io.close(file)
+					dump_texture_data = false
+					
+				end
+
                 for h = 0,3 do
                     Chunkcalc = memory.readdword(Tiledatapointer + 0x90+ 4*h)
 
-					if dump_tiles == true then
-						if h == 0 then
-							print(LiveMapId)
-						end
-					--print("0x"..bit.tohex(Chunkcalc-base)..",")
-						if h ~= 3 then
-							dump_txt = dump_txt..Chunkcalc-base..","
-						else
-							print(dump_txt..Chunkcalc-base)
-						end
-					end 
+					-- if dump_tiles == true then
+					-- 	if h == 0 then
+					-- 		print(LiveMapId)
+					-- 	end
+					-- --print("0x"..bit.tohex(Chunkcalc-base)..",")
+					-- 	if h ~= 3 then
+					-- 		dump_txt = dump_txt..Chunkcalc-base..","
+					-- 	else
+					-- 		print(dump_txt..Chunkcalc-base)
+					-- 	end
+					-- end 
 
 					if h == 3 then
 						dump_tiles = false
@@ -2403,6 +2439,7 @@ function fn()
 
 	if check_key("B") then
 		dump_tiles = true
+		dump_texture_data = true
 	end 
 
 	if mapediting then
