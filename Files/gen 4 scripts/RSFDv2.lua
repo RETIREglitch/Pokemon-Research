@@ -10,12 +10,8 @@
 
 --NOTE: don't enable infinite repel until actually in game, will reset the game if you select savefile with it active.
 ---------------------------------------------
-jump = 31 --teleportamount by default 
-modoption = 15
-bt = false 
-btval = 0
-chunkrepos = false 
-changechunk = 0
+
+-- DATA TABLES
 
 local tilename = {
 			"nothing","nothing","Grass","Grass","4","Cave","Cave/Tree","7","Cave","9","10", "HauntH","CaveW","13","14","15",
@@ -253,13 +249,6 @@ steps_data = {
     [2] = 7,
     [3] = 3
 }
-------------------------
-local bnd,br,bxr=bit.band,bit.bor,bit.bxor
-local rshift, lshift=bit.rshift, bit.lshift
-
-demo = false
-hgss = false
-
 
 data_tables = {
 	--1 DP and PD demo
@@ -277,7 +266,19 @@ data_tables = {
 
 		npc_struct_offs =  0x24B5C,
 		npc_struct_size = 0x128,
+
+		memory_shift = {
+			UG=0x8104,
+			BT=0x8104,
+			OW=0x0
+		},
+
+		memory_state_check = 0x22A00, -- 0x22A00,0x22A04,0x22A20
+		memory_state_check_val = 0x2C9EC,
+
 		-- static addresses
+		ug_init_addr = 0x2250E86,
+		ug_init_val = 0x1F
 	},
 
 	--2 DP KOREAN version
@@ -293,6 +294,9 @@ data_tables = {
 
 	},
 }
+
+demo = false
+hgss = false
 
 game_specific_data = {
 	Y = {
@@ -358,115 +362,137 @@ lang_data = game_data["language_specific_data"][lang]
 
 data_table = data_tables[lang_data["data_table_index"]]
 
+
+-- live player struct
+start_live_struct = data_table["player_live_struct_offs"]
+
 live_struct = {
 	step_counter = data_table["step_ctr"],
-	start_live_struct = data_table["player_live_struct_offs"]
-	map_id_32 = data_table["player_live_struct_offs"] + 0xC,
-	unknown_32 = data_table["player_live_struct_offs"] + 0x10,
-	x_pos_32_r = data_table["player_live_struct_offs"] + 0x14,
-	z_pos_32_r = data_table["player_live_struct_offs"] + 0x18,
-	y_pos_32_r = data_table["player_live_struct_offs"] + 0x1C,
+	
+	map_id_32 = start_live_struct + 0xC,
+	unknown_32 = start_live_struct + 0x10,
+	x_pos_32_r = start_live_struct + 0x14,
+	z_pos_32_r = start_live_struct + 0x18,
+	y_pos_32_r = start_live_struct + 0x1C,
 
-	map_id_last_warp_32 = data_table["player_live_struct_offs"] + 0x20,
-	unknown_last_warp_32 = data_table["player_live_struct_offs"] + 0x24,
-	x_pos_last_warp_32 = data_table["player_live_struct_offs"] + 0x28,
-	z_pos_last_warp_32  = data_table["player_live_struct_offs"] + 0x2C,
-	y_pos_last_warp_32  = data_table["player_live_struct_offs"] + 0x30,
+	map_id_last_warp_32 = start_live_struct + 0x20,
+	unknown_last_warp_32 = start_live_struct + 0x24,
+	x_pos_last_warp_32 = start_live_struct + 0x28,
+	z_pos_last_warp_32  = start_live_struct + 0x2C,
+	y_pos_last_warp_32  = start_live_struct + 0x30,
 
-	map_id_last_warp_32 = data_table["player_live_struct_offs"] + 0x34,
-	unknown_last_warp_32_2 = data_table["player_live_struct_offs"] + 0x24,
-	x_pos_last_warp_32_2 = data_table["player_live_struct_offs"] + 0x3C,
-	z_pos_last_warp_32_2  = data_table["player_live_struct_offs"] + 0x40,
-	y_pos_last_warp_32_2  = data_table["player_live_struct_offs"] + 0x44,
+	map_id_last_warp_32 = start_live_struct + 0x34,
+	unknown_last_warp_32_2 = start_live_struct + 0x24,
+	x_pos_last_warp_32_2 = start_live_struct + 0x3C,
+	z_pos_last_warp_32_2  = start_live_struct + 0x40,
+	y_pos_last_warp_32_2  = start_live_struct + 0x44,
 
-	map_id_stored_warp_16 = data_table["player_live_struct_offs"] + 0x4C,
-	x_stored_warp_16 = data_table["player_live_struct_offs"] + 0x50,
-	z_stored_warp_16 = data_table["player_live_struct_offs"] + 0x54,
-	y_stored_warp_16 = data_table["player_live_struct_offs"] + 0x58,
+	map_id_stored_warp_16 = start_live_struct + 0x4C,
+	x_stored_warp_16 = start_live_struct + 0x50,
+	z_stored_warp_16 = start_live_struct + 0x54,
+	y_stored_warp_16 = start_live_struct + 0x58,
 
-	map_id_last_warp_from_overworld_32 = data_table["player_live_struct_offs"] + 0x5C,
-	unknown_last_warp_from_overworld_32 = data_table["player_live_struct_offs"] + 0x60,
-	x_pos_last_warp_from_overworld_32 = data_table["player_live_struct_offs"] + 0x64,
-	z_pos_last_warp_from_overworld_32  = data_table["player_live_struct_offs"] + 0x68,
-	y_pos_last_warp_from_overworld_32  = data_table["player_live_struct_offs"] + 0x6C,
+	map_id_last_warp_from_overworld_32 = start_live_struct + 0x5C,
+	unknown_last_warp_from_overworld_32 = start_live_struct + 0x60,
+	x_pos_last_warp_from_overworld_32 = start_live_struct + 0x64,
+	z_pos_last_warp_from_overworld_32  = start_live_struct + 0x68,
+	y_pos_last_warp_from_overworld_32  = start_live_struct + 0x6C,
 
-	maps_entered_8 = data_table["player_live_struct_offs"] + 0x78, -- counts every time player changes map position in ram (in overworld, even when id remains unchanged)
+	maps_entered_8 = start_live_struct + 0x78, -- counts every time player changes map position in ram (in overworld, even when id remains unchanged)
 
-	x_map_overworld_live_8 = data_table["player_live_struct_offs"] + 0x7C,
-	z_map_overworld_live_8 = data_table["player_live_struct_offs"] + 0x7D,
+	x_map_overworld_live_8 = start_live_struct + 0x7C,
+	z_map_overworld_live_8 = start_live_struct + 0x7D,
 
-	x_map_overworld_entered_1_8 = data_table["player_live_struct_offs"] + 0x7E, -- updates when maps_entered_8 is set to 1
-	z_map_overworld_entered_1_8 = data_table["player_live_struct_offs"] + 0x7F, -- updates when maps_entered_8 is set to 1
-	direction_map_entered_1_8 = data_table["player_live_struct_offs"] + 0x80, -- updates when maps_entered_8 is set to 1
-	unknown_entered_1_8 = data_table["player_live_struct_offs"] + 0x81, -- updates when maps_entered_8 is set to 1
+	x_map_overworld_entered_1_8 = start_live_struct + 0x7E, -- updates when maps_entered_8 is set to 1
+	z_map_overworld_entered_1_8 = start_live_struct + 0x7F, -- updates when maps_entered_8 is set to 1
+	direction_map_entered_1_8 = start_live_struct + 0x80, -- updates when maps_entered_8 is set to 1
+	unknown_entered_1_8 = start_live_struct + 0x81, -- updates when maps_entered_8 is set to 1
 
-	x_map_overworld_entered_2_8 = data_table["player_live_struct_offs"] + 0x82, -- updates when maps_entered_8 is set to 2
-	z_map_overworld_entered_2_8 = data_table["player_live_struct_offs"] + 0x83, -- updates when maps_entered_8 is set to 2
-	direction_map_entered_2_8 = data_table["player_live_struct_offs"] + 0x84, -- updates when maps_entered_8 is set to 2
-	unknown_entered_2_8 = data_table["player_live_struct_offs"] + 0x85, -- updates when maps_entered_8 is set to 2
+	x_map_overworld_entered_2_8 = start_live_struct + 0x82, -- updates when maps_entered_8 is set to 2
+	z_map_overworld_entered_2_8 = start_live_struct + 0x83, -- updates when maps_entered_8 is set to 2
+	direction_map_entered_2_8 = start_live_struct + 0x84, -- updates when maps_entered_8 is set to 2
+	unknown_entered_2_8 = start_live_struct + 0x85, -- updates when maps_entered_8 is set to 2
 
-	x_map_overworld_entered_3_8 = data_table["player_live_struct_offs"] + 0x86, -- updates when maps_entered_8 is set to 3
-	z_map_overworld_entered_3_8 = data_table["player_live_struct_offs"] + 0x87, -- updates when maps_entered_8 is set to 3
-	direction_map_entered_3_8 = data_table["player_live_struct_offs"] + 0x88, -- updates when maps_entered_8 is set to 3
-	unknown_entered_3_8 = data_table["player_live_struct_offs"] + 0x89, -- updates when maps_entered_8 is set to 3
+	x_map_overworld_entered_3_8 = start_live_struct + 0x86, -- updates when maps_entered_8 is set to 3
+	z_map_overworld_entered_3_8 = start_live_struct + 0x87, -- updates when maps_entered_8 is set to 3
+	direction_map_entered_3_8 = start_live_struct + 0x88, -- updates when maps_entered_8 is set to 3
+	unknown_entered_3_8 = start_live_struct + 0x89, -- updates when maps_entered_8 is set to 3
 
-	x_map_overworld_entered_4_8 = data_table["player_live_struct_offs"] + 0x8A, -- updates when maps_entered_8 is set to 4
-	z_map_overworld_entered_4_8 = data_table["player_live_struct_offs"] + 0x8B, -- updates when maps_entered_8 is set to 4
-	direction_map_entered_4_8 = data_table["player_live_struct_offs"] + 0x8C, -- updates when maps_entered_8 is set to 4
-	unknown_entered_4_8 = data_table["player_live_struct_offs"] + 0x8D, -- updates when maps_entered_8 is set to 4
+	x_map_overworld_entered_4_8 = start_live_struct + 0x8A, -- updates when maps_entered_8 is set to 4
+	z_map_overworld_entered_4_8 = start_live_struct + 0x8B, -- updates when maps_entered_8 is set to 4
+	direction_map_entered_4_8 = start_live_struct + 0x8C, -- updates when maps_entered_8 is set to 4
+	unknown_entered_4_8 = start_live_struct + 0x8D, -- updates when maps_entered_8 is set to 4
 
-	x_map_overworld_entered_5_8 = data_table["player_live_struct_offs"] + 0x8E, -- updates when maps_entered_8 is set to 5
-	z_map_overworld_entered_5_8 = data_table["player_live_struct_offs"] + 0x8F, -- updates when maps_entered_8 is set to 5
-	direction_map_entered_5_8 = data_table["player_live_struct_offs"] + 0x90, -- updates when maps_entered_8 is set to 5
-	unknown_entered_5_8 = data_table["player_live_struct_offs"] + 0x91, -- updates when maps_entered_8 is set to 5
+	x_map_overworld_entered_5_8 = start_live_struct + 0x8E, -- updates when maps_entered_8 is set to 5
+	z_map_overworld_entered_5_8 = start_live_struct + 0x8F, -- updates when maps_entered_8 is set to 5
+	direction_map_entered_5_8 = start_live_struct + 0x90, -- updates when maps_entered_8 is set to 5
+	unknown_entered_5_8 = start_live_struct + 0x91, -- updates when maps_entered_8 is set to 5
 
-	x_map_overworld_entered_0_8 = data_table["player_live_struct_offs"] + 0x92, -- updates when maps_entered_8 is set to 0
-	z_map_overworld_entered_0_8 = data_table["player_live_struct_offs"] + 0x93, -- updates when maps_entered_8 is set to 0
-	direction_map_entered_0_8 = data_table["player_live_struct_offs"] + 0x94, -- updates when maps_entered_8 is set to 0
-	unknown_entered_0_8 = data_table["player_live_struct_offs"] + 0x95, -- updates when maps_entered_8 is set to 0
+	x_map_overworld_entered_0_8 = start_live_struct + 0x92, -- updates when maps_entered_8 is set to 0
+	z_map_overworld_entered_0_8 = start_live_struct + 0x93, -- updates when maps_entered_8 is set to 0
+	direction_map_entered_0_8 = start_live_struct + 0x94, -- updates when maps_entered_8 is set to 0
+	unknown_entered_0_8 = start_live_struct + 0x95, -- updates when maps_entered_8 is set to 0
 
-	bike_gear_16 = data_table["player_live_struct_offs"] + 0x98, -- 1 is fast, everything else slow
-	unknown_mode_16 = data_table["player_live_struct_offs"] + 0x9A,
-	movement_mode_32 = data_table["player_live_struct_offs"] + 0x9C, -- walk=0,bike=1,surf=2
-	step_counter_max4_8 = data_table["player_live_struct_offs"] + 0xA0, -- %4 performed
+	bike_gear_16 = start_live_struct + 0x98, -- 1 is fast, everything else slow
+	unknown_mode_16 = start_live_struct + 0x9A,
+	movement_mode_32 = start_live_struct + 0x9C, -- walk=0,bike=1,surf=2
+	step_counter_max4_8 = start_live_struct + 0xA0, -- %4 performed
 }
 
+-- player's npc struct 
+start_player_struct = data_table["player_npc_struct_offs"]
+
 player_struct = {
-	general_npc_data_ptr = data_table["player_npc_struct_offs"] + 0x8,
-	general_player_data_ptr = data_table["player_npc_struct_offs"] + 0xC,
-	sprite_id_32 = data_table["player_npc_struct_offs"] + 0x30,
-	movement_32 = data_table["player_npc_struct_offs"] + 0x48, --crashes after 0x10
-	facing_dir_32 = data_table["player_npc_struct_offs"] + 0x4C,
-	movement_32_r = data_table["player_npc_struct_offs"] + 0x50,
-	last_facing_dir_32 = data_table["player_npc_struct_offs"] + 0x54,
+	general_npc_data_ptr = start_player_struct + 0x8,
+	general_player_data_ptr = start_player_struct + 0xC,
+	sprite_id_32 = start_player_struct + 0x30,
+	movement_32 = start_player_struct + 0x48, --crashes after 0x10
+	facing_dir_32 = start_player_struct + 0x4C,
+	movement_32_r = start_player_struct + 0x50,
+	last_facing_dir_32 = start_player_struct + 0x54,
 
 	-- last warp coords
-	last_warp_x_32 = data_table["player_npc_struct_offs"] + 0x6C,
-	last_warp_z_32 = data_table["player_npc_struct_offs"] + 0x70,
-	last_warp_y_32 = data_table["player_npc_struct_offs"] + 0x74,
+	last_warp_x_32 = start_player_struct + 0x6C,
+	last_warp_z_32 = start_player_struct + 0x70,
+	last_warp_y_32 = start_player_struct + 0x74,
 
 	-- final coords (updated last)
-	x_32_r = data_table["player_npc_struct_offs"] + 0x78,
-	y_32_r = data_table["player_npc_struct_offs"] + 0x7C,
-	z_32_r = data_table["player_npc_struct_offs"] + 0x80,
+	x_32_r = start_player_struct + 0x78,
+	y_32_r = start_player_struct + 0x7C,
+	z_32_r = start_player_struct + 0x80,
 
 	-- coords for interacting with terain/collision + position in ram
-	x_phys_32 = data_table["player_npc_struct_offs"] + 0x84,
-	y_phys_32 = data_table["player_npc_struct_offs"] + 0x88, 
-	z_phys_32 = data_table["player_npc_struct_offs"] + 0x8C,
+	x_phys_32 = start_player_struct + 0x84,
+	y_phys_32 = start_player_struct + 0x88, 
+	z_phys_32 = start_player_struct + 0x8C,
 
 	-- coords used for camera position
 	-- has subpixel precision
-	x_cam_subpixel_16 = data_table["player_npc_struct_offs"] + 0x90,
-	x_cam_16 = data_table["player_npc_struct_offs"] + 0x92,
-	y_cam_subpixel_16 = data_table["player_npc_struct_offs"] + 0x94,
-	y_cam_16 = data_table["player_npc_struct_offs"] + 0x96,
-	z_cam_subpixel_16 = data_table["player_npc_struct_offs"] + 0x98,
-	z_cam_16 = data_table["player_npc_struct_offs"] + 0x9A,
+	x_cam_subpixel_16 = start_player_struct + 0x90,
+	x_cam_16 = start_player_struct + 0x92,
+	y_cam_subpixel_16 = start_player_struct + 0x94,
+	y_cam_16 = start_player_struct + 0x96,
+	z_cam_subpixel_16 = start_player_struct + 0x98,
+	z_cam_16 = start_player_struct + 0x9A,
 
-	tile_type_16_1 = data_table["player_npc_struct_offs"] + 0xCC,
-	tile_type_16_2 = data_table["player_npc_struct_offs"] + 0xCE,
-	sprite_ptr = data_table["player_npc_struct_offs"] +0x12C,
+	tile_type_16_1 = start_player_struct + 0xCC,
+	tile_type_16_2 = start_player_struct + 0xCE,
+	sprite_ptr = start_player_struct + 0x12C,
+}
+
+generic_npc_struct = {
+
+}
+
+start_object_struct = data_table["object_struct_offs"]
+
+object_struct = {
+	object_count = start_object_struct + 0x40,
+	runtime_index_32 = start_object_struct + 0x44,
+	x_phys_32 = start_object_struct + 0x48,
+	z_phys_32 = start_object_struct + 0x4C,
+	y_phys_32 = start_object_struct + 0x50,
+	unknown_32 = start_object_struct + 0x54
 }
 
 warp_data_struct = {
@@ -486,27 +512,30 @@ overworld_data = {
 matrix = 0x22ADA	
 }
 
+-- BASE MATH, STRING AND FORMATTING FUNCTIONS
+
+function fmt(arg,len)
+    return string.format("%0"..len.."X", bit.band(4294967295, arg))
+end
+
+
+
 function show_player_data()
 
 
 end
 
 function show_objects(obj_struct_size)
-	object_struct = base + data_table["object_struct_offs"]
-	object_count = memory.readword(object_struct + 0x40)
-	
+	object_count = memory.readword(base+object_struct["object_count"])
 	for i = 0,object_count-1 do 
-		-- runtime_index_32 = memory.readword(object_struct+(i*object_struct_size)+0x44)
-		x_phys_32 = memory.readword(object_struct +(i*obj_struct_size)+0x48)
-		z_phys_32 = memory.readword(object_struct +(i*obj_struct_size)+0x4C)
-		-- y_phys_32 = memory.readword(object_struct+(i*object_struct_size)+0x50)
-		-- unknown_32 = memory.readword(object_struct+(i*object_struct_size)+0x54)
+		x_phys_32 = memory.readword(base + object_struct["x_phys_32"] + i*obj_struct_size)
+		z_phys_32 = memory.readword(base + object_struct["z_phys_32"] + i*obj_struct_size)
 		draw_object(x_phys_32,z_phys_32,"#9793FF8","purple")
 	end
 end 
 
-function show_npcs(npc_struct_size)
-	npc_struct = base + data_table["npc_struct_offs"]
+function show_npcs(npc_struct_size,memory_offs)
+	npc_struct = base + data_table["npc_struct_offs"] + memory_offs
 	npc_count = 0
 	for i = 0,npc_count-1 do 
 		sprite_id_32 = npc_struct + 0x10
@@ -556,12 +585,44 @@ function draw_player_pos(fill_clr,border_clr)
 	gui.box(120,-108,136,-92,fill_clr,border_clr)
 end 
 
+-- function get_memory_state()
+-- 	init_on_ug = memory.readbyte(0x2250E86)
+-- 	if init_on_ug == 0x17 then
+-- 		return true
+-- 	end
+-- 	return false
+-- end
+
+function get_memory_state()
+	if memory.readdword(base+data_table["memory_state_check"]) == (base + data_table["memory_state_check_val"]) then -- check for ug/bt ptr
+		if memory.readbyte(data_table["ug_init_addr"]) == data_table["ug_init_val"] then -- if 0x1f, is UG
+			return "UG"
+		end
+		return "BT"
+	end 
+	return "OW"
+end
+
+function get_union_state()
+end 
+
+function set_screen_offsets(state)
+
+end
+
 
 function main_gui()
 	base = memory.readdword(lang_data["base_addr"]) -- check base every loop in case of reset
-	show_player_data()
+	memory_state = get_memory_state() -- check for underground,battletower or overworld state (add: intro?)
+	memory_shift = data_table["memory_shift"][memory_state] -- get memory shift based on state
 
-	show_npcs(data_table["npc_struct_size"])
+	-- temporary gui before I implement gui screens
+	gui.text(5,-180,memory_state,"red")
+	gui.text(5,-170,fmt(memory_shift,4),"red")
+	--
+
+	show_player_data()
+	show_npcs(data_table["npc_struct_size"],memory_shift)
 	show_objects(data_table["object_struct_size"])
 	draw_player_pos("#88FFFFA0","#0FB58")
 end
