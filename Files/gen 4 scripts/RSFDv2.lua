@@ -359,8 +359,10 @@ lang_data = game_data["language_specific_data"][lang]
 data_table = data_tables[lang_data["data_table_index"]]
 
 live_struct = {
-	step_ctr = data_table["step_ctr"],
+	step_counter = data_table["step_ctr"],
+	start_live_struct = data_table["player_live_struct_offs"]
 	map_id_32 = data_table["player_live_struct_offs"] + 0xC,
+	unknown_32 = data_table["player_live_struct_offs"] + 0x10,
 	x_pos_32_r = data_table["player_live_struct_offs"] + 0x14,
 	z_pos_32_r = data_table["player_live_struct_offs"] + 0x18,
 	y_pos_32_r = data_table["player_live_struct_offs"] + 0x1C,
@@ -382,15 +384,51 @@ live_struct = {
 	z_stored_warp_16 = data_table["player_live_struct_offs"] + 0x54,
 	y_stored_warp_16 = data_table["player_live_struct_offs"] + 0x58,
 
-	map_id_last_warp_from_overworld_32 = data_table["player_live_struct_offs"]+ 0x5C,
+	map_id_last_warp_from_overworld_32 = data_table["player_live_struct_offs"] + 0x5C,
 	unknown_last_warp_from_overworld_32 = data_table["player_live_struct_offs"] + 0x60,
 	x_pos_last_warp_from_overworld_32 = data_table["player_live_struct_offs"] + 0x64,
 	z_pos_last_warp_from_overworld_32  = data_table["player_live_struct_offs"] + 0x68,
 	y_pos_last_warp_from_overworld_32  = data_table["player_live_struct_offs"] + 0x6C,
 
-	bike_speed_16 = data_table["player_live_struct_offs"] + 0x90, -- 1 is fast, everything else slow
-	unknown_mode_16 = data_table["player_live_struct_offs"] + 0x92,
-	bike_mode_32 = data_table["player_live_struct_offs"] + 0x94, -- 1 is on bike
+	maps_entered_8 = data_table["player_live_struct_offs"] + 0x78, -- counts every time player changes map position in ram (in overworld, even when id remains unchanged)
+
+	x_map_overworld_live_8 = data_table["player_live_struct_offs"] + 0x7C,
+	z_map_overworld_live_8 = data_table["player_live_struct_offs"] + 0x7D,
+
+	x_map_overworld_entered_1_8 = data_table["player_live_struct_offs"] + 0x7E, -- updates when maps_entered_8 is set to 1
+	z_map_overworld_entered_1_8 = data_table["player_live_struct_offs"] + 0x7F, -- updates when maps_entered_8 is set to 1
+	direction_map_entered_1_8 = data_table["player_live_struct_offs"] + 0x80, -- updates when maps_entered_8 is set to 1
+	unknown_entered_1_8 = data_table["player_live_struct_offs"] + 0x81, -- updates when maps_entered_8 is set to 1
+
+	x_map_overworld_entered_2_8 = data_table["player_live_struct_offs"] + 0x82, -- updates when maps_entered_8 is set to 2
+	z_map_overworld_entered_2_8 = data_table["player_live_struct_offs"] + 0x83, -- updates when maps_entered_8 is set to 2
+	direction_map_entered_2_8 = data_table["player_live_struct_offs"] + 0x84, -- updates when maps_entered_8 is set to 2
+	unknown_entered_2_8 = data_table["player_live_struct_offs"] + 0x85, -- updates when maps_entered_8 is set to 2
+
+	x_map_overworld_entered_3_8 = data_table["player_live_struct_offs"] + 0x86, -- updates when maps_entered_8 is set to 3
+	z_map_overworld_entered_3_8 = data_table["player_live_struct_offs"] + 0x87, -- updates when maps_entered_8 is set to 3
+	direction_map_entered_3_8 = data_table["player_live_struct_offs"] + 0x88, -- updates when maps_entered_8 is set to 3
+	unknown_entered_3_8 = data_table["player_live_struct_offs"] + 0x89, -- updates when maps_entered_8 is set to 3
+
+	x_map_overworld_entered_4_8 = data_table["player_live_struct_offs"] + 0x8A, -- updates when maps_entered_8 is set to 4
+	z_map_overworld_entered_4_8 = data_table["player_live_struct_offs"] + 0x8B, -- updates when maps_entered_8 is set to 4
+	direction_map_entered_4_8 = data_table["player_live_struct_offs"] + 0x8C, -- updates when maps_entered_8 is set to 4
+	unknown_entered_4_8 = data_table["player_live_struct_offs"] + 0x8D, -- updates when maps_entered_8 is set to 4
+
+	x_map_overworld_entered_5_8 = data_table["player_live_struct_offs"] + 0x8E, -- updates when maps_entered_8 is set to 5
+	z_map_overworld_entered_5_8 = data_table["player_live_struct_offs"] + 0x8F, -- updates when maps_entered_8 is set to 5
+	direction_map_entered_5_8 = data_table["player_live_struct_offs"] + 0x90, -- updates when maps_entered_8 is set to 5
+	unknown_entered_5_8 = data_table["player_live_struct_offs"] + 0x91, -- updates when maps_entered_8 is set to 5
+
+	x_map_overworld_entered_0_8 = data_table["player_live_struct_offs"] + 0x92, -- updates when maps_entered_8 is set to 0
+	z_map_overworld_entered_0_8 = data_table["player_live_struct_offs"] + 0x93, -- updates when maps_entered_8 is set to 0
+	direction_map_entered_0_8 = data_table["player_live_struct_offs"] + 0x94, -- updates when maps_entered_8 is set to 0
+	unknown_entered_0_8 = data_table["player_live_struct_offs"] + 0x95, -- updates when maps_entered_8 is set to 0
+
+	bike_gear_16 = data_table["player_live_struct_offs"] + 0x98, -- 1 is fast, everything else slow
+	unknown_mode_16 = data_table["player_live_struct_offs"] + 0x9A,
+	movement_mode_32 = data_table["player_live_struct_offs"] + 0x9C, -- walk=0,bike=1,surf=2
+	step_counter_max4_8 = data_table["player_live_struct_offs"] + 0xA0, -- %4 performed
 }
 
 player_struct = {
@@ -508,8 +546,8 @@ end
 
 
 function draw_object(x,y,fill_clr,border_clr)
-	x_v = (memory.readword(base + live_struct["x_pos_16_r"]) - x) *16
-	y_v = (memory.readword(base + live_struct["z_pos_16_r"]) - y) *14
+	x_v = (memory.readword(base + live_struct["x_pos_32_r"]) - x) *16
+	y_v = (memory.readword(base + live_struct["z_pos_32_r"]) - y) *14
 	-- gui.box(131-x_v,-93-y_v, 142-x_v,-83-y_v,fill_clr,border_clr)
 	gui.box(121-x_v,-107-y_v,135-x_v,-93-y_v,fill_clr,border_clr)
 end
