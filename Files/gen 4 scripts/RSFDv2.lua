@@ -258,14 +258,19 @@ data_tables = {
 
 		-- start of structure offsets/structure data
 		player_live_struct_offs = 0x1440,
+
+		matrix_center = 0x22ADA,
+
+		general_npc_struct_offs = 0x248C8,
 		player_npc_struct_offs = 0x24A14,
 
 		object_struct_offs = 0x23C80,
-		object_count_offs = 0x40,
 		object_struct_size = 0x14,
 
 		npc_struct_offs =  0x24B5C,
 		npc_struct_size = 0x128,
+
+		
 
 		memory_shift = {
 			UG=0x8104,
@@ -273,8 +278,18 @@ data_tables = {
 			OW=0x0
 		},
 
-		memory_state_check = 0x22A00, -- 0x22A00,0x22A04,0x22A20
+		memory_state_check_offs = 0x22A00, -- 0x22A00,0x22A04,0x22A20
 		memory_state_check_val = 0x2C9EC,
+
+		ug_revealing_circle_struct_offs = 0x115150,
+		ug_cur_gem_ptr = 0x12DBC0,
+		ug_gem_struct_offs = 0x12D5E0,
+		ug_gem_size = 0x6,
+		ug_gem_count = 0xFA,
+
+		ug_mining_minigame_offs = 0x12DD36,
+		ug_mining_minigame_tile_count = 0x81, -- 13 col * 9 row of 1 byte each
+		ug_mining_minigame_visual_offs = 0x534C4,
 
 		-- static addresses
 		ug_init_addr = 0x2250E86,
@@ -440,7 +455,7 @@ live_struct = {
 }
 
 -- player's npc struct 
-start_player_struct = data_table["player_npc_struct_offs"]
+start_player_struct = data_table["player_npc_struct_offs"] -- add memory_shift
 
 player_struct = {
 	general_npc_data_ptr = start_player_struct + 0x8,
@@ -480,7 +495,48 @@ player_struct = {
 	sprite_ptr = start_player_struct + 0x12C,
 }
 
+start_general_npc_struct = data_table["general_npc_struct_offs"]
+
+general_npc_struct = {
+	max_npc_count = start_general_npc_struct + 0x24,
+	npc_count = start_general_npc_struct + 0x28,
+}
+
+start_npc_struct = data_table["npc_struct_offs"]
+
 generic_npc_struct = {
+	sprite_id_32 = start_npc_struct + 0x10,
+	movement_32 = start_npc_struct + 0x24, --crashes after 0x10
+	facing_dir_32 = start_npc_struct + 0x28,
+	movement_32_r = start_npc_struct + 0x2C,
+	last_facing_dir_32 = start_npc_struct + 0x30,
+
+	-- spawn location (?)
+	x_spawn_32 = start_npc_struct + 0x4C,
+	y_spawn_32 = start_npc_struct + 0x50,
+	z_spawn_32 = start_npc_struct + 0x54,
+
+	-- final coords (updated last)
+	x_32 = start_npc_struct + 0x58,
+	y_32 = start_npc_struct + 0x5C,
+	z_32 = start_npc_struct + 0x60,
+
+	-- coords for noticing player/talking to npc/collision
+	x_phys_32 = start_npc_struct + 0x64,
+	y_phys_32 = start_npc_struct + 0x68,
+	z_phys_32 = start_npc_struct + 0x6C,
+
+	-- coords used for camera position
+	-- has subpixel precision
+	x_cam_subpixel_16 = start_npc_struct + 0x70,
+	x_cam_16 = start_npc_struct + 0x72,
+	y_cam_subpixel_16 = start_npc_struct + 0x74,
+	y_cam_16 = start_npc_struct + 0x76,
+	z_cam_subpixel_16 = start_npc_struct + 0x78,
+	z_cam_16 = start_npc_struct + 0x7A,
+
+	tile_type_16_1 = start_npc_struct + 0xCC,
+	tile_type_16_2 = start_npc_struct + 0xCE,
 
 }
 
@@ -509,23 +565,89 @@ items_struct = {
 
 overworld_data = {
 
-matrix = 0x22ADA	
+	
 }
 
--- BASE MATH, STRING AND FORMATTING FUNCTIONS
+start_ug_circle_struct = data_table["ug_revealing_circle_struct_offs"]
+
+ug_circle_struct = {
+	x_center_circle_32 = start_ug_circle_struct + 0x40,
+	z_center_circle_32 = start_ug_circle_struct + 0x44,
+	x_subpixel_center_circle_32 = start_ug_circle_struct + 0x48,
+	z_subpixel_center_circle_32 = start_ug_circle_struct + 0x4C,
+	anime_frame_count = start_ug_circle_struct + 0x50,
+
+}
+
+start_ug_gem_struct = data_table["ug_gem_struct_offs"]
+
+ug_gem_struct = {
+	x_phys_16 = start_ug_gem_struct,
+	z_phys_16 = start_ug_gem_struct+0x2,
+	unknown_16 = start_ug_gem_struct+0x4, -- something to do with interacting, crashes at 0xffff
+
+}
+
+start_ug_mining_minigame = data_table["ug_mining_minigame_offs"]
+
+ug_mining_minigame = {
+	tiles_start = start_ug_mining_minigame,
+	play_state = start_ug_mining_minigame + 0x82, -- playing=0x8,win/loss=0x0
+	leftover_taps_8 = start_ug_mining_minigame + 0x89,
+	screen_offs_32 = start_ug_mining_minigame + 0x8A, -- for the shaking effect when tapping
+}
+
+-- BASE MATH, STRING AND FORMATTING
+
+screen_options = {
+	OW={-200,0},
+	BT={-200,0},
+	UG={0,-200}}
 
 function fmt(arg,len)
     return string.format("%0"..len.."X", bit.band(4294967295, arg))
 end
 
+function print_txt(x,y,txt,clr,screen)
+	screen = screen or 1
+	gui.text(x,screen_y[screen]+y,txt,clr)
+end 
+
+function print_square(x1,y1,x2,y2,fill,border_clr,screen)
+	screen = screen or 1
+	gui.box(x1,screen_y[screen]+y1,x2,screen_y[screen]+y2,fill,border_clr)
+end 
+
+
 
 
 function show_player_data()
-
-
 end
 
-function show_objects(obj_struct_size)
+function show_bounding_boxes()
+	show_player_data()
+	if memory_state == "UG" then 
+		draw_objects(data_table["ug_gem_count"],ug_gem_struct["x_phys_16"],ug_gem_struct["z_phys_16"],data_table["ug_gem_size"],0x0,"#FFF8666","yellow")
+	end 
+	draw_objects(memory.readword(base+object_struct["object_count"]),object_struct["x_phys_32"],object_struct["z_phys_32"],data_table["object_struct_size"],0x0,"#9793FF8","purple")
+	show_npcs(data_table["npc_struct_size"],memory_shift)
+	draw_player_pos("#88FFFFA0","#0FB58")
+end 
+
+
+function show_ug_gems(ug_gem_struct_size) -- replaced by draw_objects
+	gem_count = data_table["ug_gem_count"]
+	draw_objects(data_table["ug_gem_count"],ug_gem_struct["x_phys_16"],ug_gem_struct["z_phys_16"],data_table["ug_gem_size"],0x0,"#FFF8666","yellow")
+	for i = 0,gem_count-1 do 
+		x_phys_16 = memory.readword(base + ug_gem_struct["x_phys_16"] + i*ug_gem_struct_size)
+		z_phys_16 = memory.readword(base + ug_gem_struct["z_phys_16"] + i*ug_gem_struct_size)
+		if x_phys_16 ~= 0xffff and z_phys_16 ~= 0xffff then 
+			draw_object(x_phys_16,z_phys_16,"#FFF8666","yellow")
+		end 
+	end	
+end 
+
+function show_objects(obj_struct_size) -- replaced by draw_objects
 	object_count = memory.readword(base+object_struct["object_count"])
 	for i = 0,object_count-1 do 
 		x_phys_32 = memory.readword(base + object_struct["x_phys_32"] + i*obj_struct_size)
@@ -534,71 +656,45 @@ function show_objects(obj_struct_size)
 	end
 end 
 
-function show_npcs(npc_struct_size,memory_offs)
-	npc_struct = base + data_table["npc_struct_offs"] + memory_offs
-	npc_count = 0
-	for i = 0,npc_count-1 do 
-		sprite_id_32 = npc_struct + 0x10
-		movement_32 = npc_struct + 0x24 --crashes after 0x10
-		facing_dir_32 = npc_struct + 0x28
-		movement_32_r = npc_struct + 0x2C
-		last_facing_dir_32 = npc_struct + 0x30
-	
-		-- spawn location (?)
-		x_spawn_32 = npc_struct + 0x4C
-		y_spawn_32 = npc_struct + 0x50
-		z_spawn_32 = npc_struct + 0x54
-	
-		-- final coords (updated last)
-		x_32 = npc_struct + 0x58
-		y_32 = npc_struct + 0x5C
-		z_32 = npc_struct + 0x60
-	
-		-- coords for noticing player/talking to npc/collision
-		x_phys_32 = npc_struct + 0x64
-		y_phys_32 = npc_struct + 0x68
-		z_phys_32 = npc_struct + 0x6C
 
-		-- coords used for camera position
-		-- has subpixel precision
-		x_cam_subpixel_16 = npc_struct + 0x70
-		x_cam_16 = npc_struct + 0x72
-		y_cam_subpixel_16 = npc_struct + 0x74
-		y_cam_16 = npc_struct + 0x76
-		z_cam_subpixel_16 = npc_struct + 0x78
-		z_cam_16 = npc_struct + 0x7A
-	
-		tile_type_16_1 = npc_struct + 0xCC
-		tile_type_16_2 = npc_struct + 0xCE
+function show_npcs(npc_struct_size,memory_offs)
+	npc_struct = base + start_npc_struct + memory_offs
+	npc_count = memory.readbyte(base + general_npc_struct["npc_count"] + memory_offs) -1 -- subtracting player's npc from count
+	print_txt(5,40,npc_count,"blue")
+	if npc_count > 0 then -- prevent negative npc count when not initialized
+		for i = 0,npc_count-1 do 
+			x_phys_32 = memory.readword(base + generic_npc_struct["x_phys_32"] + i*npc_struct_size + memory_offs)
+			z_phys_32 = memory.readword(base + generic_npc_struct["z_phys_32"] + i*npc_struct_size + memory_offs)
+			draw_object(x_phys_32,z_phys_32,"#88FFFFA0","#0FB58")		
+		end
 	end
 end
 
+function draw_objects(count,x_start,y_start,struct_size,extra_offs,fill,border)
+	for i = 0,count-1 do 
+		x_phys_32 = memory.readword(base + x_start + i*struct_size + extra_offs)
+		z_phys_32 = memory.readword(base + y_start + i*struct_size + extra_offs)
+		draw_object(x_phys_32,z_phys_32,fill,border)
+	end
+end 
 
 function draw_object(x,y,fill_clr,border_clr)
 	x_v = (memory.readword(base + live_struct["x_pos_32_r"]) - x) *16
 	y_v = (memory.readword(base + live_struct["z_pos_32_r"]) - y) *14
 	-- gui.box(131-x_v,-93-y_v, 142-x_v,-83-y_v,fill_clr,border_clr)
-	gui.box(121-x_v,-107-y_v,135-x_v,-93-y_v,fill_clr,border_clr)
+	print_square(122-x_v,94-y_v,134-x_v,106-y_v,fill_clr,border_clr)
 end
 
 function draw_player_pos(fill_clr,border_clr)
-	gui.box(120,-108,136,-92,fill_clr,border_clr)
+	print_square(120,92,136,108,fill_clr,border_clr)
 end 
 
--- function get_memory_state()
--- 	init_on_ug = memory.readbyte(0x2250E86)
--- 	if init_on_ug == 0x17 then
--- 		return true
--- 	end
--- 	return false
--- end
-
 function get_memory_state()
-	if memory.readdword(base+data_table["memory_state_check"]) == (base + data_table["memory_state_check_val"]) then -- check for ug/bt ptr
+	if memory.readdword(base+data_table["memory_state_check_offs"]) == (base + data_table["memory_state_check_val"]) then -- check for ug/bt ptr
 		if memory.readbyte(data_table["ug_init_addr"]) == data_table["ug_init_val"] then -- if 0x1f, is UG
 			return "UG"
 		end
-		return "BT"
+		return "BT" 
 	end 
 	return "OW"
 end
@@ -606,8 +702,9 @@ end
 function get_union_state()
 end 
 
-function set_screen_offsets(state)
 
+function set_screen_params(memory_state)
+	return screen_options[memory_state]
 end
 
 
@@ -616,15 +713,13 @@ function main_gui()
 	memory_state = get_memory_state() -- check for underground,battletower or overworld state (add: intro?)
 	memory_shift = data_table["memory_shift"][memory_state] -- get memory shift based on state
 
-	-- temporary gui before I implement gui screens
-	gui.text(5,-180,memory_state,"red")
-	gui.text(5,-170,fmt(memory_shift,4),"red")
-	--
+	screen_y = set_screen_params(memory_state)
 
-	show_player_data()
-	show_npcs(data_table["npc_struct_size"],memory_shift)
-	show_objects(data_table["object_struct_size"])
-	draw_player_pos("#88FFFFA0","#0FB58")
+	-- temporary gui before I implement gui screens
+	print_txt(5,20,memory_state,"red")
+	print_txt(5,30,fmt(memory_shift,4),"red")
+	--
+	show_bounding_boxes()
 end
 
 
