@@ -266,11 +266,11 @@ data_tables = {
 
 		object_struct_offs = 0x23C80,
 		object_struct_size = 0x14,
+		warp_struct_size = 0xC,
+		trigger_struct_size = 0x10,
 
 		npc_struct_offs =  0x24B5C,
 		npc_struct_size = 0x128,
-
-		
 
 		memory_shift = {
 			UG=0x8104,
@@ -543,6 +543,8 @@ generic_npc_struct = {
 start_object_struct = data_table["object_struct_offs"]
 
 object_struct = {
+	warp_ptr_offs = start_object_struct + 0x38,
+	trigger_ptr_offs = start_object_struct + 0x3C,
 	object_count = start_object_struct + 0x40,
 	runtime_index_32 = start_object_struct + 0x44,
 	x_phys_32 = start_object_struct + 0x48,
@@ -550,6 +552,27 @@ object_struct = {
 	y_phys_32 = start_object_struct + 0x50,
 	unknown_32 = start_object_struct + 0x54
 }
+
+warp_struct = {
+	warp_count = -0x4,
+	x_phys_16 = 0x0,
+	z_phys_16 = 0x2,
+	map_id_16 = 0x4,
+	warp_index_at_map_id_16 = 0x6, -- the index of the warp you will get out of at the map you teleport to
+	unknown_32 = 0x8
+}
+
+trigger_struct = {
+	trigger_count = -0x4,
+	unknown_16 = 0x0,
+	x_phys_16 = 0x2,
+	z_phys_16 = 0x4,
+	vert_count_16 = 0x6,
+	hor_count_16 = 0x8,
+	unknown_2_16 = 0xA,
+	flag_index_32 = 0xC, -- not 100% certain
+}
+
 
 warp_data_struct = {
 
@@ -604,6 +627,11 @@ screen_options = {
 	BT={-200,0},
 	UG={0,-200}}
 
+function set_screen_params(memory_state)
+	return screen_options[memory_state]
+end
+	
+
 function fmt(arg,len)
     return string.format("%0"..len.."X", bit.band(4294967295, arg))
 end
@@ -618,8 +646,7 @@ function print_square(x1,y1,x2,y2,fill,border_clr,screen)
 	gui.box(x1,screen_y[screen]+y1,x2,screen_y[screen]+y2,fill,border_clr)
 end 
 
-
-
+-- show gameplay data
 
 function show_player_data()
 end
@@ -627,61 +654,80 @@ end
 function show_bounding_boxes()
 	show_player_data()
 	if memory_state == "UG" then 
-		draw_objects(data_table["ug_gem_count"],ug_gem_struct["x_phys_16"],ug_gem_struct["z_phys_16"],data_table["ug_gem_size"],0x0,"#FFF8666","yellow")
+		show_ug_gems()
 	end 
-	draw_objects(memory.readword(base+object_struct["object_count"]),object_struct["x_phys_32"],object_struct["z_phys_32"],data_table["object_struct_size"],0x0,"#9793FF8","purple")
-	show_npcs(data_table["npc_struct_size"],memory_shift)
+	show_objects()
+	show_triggers()
+	show_warps()
+	show_npcs()
 	draw_player_pos("#88FFFFA0","#0FB58")
 end 
 
 
-function show_ug_gems(ug_gem_struct_size) -- replaced by draw_objects
-	gem_count = data_table["ug_gem_count"]
-	draw_objects(data_table["ug_gem_count"],ug_gem_struct["x_phys_16"],ug_gem_struct["z_phys_16"],data_table["ug_gem_size"],0x0,"#FFF8666","yellow")
-	for i = 0,gem_count-1 do 
-		x_phys_16 = memory.readword(base + ug_gem_struct["x_phys_16"] + i*ug_gem_struct_size)
-		z_phys_16 = memory.readword(base + ug_gem_struct["z_phys_16"] + i*ug_gem_struct_size)
-		if x_phys_16 ~= 0xffff and z_phys_16 ~= 0xffff then 
-			draw_object(x_phys_16,z_phys_16,"#FFF8666","yellow")
-		end 
-	end	
+function show_ug_gems() 
+	draw_bounding_boxes(data_table["ug_gem_count"],base + ug_gem_struct["x_phys_16"], base + ug_gem_struct["z_phys_16"],data_table["ug_gem_size"],0x0,"#FFF8666","#FFF66")
 end 
 
-function show_objects(obj_struct_size) -- replaced by draw_objects
+function show_objects()
 	object_count = memory.readword(base+object_struct["object_count"])
-	for i = 0,object_count-1 do 
-		x_phys_32 = memory.readword(base + object_struct["x_phys_32"] + i*obj_struct_size)
-		z_phys_32 = memory.readword(base + object_struct["z_phys_32"] + i*obj_struct_size)
-		draw_object(x_phys_32,z_phys_32,"#9793FF8","purple")
-	end
+	draw_bounding_boxes(object_count,base + object_struct["x_phys_32"], base + object_struct["z_phys_32"],data_table["object_struct_size"],0x0,"#9793FF8","purple")
 end 
 
-
-function show_npcs(npc_struct_size,memory_offs)
-	npc_struct = base + start_npc_struct + memory_offs
-	npc_count = memory.readbyte(base + general_npc_struct["npc_count"] + memory_offs) -1 -- subtracting player's npc from count
-	print_txt(5,40,npc_count,"blue")
-	if npc_count > 0 then -- prevent negative npc count when not initialized
-		for i = 0,npc_count-1 do 
-			x_phys_32 = memory.readword(base + generic_npc_struct["x_phys_32"] + i*npc_struct_size + memory_offs)
-			z_phys_32 = memory.readword(base + generic_npc_struct["z_phys_32"] + i*npc_struct_size + memory_offs)
-			draw_object(x_phys_32,z_phys_32,"#88FFFFA0","#0FB58")		
-		end
+function show_triggers()
+	start_trigger_struct = memory.readdword(base+object_struct["trigger_ptr_offs"])
+	trigger_count = memory.readword(start_trigger_struct+trigger_struct["trigger_count"])
+	for i = 0,trigger_count-1 do 
+		x_phys_16 = memory.readword(start_trigger_struct + trigger_struct["x_phys_16"] + i*data_table["trigger_struct_size"])
+		z_phys_16 = memory.readword(start_trigger_struct + trigger_struct["z_phys_16"] + i*data_table["trigger_struct_size"])
+		vert_count_16 = memory.readword(start_trigger_struct+trigger_struct["vert_count_16"] + i*data_table["trigger_struct_size"])
+		hor_count_16 = memory.readword(start_trigger_struct+trigger_struct["hor_count_16"] + i*data_table["trigger_struct_size"])
+		for vert_offs = 0, vert_count_16-1 do
+			x_trigger_inst = x_phys_16 + vert_offs
+			for hor_offs = 0, hor_count_16-1 do
+				z_trigger_inst = z_phys_16 + hor_offs
+				draw_bounding_box(x_trigger_inst,z_trigger_inst,"#FFF8666","#FFF66")		
+			end 
+		end 
 	end
 end
 
-function draw_objects(count,x_start,y_start,struct_size,extra_offs,fill,border)
-	for i = 0,count-1 do 
-		x_phys_32 = memory.readword(base + x_start + i*struct_size + extra_offs)
-		z_phys_32 = memory.readword(base + y_start + i*struct_size + extra_offs)
-		draw_object(x_phys_32,z_phys_32,fill,border)
+function show_warps()
+	start_warp_struct = memory.readdword(base+object_struct["warp_ptr_offs"])
+	warp_count = memory.readword(start_warp_struct+warp_struct["warp_count"])
+	draw_bounding_boxes(warp_count,start_warp_struct+warp_struct["x_phys_16"],start_warp_struct+warp_struct["z_phys_16"],data_table["warp_struct_size"],0x0,"#600038", "#C00058")
+end 
+
+function show_npcs()
+	npc_count = memory.readbyte(base + general_npc_struct["npc_count"] + memory_shift) -1 -- subtracting player's npc from count
+	print_txt(5,40,npc_count,"blue")
+	if npc_count > 0 then -- prevent negative npc count when not initialized
+		draw_bounding_boxes(npc_count,base + generic_npc_struct["x_phys_32"],base + generic_npc_struct["z_phys_32"],data_table["npc_struct_size"],memory_shift,"#88FFFFA0","#0FB58")
+	end
+end
+
+function show_trainer_range()
+	npc_count = memory.readbyte(base + general_npc_struct["npc_count"] + memory_shift) -1 -- subtracting player's npc from count
+	if npc_count > 0 then -- prevent negative npc count when not initialized
+		
 	end
 end 
 
-function draw_object(x,y,fill_clr,border_clr)
+function draw_bounding_boxes(count,x_start,z_start,struct_size,extra_offs,fill,border)
+	for i = 0,count-1 do 
+		x_phys_32 = memory.readword(x_start + i*struct_size + extra_offs)
+		z_phys_32 = memory.readword(z_start + i*struct_size + extra_offs)
+		draw_bounding_box(x_phys_32,z_phys_32,fill,border)
+	end
+end 
+
+function draw_bounding_box(x,z,fill_clr,border_clr)
 	x_v = (memory.readword(base + live_struct["x_pos_32_r"]) - x) *16
-	y_v = (memory.readword(base + live_struct["z_pos_32_r"]) - y) *14
-	-- gui.box(131-x_v,-93-y_v, 142-x_v,-83-y_v,fill_clr,border_clr)
+	y_v = (memory.readword(base + live_struct["z_pos_32_r"]) - z)
+	if y_v > 0 then 
+		y_v = y_v*13
+	else
+		y_v = y_v*15.5
+	end
 	print_square(122-x_v,94-y_v,134-x_v,106-y_v,fill_clr,border_clr)
 end
 
@@ -701,12 +747,6 @@ end
 
 function get_union_state()
 end 
-
-
-function set_screen_params(memory_state)
-	return screen_options[memory_state]
-end
-
 
 function main_gui()
 	base = memory.readdword(lang_data["base_addr"]) -- check base every loop in case of reset
