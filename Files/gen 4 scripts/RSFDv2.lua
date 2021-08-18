@@ -35,46 +35,46 @@ local tile_names = {
 local map_ids = {
 	Goal = {
 		color = '#f7bbf3',
-		number = {32}
+		ids = {32}
 		},
 	Chains= {
 		color = '#DfA',
-		number = {}
+		ids = {}
 	},
 	MysteryZone = {
 		color = '#88888866',
-		number = {0}
+		ids = {0}
 	},
 	Blackout = {
 		color = 'orange',
-		number = {332, 333}
+		ids = {332, 333}
 	},
 	Movement = {
 		color = 'purple',
-		number = {117, 177, 179, 181, 183, 192, 393,
+		ids = {117, 177, 179, 181, 183, 192, 393,
             474, 475, 476, 477, 478, 479, 480, 481, 482, 483,
             484, 485, 486, 487, 488, 489, 490, 496}
 	},
 	VoidExit = {
 		color = 'yellow',
-		number = {105, 114, 337, 461, 516, 186, 187}
+		ids = {105, 114, 337, 461, 516, 186, 187}
 	},
 	DANGER = {
 		color = 'red',
-		number = {35, 88, 93, 95, 122,133, 150 ,154, 155, 156, 176, 178, 180, 182,
+		ids = {35, 88, 93, 95, 122,133, 150 ,154, 155, 156, 176, 178, 180, 182,
 				184, 185, 188, 291, 293, 295, 504, 505, 506, 507, 508, 509}
 	},
 	Wrongwarp = {
 		color = '#666fd',
-		number = {7,37,49,70,102,124,135,152,169,174,190,421,429,436,444,453,460,495}
+		ids = {7,37,49,70,102,124,135,152,169,174,190,421,429,436,444,453,460,495}
 	},
 	Jubilife = {
 		color = '#66ffbbff',
-		number = {3}
+		ids = {3}
 	},
 	Normal = {
 		color = '#00bb00ff',
-		number = {}
+		ids = {}
 	}
 }
 
@@ -259,7 +259,8 @@ data_tables = {
 		-- start of structure offsets/structure data
 		player_live_struct_offs = 0x1440,
 
-		matrix_center = 0x22ADA,
+		matrix_struct_offs = 0x22A84,
+		matrix_size = 30,
 
 		general_npc_struct_offs = 0x248C8,
 		player_npc_struct_offs = 0x24A14,
@@ -627,6 +628,14 @@ ug_excavation_minigame_struct = {
 	screen_offs_32 = start_ug_excavation_minigame + 0x8A, -- for the shaking effect when tapping
 }
 
+start_matrix_struct = data_table["matrix_struct_offs"]
+matrix_struct = {
+	matrix_width_8 = start_matrix_struct + 0x54,
+	matrix_height_8 = start_matrix_struct + 0x55,
+	matrix_center_16 = start_matrix_struct + 0x56,
+}
+
+
 -- MATH, INPUT, FORMATTING, NON-GAMEPLAY RELATED FUNCTIONS
 
 screen_options = {
@@ -711,7 +720,6 @@ function draw_rectangle(x,y,width,height,fill,border_clr,screen)
 	gui.box(x-(width/2),screen_y[screen]+y-(height/2),x+(width/2),screen_y[screen]+y+(height/2),fill,border_clr)
 end 
 
--- NON GUI GAMEPLAY FUNCTIONS
 function wait_frames(frames)
 	current_frame = emu.framecount()
 	target_frame = current_frame + frames
@@ -721,9 +729,20 @@ function wait_frames(frames)
 	end 
 end
 
+-- MOVEMENT FUNCTIONS
+
+collision_states = {
+	[0x1000] = 0x1C20,
+	[0x1C20] = 0x1000
+}
+
+function switch_wtw_state()
+	current_collision_state = memory.readword(lang_data["collision_check_addr"])
+	memory.writeword(lang_data["collision_check_addr"],collision_states[current_collision_state])
+end
+
 function set_stepcounter(steps)
 	step_addr = base+live_struct["step_counter"]
-	print(step_addr)
 	memory.writeword(step_addr,0)
 end 
 
@@ -794,6 +813,23 @@ function left(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 	wait_frames(delay_after_reset*30)
 end
 
+function down(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
+	player_pos_y = memory.readdword(base + live_struct["z_pos_32_r"])
+	target = (player_pos_y + steps)%4294967296
+
+	-- account for bike momentum
+	if check_bike_state() == 2 then
+		target = target - 2
+	end 
+
+	move_player(pos,target,live_struct["z_pos_32_r"],false,true)
+	if reset_stepcounter then
+		wait_frames(delay_before_reset*30)
+		tap_touch_screen(115,120,4)
+	end 
+	wait_frames(delay_after_reset*30)
+end
+
 function right(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 	player_pos_x = memory.readdword(base + live_struct["x_pos_32_r"])
 	target = (player_pos_x + steps)%4294967296
@@ -811,28 +847,40 @@ function right(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 	wait_frames(delay_after_reset*30)
 end
 
-function down(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
-	player_pos_y = memory.readdword(base + live_struct["z_pos_32_r"])
-	target = (player_pos_y + steps)%4294967296
-	print(target) 
-
-	-- account for bike momentum
-	if check_bike_state() == 2 then
-		target = target - 2
-	end 
-
-	move_player(pos,target,live_struct["z_pos_32_r"],false,true)
-	if reset_stepcounter then
-		wait_frames(delay_before_reset*30)
-		tap_touch_screen(115,120,4)
-	end 
-	wait_frames(delay_after_reset*30)
-end
-
 function auto_movement()
 	up(16,2,5,true)
 	down(14,2,5,true)
 end 
+
+tp_amount = 31
+
+function teleport_up()
+	z_phys_32 = memory.readdword(base + player_struct["z_phys_32"] + memory_shift)
+	memory.writedword(base + player_struct["z_phys_32"] + memory_shift,z_phys_32 - tp_amount) 
+	z_cam_16 = memory.readword(base + player_struct["z_cam_16"] + memory_shift)
+	memory.writeword(base + player_struct["z_cam_16"] + memory_shift,z_cam_16 - tp_amount) 
+end
+
+function teleport_left()
+	x_phys_32 = memory.readdword(base + player_struct["x_phys_32"] + memory_shift)
+	memory.writedword(base + player_struct["x_phys_32"] + memory_shift,x_phys_32 - tp_amount) 
+	x_cam_16 = memory.readword(base + player_struct["x_cam_16"] + memory_shift)
+	memory.writeword(base + player_struct["x_cam_16"] + memory_shift,x_cam_16 - tp_amount) 
+end
+
+function teleport_right()
+	x_phys_32 = memory.readdword(base + player_struct["x_phys_32"] + memory_shift)
+	memory.writedword(base + player_struct["x_phys_32"] + memory_shift,x_phys_32 + tp_amount) 
+	x_cam_16 = memory.readword(base + player_struct["x_cam_16"] + memory_shift)
+	memory.writeword(base + player_struct["x_cam_16"] + memory_shift,x_cam_16 + tp_amount)
+end
+
+function teleport_down()
+	z_phys_32 = memory.readdword(base + player_struct["z_phys_32"] + memory_shift)
+	memory.writedword(base + player_struct["z_phys_32"] + memory_shift,z_phys_32 + tp_amount) 
+	z_cam_16 = memory.readword(base + player_struct["z_cam_16"] + memory_shift)
+	memory.writeword(base + player_struct["z_cam_16"] + memory_shift,z_cam_16 + tp_amount) 
+end
 
 -- GUI GAMEPLAY FUNCTIONS
 
@@ -959,11 +1007,61 @@ function show_bounding_boxes(memory_state)
 end 
 
 --
+menu_id = 0
+menu_count = 2
+
+function increment_menu()
+	menu_id = (menu_id + 1)%menu_count
+end 
+
+function get_map_id_color(map_id)
+	if map_id > 558 then
+		return map_ids['Jubilife']['color']
+	else
+		for k,v in pairs(map_ids) do
+			for i=1,#map_ids[k]['ids'] do
+				if map_ids[k]['ids'][i] == map_id then 
+					return map_ids[k]['color']
+				end
+			end
+		end
+	end
+	return map_ids['Normal']['color']
+end 
+
 
 function show_void_pos()
+	matrix_width = memory.readbyte(base + matrix_struct["matrix_width_8"])
+	matrix_center = base + matrix_struct["matrix_center_16"]
+
+	x_phys_32 = memory.readdwordsigned(base + player_struct["x_phys_32"] + memory_shift)
+	z_phys_32 = memory.readdwordsigned(base + player_struct["z_phys_32"] + memory_shift)
+
+	x_offs = math.modf(x_phys_32 / 32) *2
+	z_offs = math.modf(z_phys_32 / 32) *2 *matrix_width 
+
+	center = (5*2) + (data_table["matrix_size"]*2*9)
+	for row=0,9 do
+		for col=0,18 do 
+			c_map_offset = matrix_center+x_offs+z_offs + row*2 + col*2*data_table["matrix_size"]-center
+			c_map_id = memory.readword(c_map_offset)
+			if c_map_offset == matrix_center + x_offs+z_offs then
+				clr = 'white'
+			else
+				clr = get_map_id_color(c_map_id)
+			end
+
+			if c_map_id > 999 then
+				c_map_id = ">999"
+			end 
+
+			print_txt(3 + row*25,3 + col*10,c_map_id,clr,2)
+		end 
+	end 
 end
 
 function show_chunks_ow()
+	print('chunks')
 end
 
 function show_chunks_battle_tower()
@@ -984,10 +1082,20 @@ function show_menu_choices()
 end 
 
 function show_menu(index)
-	menu_choices[memory_state][index]()
+	menu_count = #menu_choices[memory_state]
+	menu_id = menu_id%menu_count
+	menu_choices[memory_state][index+1]()
 end
 
-key_configuration = {auto_movement = {"shift","T"},}
+key_configuration = {
+	switch_wtw_state = {"W"},
+	auto_movement = {"shift","T"},
+	increment_menu = {"shift","V"},
+	teleport_up = {"shift","up"},
+	teleport_left = {"shift","left"},
+	teleport_down = {"shift","down"},
+	teleport_right = {"shift","right"}
+}
 
 function run_functions_on_keypress()
 	for funct,config_keys in pairs(key_configuration) do
@@ -1011,7 +1119,7 @@ function main_gui()
 	
 	-- main 
 	show_bounding_boxes(memory_state)
-	show_menu(1)
+	show_menu(menu_id)
 
 	get_keys()
 	-- get_joy()
