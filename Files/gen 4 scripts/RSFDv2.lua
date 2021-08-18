@@ -13,7 +13,7 @@
 
 -- DATA TABLES
 
-local tilename = {
+local tile_names = {
 			"nothing","nothing","Grass","Grass","4","Cave","Cave/Tree","7","Cave","9","10", "HauntH","CaveW","13","14","15",
 			"Pond","Water","Water","WaterF","Water","Water","Puddle","ShallW","24","Water","26","27","28","29","30","31",
 			"Ice","Sand","Water","35","Cave","Cave","38","39","40","41","Water","43","44","45","46","47",
@@ -32,7 +32,7 @@ local tilename = {
 			"240","241","242","243","244","245","246","247","248","249","250","251","252","253","254","Void"
 }
 
-local mapId = {
+local map_ids = {
 	Goal = {
 		color = '#f7bbf3',
 		number = {32}
@@ -78,7 +78,7 @@ local mapId = {
 	}
 }
 
-local CollisionId = {
+local collision_ids = {
     Custom = {
         color = '#f7bbf3',
         number = {}
@@ -282,16 +282,26 @@ data_tables = {
 		memory_state_check_val = 0x2C9EC,
 
 		ug_revealing_circle_struct_offs = 0x115150,
+		ug_trap_struct_offs =0x12B5B0,
+		ug_trap_struct_size = 0x6,
+		
+
 		ug_cur_gem_ptr = 0x12DBC0,
 		ug_gem_struct_offs = 0x12D5E0,
-		ug_gem_size = 0x6,
+		ug_gem_struct_size = 0x6,
 		ug_gem_count = 0xFA,
 
-		ug_mining_minigame_offs = 0x12DD36,
-		ug_mining_minigame_tile_count = 0x81, -- 13 col * 9 row of 1 byte each
-		ug_mining_minigame_visual_offs = 0x534C4,
+		ug_excavation_minigame_offs = 0x12DD36,
+		ug_excavation_minigame_tile_count = 0x81, -- 13 col * 9 row of 1 byte each
+		ug_excavation_minigame_visual_offs = 0x534C4,
+
+		
 
 		-- static addresses
+		menu_addr = 0x21C45BC, -- also check for underground minigame
+
+		ug_trap_count_addr= 0x222CAD7,
+
 		ug_init_addr = 0x2250E86,
 		ug_init_val = 0x1F
 	},
@@ -573,22 +583,10 @@ trigger_struct = {
 	flag_index_32 = 0xC, -- not 100% certain
 }
 
-
-warp_data_struct = {
-
-}
-
 chunk_struct = {
-
 }
 
 items_struct = {
-
-}
-
-overworld_data = {
-
-	
 }
 
 start_ug_circle_struct = data_table["ug_revealing_circle_struct_offs"]
@@ -611,16 +609,25 @@ ug_gem_struct = {
 
 }
 
-start_ug_mining_minigame = data_table["ug_mining_minigame_offs"]
+start_ug_trap_struct = data_table["ug_trap_struct_offs"]
 
-ug_mining_minigame = {
-	tiles_start = start_ug_mining_minigame,
-	play_state = start_ug_mining_minigame + 0x82, -- playing=0x8,win/loss=0x0
-	leftover_taps_8 = start_ug_mining_minigame + 0x89,
-	screen_offs_32 = start_ug_mining_minigame + 0x8A, -- for the shaking effect when tapping
+ug_trap_struct = {
+	x_phys_16 = start_ug_trap_struct,
+	z_phys_16 = start_ug_trap_struct+0x2,
+	trap_type_id_8 = start_ug_trap_struct+0x4,
+	trap_array_id_8 = start_ug_trap_struct+0x5, 
 }
 
--- BASE MATH, STRING AND FORMATTING
+start_ug_excavation_minigame = data_table["ug_excavation_minigame_offs"]
+
+ug_excavation_minigame_struct = {
+	tiles_start = start_ug_excavation_minigame,
+	play_state = start_ug_excavation_minigame + 0x82, -- playing=0x8,win/loss=0x0
+	leftover_taps_8 = start_ug_excavation_minigame + 0x89,
+	screen_offs_32 = start_ug_excavation_minigame + 0x8A, -- for the shaking effect when tapping
+}
+
+-- MATH, INPUT, FORMATTING, NON-GAMEPLAY RELATED FUNCTIONS
 
 screen_options = {
 	OW={-200,0},
@@ -631,6 +638,23 @@ function set_screen_params(memory_state)
 	return screen_options[memory_state]
 end
 	
+key = {}
+last_key = {}
+joy = {}
+last_joy = {}
+
+function get_keys()
+	last_key = key
+	key = input.get()
+end
+
+function check_key(btn)
+	if key[btn] and not last_key[btn] then
+		return true
+	else
+		return false
+	end
+end
 
 function fmt(arg,len)
     return string.format("%0"..len.."X", bit.band(4294967295, arg))
@@ -641,31 +665,32 @@ function print_txt(x,y,txt,clr,screen)
 	gui.text(x,screen_y[screen]+y,txt,clr)
 end 
 
-function print_square(x1,y1,x2,y2,fill,border_clr,screen)
+function draw_rectangle(x,y,width,height,fill,border_clr,screen)
 	screen = screen or 1
-	gui.box(x1,screen_y[screen]+y1,x2,screen_y[screen]+y2,fill,border_clr)
+	gui.box(x-(width/2),screen_y[screen]+y-(height/2),x+(width/2),screen_y[screen]+y+(height/2),fill,border_clr)
 end 
 
--- show gameplay data
+-- GAMEPLAY DATA
 
 function show_player_data()
 end
 
-function show_bounding_boxes()
-	show_player_data()
-	if memory_state == "UG" then 
-		show_ug_gems()
+function win_ug_minigame()
+	for i = 0,data_table["ug_excavation_minigame_tile_count"] do
+		memory.writebyte(base+ug_excavation_minigame_struct["tiles_start"]+i,0)		
 	end 
-	show_objects()
-	show_triggers()
-	show_warps()
-	show_npcs()
-	draw_player_pos("#88FFFFA0","#0FB58")
+end
+
+function remove_trap_effect()
 end 
 
-
 function show_ug_gems() 
-	draw_bounding_boxes(data_table["ug_gem_count"],base + ug_gem_struct["x_phys_16"], base + ug_gem_struct["z_phys_16"],data_table["ug_gem_size"],0x0,"#FFF8666","#FFF66")
+	draw_bounding_boxes(data_table["ug_gem_count"],base + ug_gem_struct["x_phys_16"], base + ug_gem_struct["z_phys_16"],data_table["ug_gem_struct_size"],0x0,"#FFF8666","#FFF66")
+end 
+
+function show_ug_traps()
+	ug_trap_count = memory.readbyte(data_table["ug_trap_count_addr"])
+	draw_bounding_boxes(ug_trap_count,base + ug_trap_struct["x_phys_16"], base + ug_trap_struct["z_phys_16"],data_table["ug_trap_struct_size"],0x0,"#FFFFFF8","white")
 end 
 
 function show_objects()
@@ -728,11 +753,11 @@ function draw_bounding_box(x,z,fill_clr,border_clr)
 	else
 		y_v = y_v*15.5
 	end
-	print_square(122-x_v,94-y_v,134-x_v,106-y_v,fill_clr,border_clr)
+	draw_rectangle(127-x_v,99-y_v,12,12,fill_clr,border_clr)
 end
 
 function draw_player_pos(fill_clr,border_clr)
-	print_square(120,92,136,108,fill_clr,border_clr)
+	draw_rectangle(127,99,14,14,fill_clr,border_clr)
 end 
 
 function get_memory_state()
@@ -745,8 +770,56 @@ function get_memory_state()
 	return "OW"
 end
 
-function get_union_state()
+function show_bounding_boxes(memory_state)
+	-- data that should always be shown
+	draw_player_pos("#88FFFFA0","#0FB58")
+	show_npcs()
+
+	-- data that should only be shown when in UG (check is for excavation game)
+	if memory_state == "UG" then
+		-- if memory.readbyte(base+data_table["menu_addr"]) == 0 then 
+		show_ug_gems()
+		show_ug_traps()
+		-- 	return 
+		-- end
+		return
+	end 
+	-- data that should only be shown when not in UG
+	show_player_data()
+	show_objects()
+	show_triggers()
+	show_warps()
+	-- data that is unique to overworld
 end 
+
+function show_void_pos()
+end
+
+function show_chunks_ow()
+end
+
+function show_chunks_battle_tower()
+end
+
+function show_chunks_ug()
+end
+
+-- SHOW MENU DATA
+
+menu_choices = {
+	OW = {show_void_pos,show_chunks_ow},
+	UG = {show_void_pos,show_chunks_ug},
+	BT = {show_void_pos,show_chunks_bt}
+	}
+
+function show_menu_choices()
+end 
+
+function show_menu(index)
+	menu_choices[memory_state][index]()
+end
+
+
 
 function main_gui()
 	base = memory.readdword(lang_data["base_addr"]) -- check base every loop in case of reset
@@ -758,8 +831,10 @@ function main_gui()
 	-- temporary gui before I implement gui screens
 	print_txt(5,20,memory_state,"red")
 	print_txt(5,30,fmt(memory_shift,4),"red")
-	--
-	show_bounding_boxes()
+	
+	-- main 
+	show_bounding_boxes(memory_state)
+	show_menu(1)
 end
 
 
