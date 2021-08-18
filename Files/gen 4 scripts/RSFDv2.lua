@@ -648,6 +648,22 @@ function get_keys()
 	key = input.get()
 end
 
+function check_keys(btns)
+	pressed_key_count = 0
+	not_prev_held = false
+	for btn =1,#btns do
+		if key[btns[btn]] then 	
+				pressed_key_count = pressed_key_count + 1
+		end 
+		if not last_key[btns[btn]] then
+			not_prev_held = true -- check wether at least 1 button wasn't previously held
+		end 
+	end
+	if not_prev_held then
+		return pressed_key_count
+	end 
+end 
+
 function check_key(btn)
 	if key[btn] and not last_key[btn] then
 		return true
@@ -655,6 +671,74 @@ function check_key(btn)
 		return false
 	end
 end
+
+
+
+function up(steps)
+	target = bit.band(Ypostrackery - steps, 0xFFFF)
+	if target < 0 and Ypostrackery > 0 then
+		target = bit.band(bit.bnot(target) - 1, 0xFFFF)
+	end
+	while Ypostrackery ~= target do
+		joy.up = true
+		joy.down = false
+		joy.left = false
+		joy.right = false
+		joypad.set(joy)
+		joy = {}
+		emu.frameadvance()
+	Ypostrackery = memory.readword(YPositionAddrOffset + base)
+	end
+end
+
+function right(steps)
+	target = bit.band(Xpostrackerx  + steps, 0xFFFF)
+	if target < 0 and Xpostrackerx  > 0 then
+		target = bit.band(bit.bnot(target) - 1, 0xFF)
+	end
+	while Xpostrackerx  ~= target do
+		joy.up = false
+		joy.down = false
+		joy.left = false
+		joy.right = true
+		joypad.set(joy)
+		joy = {}
+		emu.frameadvance()
+	Xpostrackerx  = memory.readword(XPositionAddrOffset + base)
+	end
+end
+
+function down(steps)
+	target = bit.band(Ypostrackery + steps, 0xFFFF)
+	if target < 0 and Ypostrackery > 0 then
+		target = bit.band(bit.bnot(target) - 1, 0xFFFF)
+	end
+	while Ypostrackery ~= target do
+		joy.up = false
+		joy.down = true
+		joy.left = false
+		joy.right = false
+		joypad.set(joy)
+		joy = {}
+		emu.frameadvance()
+	Ypostrackery = memory.readword(YPositionAddrOffset + base)
+	end
+end
+
+function left(steps)
+	target = bit.band(Xpostrackerx  - steps, 0xFFFF)
+	while Xpostrackerx  ~= target do
+		joy.up = false
+		joy.down = false
+		joy.left = true
+		joy.right = false
+		joypad.set(joy)
+		joy = {}
+		emu.frameadvance()
+	Xpostrackerx  = memory.readword(XPositionAddrOffset + base)
+	end
+end
+
 
 function fmt(arg,len)
     return string.format("%0"..len.."X", bit.band(4294967295, arg))
@@ -672,6 +756,16 @@ end
 
 -- GAMEPLAY DATA
 
+function get_memory_state()
+	if memory.readdword(base+data_table["memory_state_check_offs"]) == (base + data_table["memory_state_check_val"]) then -- check for ug/bt ptr
+		if memory.readbyte(data_table["ug_init_addr"]) == data_table["ug_init_val"] then -- if 0x1f, is UG
+			return "UG"
+		end
+		return "BT" 
+	end 
+	return "OW"
+end
+
 function show_player_data()
 end
 
@@ -683,6 +777,8 @@ end
 
 function remove_trap_effect()
 end 
+
+-- BOUNDING BOXES
 
 function show_ug_gems() 
 	draw_bounding_boxes(data_table["ug_gem_count"],base + ug_gem_struct["x_phys_16"], base + ug_gem_struct["z_phys_16"],data_table["ug_gem_struct_size"],0x0,"#FFF8666","#FFF66")
@@ -760,16 +856,6 @@ function draw_player_pos(fill_clr,border_clr)
 	draw_rectangle(127,99,14,14,fill_clr,border_clr)
 end 
 
-function get_memory_state()
-	if memory.readdword(base+data_table["memory_state_check_offs"]) == (base + data_table["memory_state_check_val"]) then -- check for ug/bt ptr
-		if memory.readbyte(data_table["ug_init_addr"]) == data_table["ug_init_val"] then -- if 0x1f, is UG
-			return "UG"
-		end
-		return "BT" 
-	end 
-	return "OW"
-end
-
 function show_bounding_boxes(memory_state)
 	-- data that should always be shown
 	draw_player_pos("#88FFFFA0","#0FB58")
@@ -791,6 +877,15 @@ function show_bounding_boxes(memory_state)
 	show_warps()
 	-- data that is unique to overworld
 end 
+
+-- MOVEMENT
+
+function auto_movement()
+	print("Yay")
+end 
+
+
+--
 
 function show_void_pos()
 end
@@ -819,6 +914,15 @@ function show_menu(index)
 	menu_choices[memory_state][index]()
 end
 
+key_configuration = {auto_movement = {"shift","T"},}
+
+function run_functions_on_keypress()
+	for funct,config_keys in pairs(key_configuration) do
+		if check_keys(config_keys) == #config_keys then
+			loadstring(funct.."()")()
+		end 
+	end
+end
 
 
 function main_gui()
@@ -835,6 +939,9 @@ function main_gui()
 	-- main 
 	show_bounding_boxes(memory_state)
 	show_menu(1)
+
+	get_keys()
+	run_functions_on_keypress()
 end
 
 
