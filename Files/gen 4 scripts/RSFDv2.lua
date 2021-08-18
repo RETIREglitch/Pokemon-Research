@@ -254,7 +254,7 @@ data_tables = {
 	--1 DP and PD demo
 	{
 		-- standalone offs
-		step_ctr_offs = 0x1384,
+		step_counter_offs = 0x1384,
 
 		-- start of structure offsets/structure data
 		player_live_struct_offs = 0x1440,
@@ -392,7 +392,7 @@ data_table = data_tables[lang_data["data_table_index"]]
 start_live_struct = data_table["player_live_struct_offs"]
 
 live_struct = {
-	step_counter = data_table["step_ctr"],
+	step_counter = data_table["step_counter_offs"],
 	
 	map_id_32 = start_live_struct + 0xC,
 	unknown_32 = start_live_struct + 0x10,
@@ -642,6 +642,8 @@ key = {}
 last_key = {}
 joy = {}
 last_joy = {}
+stylus_ = {}
+last_stylus = {}
 
 function get_keys()
 	last_key = key
@@ -656,7 +658,7 @@ function check_keys(btns)
 				pressed_key_count = pressed_key_count + 1
 		end 
 		if not last_key[btns[btn]] then
-			not_prev_held = true -- check wether at least 1 button wasn't previously held
+			not_prev_held = true -- check if at least 1 button wasn't previously held
 		end 
 	end
 	if not_prev_held then
@@ -672,73 +674,28 @@ function check_key(btn)
 	end
 end
 
+function get_joy()
+	last_joy = joy
+	joy = joypad.get()
+end 
 
-
-function up(steps)
-	target = bit.band(Ypostrackery - steps, 0xFFFF)
-	if target < 0 and Ypostrackery > 0 then
-		target = bit.band(bit.bnot(target) - 1, 0xFFFF)
-	end
-	while Ypostrackery ~= target do
-		joy.up = true
-		joy.down = false
-		joy.left = false
-		joy.right = false
-		joypad.set(joy)
-		joy = {}
-		emu.frameadvance()
-	Ypostrackery = memory.readword(YPositionAddrOffset + base)
-	end
+function get_stylus()
+	last_stylus = stylus_
+	stylus_ = stylus.get()
 end
 
-function right(steps)
-	target = bit.band(Xpostrackerx  + steps, 0xFFFF)
-	if target < 0 and Xpostrackerx  > 0 then
-		target = bit.band(bit.bnot(target) - 1, 0xFF)
-	end
-	while Xpostrackerx  ~= target do
-		joy.up = false
-		joy.down = false
-		joy.left = false
-		joy.right = true
-		joypad.set(joy)
-		joy = {}
+function tap_touch_screen(x_,y_,frames)
+	current_frame = emu.framecount()
+	target_frame = current_frame + frames
+	while current_frame ~= target_frame do
+		stylus_.x = x_
+		stylus_.y = y_
+		stylus_.touch = true
+		stylus.set(stylus_)
 		emu.frameadvance()
-	Xpostrackerx  = memory.readword(XPositionAddrOffset + base)
-	end
+		current_frame = emu.framecount()
+	end 
 end
-
-function down(steps)
-	target = bit.band(Ypostrackery + steps, 0xFFFF)
-	if target < 0 and Ypostrackery > 0 then
-		target = bit.band(bit.bnot(target) - 1, 0xFFFF)
-	end
-	while Ypostrackery ~= target do
-		joy.up = false
-		joy.down = true
-		joy.left = false
-		joy.right = false
-		joypad.set(joy)
-		joy = {}
-		emu.frameadvance()
-	Ypostrackery = memory.readword(YPositionAddrOffset + base)
-	end
-end
-
-function left(steps)
-	target = bit.band(Xpostrackerx  - steps, 0xFFFF)
-	while Xpostrackerx  ~= target do
-		joy.up = false
-		joy.down = false
-		joy.left = true
-		joy.right = false
-		joypad.set(joy)
-		joy = {}
-		emu.frameadvance()
-	Xpostrackerx  = memory.readword(XPositionAddrOffset + base)
-	end
-end
-
 
 function fmt(arg,len)
     return string.format("%0"..len.."X", bit.band(4294967295, arg))
@@ -754,7 +711,130 @@ function draw_rectangle(x,y,width,height,fill,border_clr,screen)
 	gui.box(x-(width/2),screen_y[screen]+y-(height/2),x+(width/2),screen_y[screen]+y+(height/2),fill,border_clr)
 end 
 
--- GAMEPLAY DATA
+-- NON GUI GAMEPLAY FUNCTIONS
+function wait_frames(frames)
+	current_frame = emu.framecount()
+	target_frame = current_frame + frames
+	while current_frame ~= target_frame do
+		emu.frameadvance()
+		current_frame = emu.framecount()
+	end 
+end
+
+function set_stepcounter(steps)
+	step_addr = base+live_struct["step_counter"]
+	print(step_addr)
+	memory.writeword(step_addr,0)
+end 
+
+function check_bike_state()
+	bike_state = 0
+	if memory.readword(base+live_struct["movement_mode_32"]) == 1 then -- on bike
+		bike_state = bike_state + 1
+		if memory.readword(base+live_struct["bike_gear_16"]) == 1 then -- fast gear
+			bike_state = 2
+		end
+	end 
+	return bike_state
+end 
+
+function move_player(pos,target,pos_offs,j_up,j_down,j_left,j_right)
+	while pos ~= target do
+		joy.up = j_up or false
+		joy.down = j_down or false
+		joy.left = j_left or false
+		joy.right = j_right or false
+		joypad.set(joy)
+		joy = {}
+		emu.frameadvance()
+		pos = memory.readdword(base + pos_offs)
+	end
+end 
+
+function up(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
+	player_pos_y = memory.readdword(base + live_struct["z_pos_32_r"])
+	target = player_pos_y - steps
+
+	-- account for bike momentum
+	if check_bike_state() == 2 then
+		target = target + 2
+	end 
+
+	if target < 0 then
+		target = 4294967295 + target + 1
+	end
+	
+	move_player(pos,target,live_struct["z_pos_32_r"],true)
+	if reset_stepcounter then
+		wait_frames(delay_before_reset*30)
+		tap_touch_screen(115,120,4)
+	end 
+	wait_frames(delay_after_reset*30)
+end
+
+function left(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
+	player_pos_x = memory.readdword(base + live_struct["x_pos_32_r"])
+	target = player_pos_x - steps
+
+	-- account for bike momentum
+	if check_bike_state() == 2 then
+		target = target + 2
+	end 
+
+	if target < 0 then
+		target = 4294967295 + target
+	end 
+
+	move_player(pos,target,live_struct["x_pos_32_r"],false,false,true)
+	
+	if reset_stepcounter then
+		wait_frames(delay_before_reset*30)
+		tap_touch_screen(115,120,4)
+	end 
+	wait_frames(delay_after_reset*30)
+end
+
+function right(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
+	player_pos_x = memory.readdword(base + live_struct["x_pos_32_r"])
+	target = (player_pos_x + steps)%4294967296
+
+	-- account for bike momentum
+	if check_bike_state() == 2 then
+		target = target - 2
+	end 
+
+	move_player(pos,target,live_struct["x_pos_32_r"],false,false,false,true)
+	if reset_stepcounter then
+		wait_frames(delay_before_reset*30)
+		tap_touch_screen(115,120,4)
+	end 
+	wait_frames(delay_after_reset*30)
+end
+
+function down(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
+	player_pos_y = memory.readdword(base + live_struct["z_pos_32_r"])
+	target = (player_pos_y + steps)%4294967296
+	print(target) 
+
+	-- account for bike momentum
+	if check_bike_state() == 2 then
+		target = target - 2
+	end 
+
+	move_player(pos,target,live_struct["z_pos_32_r"],false,true)
+	if reset_stepcounter then
+		wait_frames(delay_before_reset*30)
+		tap_touch_screen(115,120,4)
+	end 
+	wait_frames(delay_after_reset*30)
+end
+
+function auto_movement()
+	up(16,2,5,true)
+	down(14,2,5,true)
+end 
+
+-- GUI GAMEPLAY FUNCTIONS
 
 function get_memory_state()
 	if memory.readdword(base+data_table["memory_state_check_offs"]) == (base + data_table["memory_state_check_val"]) then -- check for ug/bt ptr
@@ -878,13 +958,6 @@ function show_bounding_boxes(memory_state)
 	-- data that is unique to overworld
 end 
 
--- MOVEMENT
-
-function auto_movement()
-	print("Yay")
-end 
-
-
 --
 
 function show_void_pos()
@@ -941,6 +1014,8 @@ function main_gui()
 	show_menu(1)
 
 	get_keys()
+	-- get_joy()
+	get_stylus()
 	run_functions_on_keypress()
 end
 
