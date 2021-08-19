@@ -252,13 +252,15 @@ steps_data = {
 
 data_tables = {
 	--1 DP and PD demo
-	{
+	{	
 		-- standalone offs
 		step_counter_offs = 0x1384,
 
 		-- start of structure offsets/structure data
 		player_live_struct_offs = 0x1440,
 
+		mapdata_and_menu_struct_offs = 0x22964,
+		chunk_calculation_ptr = 0x229F0,
 		matrix_struct_offs = 0x22A84,
 		matrix_size = 30,
 
@@ -388,6 +390,12 @@ lang_data = game_data["language_specific_data"][lang]
 
 data_table = data_tables[lang_data["data_table_index"]]
 
+
+-- base struct
+base_struct = {
+	player_name=0x278,
+	money = 0x28C,
+}
 
 -- live player struct
 start_live_struct = data_table["player_live_struct_offs"]
@@ -629,12 +637,19 @@ ug_excavation_minigame_struct = {
 }
 
 start_matrix_struct = data_table["matrix_struct_offs"]
+
 matrix_struct = {
 	matrix_width_8 = start_matrix_struct + 0x54,
 	matrix_height_8 = start_matrix_struct + 0x55,
 	matrix_center_16 = start_matrix_struct + 0x56,
 }
 
+start_mapdata_and_menu_struct = data_table["mapdata_and_menu_struct_offs"]
+
+mapdata_and_menu_struct = {
+	side_menu_state = start_mapdata_and_menu_struct + 0x78,
+	menu_index = start_mapdata_and_menu_struct + 0xF4,
+}
 
 -- MATH, INPUT, FORMATTING, NON-GAMEPLAY RELATED FUNCTIONS
 
@@ -686,6 +701,7 @@ end
 function get_joy()
 	last_joy = joy
 	joy = joypad.get()
+	print(joy)
 end 
 
 function get_stylus()
@@ -703,6 +719,75 @@ function tap_touch_screen(x_,y_,frames)
 		stylus.set(stylus_)
 		emu.frameadvance()
 		current_frame = emu.framecount()
+	end 
+end
+
+function press_button(btn)
+	current_frame = emu.framecount()
+	target_frame = current_frame + 2
+	while current_frame ~= target_frame do
+		joy[btn] = true 
+		joypad.set(joy)
+		emu.frameadvance()
+		current_frame = emu.framecount()
+	end 
+	joy[btn] = false
+end 
+
+function use_menu(menu_index)
+	if memory.readword(base + mapdata_and_menu_struct["side_menu_state"]) == 0 then	
+		press_button("X")
+	end 
+	
+	current_menu_index = memory.readbyte(base + mapdata_and_menu_struct["menu_index"])
+
+	if menu_index > current_menu_index then 
+		btn = "down"
+	else
+		btn = "up"
+	end 
+
+	while menu_index ~= current_menu_index do
+		press_button(btn)
+		wait_frames(2)
+		current_menu_index = memory.readbyte(base + mapdata_and_menu_struct["menu_index"])
+	end 
+	press_button("A")
+end
+
+mash_switch = {
+	A = "B",
+	B = "A"
+}
+
+function mash_text(frames)
+	btn= "A"
+	current_frame = emu.framecount()
+	target_frame = current_frame + frames
+	while current_frame < target_frame do
+		button_release_frame = current_frame + 2
+		while current_frame ~= button_release_frame do 
+			joy[mash_switch[btn]] = false
+			joy[btn] = true 
+			joypad.set(joy)
+			emu.frameadvance()
+			current_frame = emu.framecount()
+		end 
+		btn = mash_switch[btn]
+	end 
+	joy[mash_switch[btn]] = false
+end 
+
+function mash_text_only_a_press(frames)
+	current_frame = emu.framecount()
+	target_frame = current_frame + frames
+	while current_frame < target_frame do
+		print("hey")
+		joy.A = true
+		joypad.set(joy)
+		emu.frameadvance()
+		current_frame = emu.framecount()
+		wait_frames(2)
 	end 
 end
 
@@ -771,12 +856,18 @@ function move_player(pos,target,pos_offs,j_up,j_down,j_left,j_right)
 end 
 
 function up(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
+	delay_before_reset = delay_before_reset or 2
+	delay_after_reset = delay_after_reset or 4
+	reset_stepcounter = reset_stepcounter or true 
+
 	player_pos_y = memory.readdword(base + live_struct["z_pos_32_r"])
 	target = player_pos_y - steps
 
 	-- account for bike momentum
 	if check_bike_state() == 2 then
-		target = target + 2
+		if steps > 3 then 
+			target = target + 2
+		end
 	end 
 
 	if target < 0 then
@@ -792,12 +883,18 @@ function up(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 end
 
 function left(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
+	delay_before_reset = delay_before_reset or 2
+	delay_after_reset = delay_after_reset or 4
+	reset_stepcounter = reset_stepcounter or true
+
 	player_pos_x = memory.readdword(base + live_struct["x_pos_32_r"])
 	target = player_pos_x - steps
 
 	-- account for bike momentum
 	if check_bike_state() == 2 then
-		target = target + 2
+		if steps > 3 then 
+			target = target + 2
+		end
 	end 
 
 	if target < 0 then
@@ -814,14 +911,19 @@ function left(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 end
 
 function down(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
+	delay_before_reset = delay_before_reset or 2
+	delay_after_reset = delay_after_reset or 4
+	reset_stepcounter = reset_stepcounter or true
+
 	player_pos_y = memory.readdword(base + live_struct["z_pos_32_r"])
 	target = (player_pos_y + steps)%4294967296
 
 	-- account for bike momentum
 	if check_bike_state() == 2 then
-		target = target - 2
-	end 
-
+		if steps > 3 then 
+			target = target - 2	
+		end 
+	end
 	move_player(pos,target,live_struct["z_pos_32_r"],false,true)
 	if reset_stepcounter then
 		wait_frames(delay_before_reset*30)
@@ -831,12 +933,18 @@ function down(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 end
 
 function right(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
+	delay_before_reset = delay_before_reset or 2
+	delay_after_reset = delay_after_reset or 4
+	reset_stepcounter = reset_stepcounter or true
+
 	player_pos_x = memory.readdword(base + live_struct["x_pos_32_r"])
 	target = (player_pos_x + steps)%4294967296
 
 	-- account for bike momentum
 	if check_bike_state() == 2 then
-		target = target - 2
+		if steps > 3 then 
+			target = target - 2
+		end 
 	end 
 
 	move_player(pos,target,live_struct["x_pos_32_r"],false,false,false,true)
@@ -848,8 +956,13 @@ function right(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 end
 
 function auto_movement()
-	up(16,2,5,true)
-	down(14,2,5,true)
+	-- down(1)
+	-- right(16)
+	-- press_button("Y")
+	-- mash_text(400)
+	use_menu(4)
+	mash_text_only_a_press(600)
+
 end 
 
 tp_amount = 31

@@ -2437,10 +2437,10 @@ function fn()
 	end
 	end 
 
-	if check_key("B") then
-		dump_tiles = true
-		dump_texture_data = true
-	end 
+	-- if check_key("B") then
+	-- 	dump_tiles = true
+	-- 	dump_texture_data = true
+	-- end 
 
 	if mapediting then
 		writemap()
