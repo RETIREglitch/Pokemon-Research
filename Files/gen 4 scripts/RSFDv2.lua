@@ -280,9 +280,12 @@ data_tables = {
 			BT=0x8104,
 			OW=0x0
 		},
-
+		
 		memory_state_check_offs = 0x22A00, -- 0x22A00,0x22A04,0x22A20
 		memory_state_check_val = 0x2C9EC,
+
+		menu_data = 0x29434,
+		bag_menu_index_offs = 0x2977C,
 
 		ug_revealing_circle_struct_offs = 0x115150,
 		ug_trap_struct_offs =0x12B5B0,
@@ -301,6 +304,7 @@ data_tables = {
 		
 
 		-- static addresses
+		bag_hovering_data_ptr = 0x2106FAC,
 		menu_addr = 0x21C45BC, -- also check for underground minigame
 
 		ug_trap_count_addr= 0x222CAD7,
@@ -813,6 +817,51 @@ function use_menu(menu_index)
 	press_button("A")
 end
 
+function use_item(menu_id,item_id)
+	item_id = item_id%0x100
+	use_menu(2)
+	wait_frames(100)
+	
+	bag_menu_id = memory.readbyte(base + data_table["bag_menu_index_offs"])
+	count_button_presses = math.abs(menu_id - bag_menu_id)
+
+	if menu_id > bag_menu_id then
+		direction = "right"
+	else
+		direction = "left"
+	end
+
+	for i = 1,count_button_presses do 
+		press_button(direction)
+		wait_frames(4)
+	end 
+
+	hovering_item_id_offs = memory.readdword(data_table["bag_hovering_data_ptr"])
+	hovering_item_id = memory.readbyte(hovering_item_id_offs + 0x360)
+	while item_id ~= hovering_item_id do
+		press_button("down")
+		wait_frames(2)
+		hovering_item_id = memory.readbyte(hovering_item_id_offs + 0x360)
+		if hovering_item_id == 0xF8 then
+			print("Failed to find item")
+			press_button("B")
+			wait_frames(120)
+			press_button("B")
+			wait_frames(8)
+			return
+		end 
+	end
+
+	press_button("A")
+	wait_frames(8)
+	press_button("A")
+	wait_frames(120)
+end 
+
+function use_explorer_kit()
+	use_item(7,0x01AC)
+end
+
 mash_switch = {
 	A = "B",
 	B = "A"
@@ -838,22 +887,25 @@ end
 
 function mash_button(btn,frames)
 	c_frame_mash = emu.framecount()
-	target_frame_mash = current_frame + frames
+	target_frame_mash = c_frame_mash+ frames
 	
-	while current_frame_mash ~= target_frame_mash do
+	while c_frame_mash ~= target_frame_mash do
 		press_button(btn)
 		wait_frames(2)
-		current_frame_mash = emu.framecount()
+		c_frame_mash = emu.framecount()
 	end 
 end
 
-function save(reset,wait_for_intro)
-	reset = reset or "hard"
+function save()
 	wait_for_intro = wait_for_intro or false
 	use_menu(4)
 	mash_button("A",200)
 	wait_frames(400)
-	if reset == "hard" then
+end 
+
+function reset(reset_type,wait_for_intro)
+	reset_type = reset_type or "hard"
+	if reset_type == "hard" then
 		print("hard reset")
 		emu.reset()
 	elseif reset == "soft" then
@@ -870,6 +922,7 @@ function save(reset,wait_for_intro)
 		press_button("A")
 		wait_frames(200)
 		press_button("A")
+		wait_frames(100)
 		return
 	end 
 	wait_frames(450)
@@ -878,7 +931,20 @@ function save(reset,wait_for_intro)
 	press_button("A")
 	wait_frames(200)
 	press_button("A")
+	wait_frames(100)
+end 
 
+function save_reset(reset_type,wait_for_intro)
+	save()
+	reset(reset_type,wait_for_intro)
+end 
+
+function wrong_warp_reset()
+	mash_button("A",400)
+	wait_frames(350)
+	mash_button("A",8)
+	wait_frames(200)
+	reset()
 end 
 
 function get_on_bike(bike_gear)
@@ -1076,10 +1142,23 @@ function auto_movement()
 	-- down(1)
 	-- right(16)
 	-- get_on_bike()
-
 	-- up(430)
 	-- left(1)
-	save("soft")
+	-- save_reset()
+
+	-- right(193)
+	-- up(64)
+	-- save_reset()
+
+	-- left(214)
+	-- down(479)
+	-- graphic_reload()
+	-- down(2)
+	-- graphic_reload()
+	-- down(3)
+	-- left(2)
+	-- wrong_warp_reset()
+	use_explorer_kit()
 
 	-- graphic_reload()
 end 
