@@ -653,6 +653,20 @@ mapdata_and_menu_struct = {
 
 -- MATH, INPUT, FORMATTING, NON-GAMEPLAY RELATED FUNCTIONS
 
+function fmt(arg,len)
+    return string.format("%0"..len.."X", bit.band(4294967295, arg))
+end
+
+function print_txt(x,y,txt,clr,screen)
+	screen = screen or 1
+	gui.text(x,screen_y[screen]+y,txt,clr)
+end 
+
+function draw_rectangle(x,y,width,height,fill,border_clr,screen)
+	screen = screen or 1
+	gui.box(x-(width/2),screen_y[screen]+y-(height/2),x+(width/2),screen_y[screen]+y+(height/2),fill,border_clr)
+end 
+
 screen_options = {
 	OW={-200,0},
 	BT={-200,0},
@@ -662,6 +676,8 @@ function set_screen_params(memory_state)
 	return screen_options[memory_state]
 end
 	
+-- INPUT FUNCTIONS 
+
 key = {}
 last_key = {}
 joy = {}
@@ -701,7 +717,6 @@ end
 function get_joy()
 	last_joy = joy
 	joy = joypad.get()
-	print(joy)
 end 
 
 function get_stylus()
@@ -718,6 +733,19 @@ function wait_frames(frames)
 	end 
 end
 
+clock = os.clock
+
+function sleep(n)  -- seconds
+   local t0 = clock()
+   while clock() - t0 <= n do
+   end
+end
+
+function wait_for_reset()
+	current_frame = emu.framecount()
+	sleep(1)
+end
+
 function tap_touch_screen(x_,y_,frames)
 	current_frame = emu.framecount()
 	target_frame = current_frame + frames
@@ -731,9 +759,10 @@ function tap_touch_screen(x_,y_,frames)
 	end 
 end
 
-function press_button(btn)
+function press_button(btn,frames)
+	frames = frames or 2
 	current_frame = emu.framecount()
-	target_frame = current_frame + 2
+	target_frame = current_frame + frames
 	while current_frame ~= target_frame do
 		joy[btn] = true 
 		joypad.set(joy)
@@ -742,6 +771,23 @@ function press_button(btn)
 	end 
 	joy[btn] = false
 end 
+
+function press_buttons(btns,frames)
+	frames = frames or 2
+	current_frame = emu.framecount()
+	target_frame = current_frame + frames
+	while current_frame ~= target_frame do
+		for i = 1,#btns do
+			joy[btns[i]] = true
+		end 
+		joypad.set(joy)
+		emu.frameadvance()
+		current_frame = emu.framecount()
+	end 
+	for btn = 1,#btns do
+		joy[btn] = false
+	end 
+end 	
 
 function use_menu(menu_index)
 	if memory.readword(base + mapdata_and_menu_struct["side_menu_state"]) == 0 then	
@@ -801,13 +847,38 @@ function mash_button(btn,frames)
 	end 
 end
 
-function save(reset)
+function save(reset,wait_for_intro)
+	reset = reset or "hard"
+	wait_for_intro = wait_for_intro or false
 	use_menu(4)
 	mash_button("A",200)
-	wait_frames(500)
-	if reset or true then
-		print("this will reset in future")
+	wait_frames(400)
+	if reset == "hard" then
+		print("hard reset")
+		emu.reset()
+	elseif reset == "soft" then
+		print("soft reset")
+		press_buttons({"start","select","L","R"},2)
+		wait_for_reset()
+		wait_frames(40)
+	else return
 	end 
+	if wait_for_intro then
+		wait_frames(1600) --1300 is enough, this is for demonstration purposes
+		press_button("A")
+		wait_frames(80)
+		press_button("A")
+		wait_frames(200)
+		press_button("A")
+		return
+	end 
+	wait_frames(450)
+	press_button("A")
+	wait_frames(80)
+	press_button("A")
+	wait_frames(200)
+	press_button("A")
+
 end 
 
 function get_on_bike(bike_gear)
@@ -854,20 +925,6 @@ function graphic_reload()
 	press_button("B")
 	wait_frames(100)
 	press_button("B")
-end 
-
-function fmt(arg,len)
-    return string.format("%0"..len.."X", bit.band(4294967295, arg))
-end
-
-function print_txt(x,y,txt,clr,screen)
-	screen = screen or 1
-	gui.text(x,screen_y[screen]+y,txt,clr)
-end 
-
-function draw_rectangle(x,y,width,height,fill,border_clr,screen)
-	screen = screen or 1
-	gui.box(x-(width/2),screen_y[screen]+y-(height/2),x+(width/2),screen_y[screen]+y+(height/2),fill,border_clr)
 end 
 
 -- MOVEMENT FUNCTIONS
@@ -1022,9 +1079,9 @@ function auto_movement()
 
 	-- up(430)
 	-- left(1)
-	-- save()
+	save("soft")
 
-	graphic_reload()
+	-- graphic_reload()
 end 
 
 tp_amount = 31
@@ -1297,7 +1354,7 @@ function main_gui()
 	show_menu(menu_id)
 
 	get_keys()
-	-- get_joy()
+	get_joy()
 	get_stylus()
 	run_functions_on_keypress()
 end
