@@ -709,6 +709,15 @@ function get_stylus()
 	stylus_ = stylus.get()
 end
 
+function wait_frames(frames)
+	current_frame = emu.framecount()
+	target_frame = current_frame + frames
+	while current_frame ~= target_frame do
+		emu.frameadvance()
+		current_frame = emu.framecount()
+	end 
+end
+
 function tap_touch_screen(x_,y_,frames)
 	current_frame = emu.framecount()
 	target_frame = current_frame + frames
@@ -741,7 +750,10 @@ function use_menu(menu_index)
 	
 	current_menu_index = memory.readbyte(base + mapdata_and_menu_struct["menu_index"])
 
-	if menu_index > current_menu_index then 
+	if menu_index == current_menu_index then 
+		wait_frames(4)
+		press_button("A")
+	elseif menu_index > current_menu_index then 
 		btn = "down"
 	else
 		btn = "up"
@@ -778,18 +790,71 @@ function mash_text(frames)
 	joy[mash_switch[btn]] = false
 end 
 
-function mash_text_only_a_press(frames)
-	current_frame = emu.framecount()
-	target_frame = current_frame + frames
-	while current_frame < target_frame do
-		print("hey")
-		joy.A = true
-		joypad.set(joy)
-		emu.frameadvance()
-		current_frame = emu.framecount()
+function mash_button(btn,frames)
+	c_frame_mash = emu.framecount()
+	target_frame_mash = current_frame + frames
+	
+	while current_frame_mash ~= target_frame_mash do
+		press_button(btn)
 		wait_frames(2)
+		current_frame_mash = emu.framecount()
 	end 
 end
+
+function save(reset)
+	use_menu(4)
+	mash_button("A",200)
+	wait_frames(500)
+	if reset or true then
+		print("this will reset in future")
+	end 
+end 
+
+function get_on_bike(bike_gear)
+	bike_gear = bike_gear or 1
+	wait_frames(4)
+
+	if check_bike_state() == 0 then -- walking, slow bike
+		press_button("Y")
+		wait_frames(8)
+		if bike_gear == 1 then 
+			press_button("B")
+			wait_frames(8)
+		end
+		return
+	end
+	if check_bike_state() == 1 then -- on bike, slow bike
+		if bike_gear == 1 then
+			press_button("B")
+			wait_frames(8)
+		end 
+		return
+	end 
+	if check_bike_state() == 2 then --on bike, fast bike
+		if bike_gear == 0 then
+			press_button("B")
+			wait_frames(8)
+		end 
+		return
+	end 
+	if check_bike_state() == 4 then -- walking, fast bike
+		press_button("Y")
+		wait_frames(8)
+		if bike_gear == 0 then 
+			press_button("B")
+			wait_frames(8)
+		end
+		return
+	end
+end
+
+function graphic_reload()
+	use_menu(5)
+	wait_frames(100)
+	press_button("B")
+	wait_frames(100)
+	press_button("B")
+end 
 
 function fmt(arg,len)
     return string.format("%0"..len.."X", bit.band(4294967295, arg))
@@ -804,15 +869,6 @@ function draw_rectangle(x,y,width,height,fill,border_clr,screen)
 	screen = screen or 1
 	gui.box(x-(width/2),screen_y[screen]+y-(height/2),x+(width/2),screen_y[screen]+y+(height/2),fill,border_clr)
 end 
-
-function wait_frames(frames)
-	current_frame = emu.framecount()
-	target_frame = current_frame + frames
-	while current_frame ~= target_frame do
-		emu.frameadvance()
-		current_frame = emu.framecount()
-	end 
-end
 
 -- MOVEMENT FUNCTIONS
 
@@ -838,7 +894,11 @@ function check_bike_state()
 		if memory.readword(base+live_struct["bike_gear_16"]) == 1 then -- fast gear
 			bike_state = 2
 		end
-	end 
+	else 
+		if memory.readword(base+live_struct["bike_gear_16"]) == 1 then -- fast gear, but walking
+			bike_state = 4
+		end	
+	end 	
 	return bike_state
 end 
 
@@ -958,11 +1018,13 @@ end
 function auto_movement()
 	-- down(1)
 	-- right(16)
-	-- press_button("Y")
-	-- mash_text(400)
-	use_menu(4)
-	mash_text_only_a_press(600)
+	-- get_on_bike()
 
+	-- up(430)
+	-- left(1)
+	-- save()
+
+	graphic_reload()
 end 
 
 tp_amount = 31
