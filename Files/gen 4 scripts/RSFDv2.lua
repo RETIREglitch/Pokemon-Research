@@ -253,7 +253,7 @@ steps_data = {
 data_tables = {
 	--1 DP and PD demo
 	{	
-		-- standalone offs
+		item_struct_offs = 0x838,
 		step_counter_offs = 0x1384,
 
 		-- start of structure offsets/structure data
@@ -285,7 +285,7 @@ data_tables = {
 		memory_state_check_val = 0x2C9EC,
 
 		menu_data = 0x29434,
-		bag_menu_index_offs = 0x2977C,
+		current_pocket_index_offs = 0x2977C,
 
 		ug_revealing_circle_struct_offs = 0x115150,
 		ug_trap_struct_offs =0x12B5B0,
@@ -599,7 +599,25 @@ trigger_struct = {
 chunk_struct = {
 }
 
-items_struct = {
+start_item_struct = data_table["item_struct_offs"]
+
+item_pocket_struct = {
+	{"items_pocket",start_item_struct, start_item_struct + 0x94},
+	{"medicine_pocket",start_item_struct + 0x51C,start_item_struct + 0x5BC},
+	{"balls_pocket",start_item_struct + 0x6BC,start_item_struct + 0x6F8},
+	{"tms_hms_pocket",start_item_struct + 0x35C,start_item_struct + 0x4EC},	
+	{"berries_pocket",start_item_struct + 0x5BC,start_item_struct + 0x6BC},
+	{"mails_pocket",start_item_struct + 0x4EC, start_item_struct + 0x5BC},
+	{"battle_items_pocket",start_item_struct + 0x6F8,start_item_struct + 0x9A1},
+	{"key_items_pocket",start_item_struct + 0x294,start_item_struct + 0x35C}
+}
+
+selected_key_item = start_item_struct + 0xC25
+
+
+item_struct = {
+	item_id = 0x0,
+	item_count = 0x4
 }
 
 start_ug_circle_struct = data_table["ug_revealing_circle_struct_offs"]
@@ -653,6 +671,12 @@ start_mapdata_and_menu_struct = data_table["mapdata_and_menu_struct_offs"]
 mapdata_and_menu_struct = {
 	side_menu_state = start_mapdata_and_menu_struct + 0x78,
 	menu_index = start_mapdata_and_menu_struct + 0xF4,
+}
+
+hovering_item_struct = {
+	hovering_item_text_pointer = 0x358,
+	hovering_item_id = 0x360,
+	unknown_16 = 0x362,
 }
 
 -- MATH, INPUT, FORMATTING, NON-GAMEPLAY RELATED FUNCTIONS
@@ -817,15 +841,63 @@ function use_menu(menu_index)
 	press_button("A")
 end
 
-function use_item(menu_id,item_id)
+function find_item_address_from_pocket(item_id,pocket_id,item_id2)
+	item_id2 = item_id2 or item_id
+	print(fmt(item_id,4))
+	print(fmt(item_id2,4))
+	current_addr = base + item_pocket_struct[pocket_id+1][2]
+	end_addr = base + item_pocket_struct[pocket_id+1][3]
+	current_item_id = memory.readword(current_addr)
+	while (current_addr < end_addr) and (current_item_id ~= 0) do
+		current_item_id = memory.readword(current_addr)
+		if (current_item_id == item_id) or (current_item_id == item_id2)  then
+			print("item found with id "..fmt(item_id,4).." or id "..fmt(item_id2,4).." at addr "..fmt(current_addr,8).." in "..item_pocket_struct[pocket_id+1][1])
+			return  current_addr
+		end 
+		current_addr = current_addr + 0x4
+	end 
+	return nil 
+end 
+
+
+function find_item_address(item_id)
+	for pocket_id = 0,#item_pocket_struct-1 do
+		current_addr = base + item_pocket_struct[pocket_id+1][2]
+		end_addr = base + item_pocket_struct[pocket_id+1][3]
+		current_item_id = memory.readword(current_addr)
+		while (current_addr < end_addr) and (current_item_id ~= 0) do
+			current_item_id = memory.readword(current_addr)
+			if current_item_id == item_id then
+				data = {current_addr,pocket_id}
+				print("item found with id "..fmt(item_id,4).." at addr "..fmt(current_addr,8).." in "..item_pocket_struct[pocket_id+1][1])
+				return data
+			end 
+			
+			current_addr = current_addr + 0x4
+		end 
+	end
+	print("item with id "..fmt(item_id,4).." not found")
+	return {nil,nil}
+end 
+
+function use_item(item_id)
+	item_data = find_item_address(item_id)
+	item_address = item_data[1]
+	pocket_id = item_data[2]
+
+	if item_address == nil then
+		print("use_item has failed, the requested item cannot be found in any pocket")
+		return
+	end
+	
 	item_id = item_id%0x100
 	use_menu(2)
 	wait_frames(100)
 	
-	bag_menu_id = memory.readbyte(base + data_table["bag_menu_index_offs"])
-	count_button_presses = math.abs(menu_id - bag_menu_id)
+	current_pocket_id = memory.readbyte(base + data_table["current_pocket_index_offs"])
+	count_button_presses = math.abs(pocket_id - current_pocket_id)
 
-	if menu_id > bag_menu_id then
+	if pocket_id > current_pocket_id then
 		direction = "right"
 	else
 		direction = "left"
@@ -835,22 +907,46 @@ function use_item(menu_id,item_id)
 		press_button(direction)
 		wait_frames(4)
 	end 
+	wait_frames(20)
+	current_pocket_id = memory.readbyte(base + data_table["current_pocket_index_offs"])
 
 	hovering_item_id_offs = memory.readdword(data_table["bag_hovering_data_ptr"])
-	hovering_item_id = memory.readbyte(hovering_item_id_offs + 0x360)
-	while item_id ~= hovering_item_id do
-		press_button("down")
-		wait_frames(2)
-		hovering_item_id = memory.readbyte(hovering_item_id_offs + 0x360)
-		if hovering_item_id == 0xF8 then
-			print("Failed to find item")
-			press_button("B")
-			wait_frames(120)
-			press_button("B")
-			wait_frames(8)
-			return
-		end 
+	hovering_item_id = memory.readbyte(hovering_item_id_offs + hovering_item_struct["hovering_item_id"])
+	hovering_item_address = find_item_address_from_pocket(hovering_item_id,current_pocket_id,hovering_item_id+0x100)
+		
+	if hovering_item_address == nil then 
+		print("use_item failed, current selected item couldn't be found in pocket"..current_pocket_id)
+		print("function will now return")
+		return
+	end 
+
+	count_button_presses = math.abs(item_address - hovering_item_address)/4
+	print(count_button_presses)
+
+	if item_address > hovering_item_address then
+		direction = "down"
+	else 
+		direction = "up"
 	end
+
+	for i = 1,count_button_presses do
+		press_button(direction)
+		wait_frames(8)
+	end
+
+	-- while item_id ~= hovering_item_id do
+	-- 	press_button(direction)
+	-- 	wait_frames(2)
+	-- 	hovering_item_id = memory.readbyte(hovering_item_id_offs + 0x360)
+	-- 	if hovering_item_id == 0xF8 then
+	-- 		print("Failed to find item")
+	-- 		press_button("B")
+	-- 		wait_frames(120)
+	-- 		press_button("B")
+	-- 		wait_frames(8)
+	-- 		return
+	-- 	end 
+	-- end
 
 	press_button("A")
 	wait_frames(8)
@@ -858,8 +954,11 @@ function use_item(menu_id,item_id)
 	wait_frames(120)
 end 
 
-function use_explorer_kit()
-	use_item(7,0x01AC)
+function use_explorer_kit(full)
+	-- full = full or false
+	-- use_item(7,0x01AC)
+	use_item(0x01AC)
+
 end
 
 mash_switch = {
