@@ -602,7 +602,7 @@ chunk_struct = {
 start_item_struct = data_table["item_struct_offs"]
 
 item_pocket_struct = {
-	{"items_pocket",start_item_struct, start_item_struct + 0x94},
+	{"items_pocket",start_item_struct, start_item_struct + 0x294},
 	{"medicine_pocket",start_item_struct + 0x51C,start_item_struct + 0x5BC},
 	{"balls_pocket",start_item_struct + 0x6BC,start_item_struct + 0x6F8},
 	{"tms_hms_pocket",start_item_struct + 0x35C,start_item_struct + 0x4EC},	
@@ -758,6 +758,9 @@ function wait_frames(frames)
 	while current_frame ~= target_frame do
 		emu.frameadvance()
 		current_frame = emu.framecount()
+		if current_frame == 0 then
+		 	break
+		end 
 	end 
 end
 
@@ -843,8 +846,6 @@ end
 
 function find_item_address_from_pocket(item_id,pocket_id,item_id2)
 	item_id2 = item_id2 or item_id
-	print(fmt(item_id,4))
-	print(fmt(item_id2,4))
 	current_addr = base + item_pocket_struct[pocket_id+1][2]
 	end_addr = base + item_pocket_struct[pocket_id+1][3]
 	current_item_id = memory.readword(current_addr)
@@ -867,6 +868,7 @@ function find_item_address(item_id)
 		current_item_id = memory.readword(current_addr)
 		while (current_addr < end_addr) and (current_item_id ~= 0) do
 			current_item_id = memory.readword(current_addr)
+			-- print("item with id "..fmt(current_item_id,4)..item_pocket_struct[pocket_id+1][1])
 			if current_item_id == item_id then
 				data = {current_addr,pocket_id}
 				print("item found with id "..fmt(item_id,4).." at addr "..fmt(current_addr,8).." in "..item_pocket_struct[pocket_id+1][1])
@@ -915,13 +917,10 @@ function use_item(item_id)
 	hovering_item_address = find_item_address_from_pocket(hovering_item_id,current_pocket_id,hovering_item_id+0x100)
 		
 	if hovering_item_address == nil then 
-		print("use_item failed, current selected item couldn't be found in pocket"..current_pocket_id)
+		print("use_item failed, current selected item couldn't be found in pocket "..current_pocket_id)
 		print("function will now return")
 		return
 	end 
-
-	count_button_presses = math.abs(item_address - hovering_item_address)/4
-	print(count_button_presses)
 
 	if item_address > hovering_item_address then
 		direction = "down"
@@ -929,24 +928,29 @@ function use_item(item_id)
 		direction = "up"
 	end
 
-	for i = 1,count_button_presses do
-		press_button(direction)
-		wait_frames(8)
-	end
+	-- slow, but efficient 
+	-- count_button_presses = math.abs(item_address - hovering_item_address)/4
 
-	-- while item_id ~= hovering_item_id do
+	-- for i = 1,count_button_presses do
 	-- 	press_button(direction)
-	-- 	wait_frames(2)
-	-- 	hovering_item_id = memory.readbyte(hovering_item_id_offs + 0x360)
-	-- 	if hovering_item_id == 0xF8 then
-	-- 		print("Failed to find item")
-	-- 		press_button("B")
-	-- 		wait_frames(120)
-	-- 		press_button("B")
-	-- 		wait_frames(8)
-	-- 		return
-	-- 	end 
+	-- 	wait_frames(8)
 	-- end
+
+	-- fast, but inefficient. the duality of man :/
+
+	while item_id ~= hovering_item_id do
+		press_button(direction)
+		wait_frames(2)
+		hovering_item_id = memory.readbyte(hovering_item_id_offs + 0x360)
+		-- if hovering_item_id == 0xF8 then
+		-- 	print("Failed to find item")
+		-- 	press_button("B")
+		-- 	wait_frames(120)
+		-- 	press_button("B")
+		-- 	wait_frames(8)
+		-- 	return
+		-- end 
+	end
 
 	press_button("A")
 	wait_frames(8)
@@ -954,11 +958,37 @@ function use_item(item_id)
 	wait_frames(120)
 end 
 
-function use_explorer_kit(full)
-	-- full = full or false
-	-- use_item(7,0x01AC)
+function use_explorer_kit(full,crash,reset_)
+	wait_frames(80)
 	use_item(0x01AC)
 
+	if full then 
+		mash_button("A",200)
+		wait_frames(400)
+		if crash then
+			wait_frames(400)
+			print("crash A")
+			press_button("A")
+			sleep(2)
+			wait_frames(650)
+			print("A 1")
+			press_button("A")
+			wait_frames(80)
+			print("A 2")
+			press_button("A")
+			wait_frames(200)
+			print("A 3")
+			press_button("A")
+			wait_frames(100)
+			return
+		end
+		if reset_ then
+			reset()
+		end 
+		return
+	end 
+	press_button("B")
+	wait_frames(60)
 end
 
 mash_switch = {
@@ -996,7 +1026,6 @@ function mash_button(btn,frames)
 end
 
 function save()
-	wait_for_intro = wait_for_intro or false
 	use_menu(4)
 	mash_button("A",200)
 	wait_frames(400)
@@ -1005,10 +1034,10 @@ end
 function reset(reset_type,wait_for_intro)
 	reset_type = reset_type or "hard"
 	if reset_type == "hard" then
-		print("hard reset")
+		-- print("hard reset")
 		emu.reset()
 	elseif reset == "soft" then
-		print("soft reset")
+		-- print("soft reset")
 		press_buttons({"start","select","L","R"},2)
 		wait_for_reset()
 		wait_frames(40)
@@ -1038,17 +1067,19 @@ function save_reset(reset_type,wait_for_intro)
 	reset(reset_type,wait_for_intro)
 end 
 
-function wrong_warp_reset()
+function wrong_warp_reset(wait_for_intro)
 	mash_button("A",400)
 	wait_frames(350)
 	mash_button("A",8)
 	wait_frames(200)
-	reset()
+	reset("hard",wait_for_intro)
 end 
 
-function get_on_bike(bike_gear)
+function get_on_bike(bike_gear,init_wait)
+	init_wait = init_wait or 4
 	bike_gear = bike_gear or 1
-	wait_frames(4)
+	init_wait = init_wait or 4
+	wait_frames(init_wait)
 
 	if check_bike_state() == 0 then -- walking, slow bike
 		press_button("Y")
@@ -1062,14 +1093,12 @@ function get_on_bike(bike_gear)
 	if check_bike_state() == 1 then -- on bike, slow bike
 		if bike_gear == 1 then
 			press_button("B")
-			wait_frames(8)
 		end 
 		return
 	end 
 	if check_bike_state() == 2 then --on bike, fast bike
 		if bike_gear == 0 then
 			press_button("B")
-			wait_frames(8)
 		end 
 		return
 	end 
@@ -1126,10 +1155,10 @@ end
 
 function move_player(pos,target,pos_offs,j_up,j_down,j_left,j_right)
 	while pos ~= target do
-		joy.up = j_up or false
-		joy.down = j_down or false
-		joy.left = j_left or false
-		joy.right = j_right or false
+		joy.up = j_up
+		joy.down = j_down
+		joy.left = j_left
+		joy.right = j_right
 		joypad.set(joy)
 		joy = {}
 		emu.frameadvance()
@@ -1137,10 +1166,17 @@ function move_player(pos,target,pos_offs,j_up,j_down,j_left,j_right)
 	end
 end 
 
+function return_arg(input,other)
+	if input == "false" then
+			return false
+		end
+	return other
+end
+
 function up(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 	delay_before_reset = delay_before_reset or 2
 	delay_after_reset = delay_after_reset or 4
-	reset_stepcounter = reset_stepcounter or true 
+	reset_stepcounter = return_arg(reset_stepcounter,true)
 
 	player_pos_y = memory.readdword(base + live_struct["z_pos_32_r"])
 	target = player_pos_y - steps
@@ -1167,7 +1203,7 @@ end
 function left(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 	delay_before_reset = delay_before_reset or 2
 	delay_after_reset = delay_after_reset or 4
-	reset_stepcounter = reset_stepcounter or true
+	reset_stepcounter = return_arg(reset_stepcounter,true)
 
 	player_pos_x = memory.readdword(base + live_struct["x_pos_32_r"])
 	target = player_pos_x - steps
@@ -1195,7 +1231,7 @@ end
 function down(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 	delay_before_reset = delay_before_reset or 2
 	delay_after_reset = delay_after_reset or 4
-	reset_stepcounter = reset_stepcounter or true
+	reset_stepcounter = return_arg(reset_stepcounter,true)
 
 	player_pos_y = memory.readdword(base + live_struct["z_pos_32_r"])
 	target = (player_pos_y + steps)%4294967296
@@ -1217,7 +1253,7 @@ end
 function right(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 	delay_before_reset = delay_before_reset or 2
 	delay_after_reset = delay_after_reset or 4
-	reset_stepcounter = reset_stepcounter or true
+	reset_stepcounter = return_arg(reset_stepcounter,true)
 
 	player_pos_x = memory.readdword(base + live_struct["x_pos_32_r"])
 	target = (player_pos_x + steps)%4294967296
@@ -1237,13 +1273,34 @@ function right(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 	wait_frames(delay_after_reset*30)
 end
 
+function go_direction_wait_warp(direction,frames)
+	frames = frames or 200
+	wait_frames(20)
+	press_button(direction)
+	wait_frames(frames)
+end
+
 function auto_movement()
+	-- get_on_bike(0,0)
+	-- right(5,0,0,"false")
+	-- down(1,0,0,"false")
+	-- up(1,0,0,"false")
+	-- left(1,0,0,"false")
+	-- get_on_bike(1,0)
+	-- up(27,0,0,"false")
+	-- left(37,0,0,"false")
+	-- up(13,0,0,"false")
+	-- right(7,0,0,"false")
+	-- down(1)
+	-- graphic_reload()
+	-- go_direction_wait_warp("down")
+
 	-- down(1)
 	-- right(16)
-	-- get_on_bike()
+	-- get_on_bike(1)
 	-- up(430)
 	-- left(1)
-	-- save_reset()
+	-- use_explorer_kit(true,true)
 
 	-- right(193)
 	-- up(64)
@@ -1256,10 +1313,19 @@ function auto_movement()
 	-- graphic_reload()
 	-- down(3)
 	-- left(2)
-	-- wrong_warp_reset()
+	-- wrong_warp_reset(true)
+	
+	-- wait_frames(100)
+	-- right(704)
+	-- down(725)
+	-- right(16)
+	-- use_explorer_kit(true,true)
+	-- wait(100)
+	-- right(2)
+	-- use_item(0x4F)
 	use_explorer_kit()
 
-	-- graphic_reload()
+
 end 
 
 tp_amount = 31
