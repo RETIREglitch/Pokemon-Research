@@ -310,7 +310,10 @@ data_tables = {
 		ug_trap_count_addr= 0x222CAD7,
 
 		ug_init_addr = 0x2250E86,
-		ug_init_val = 0x1F
+		ug_init_val = 0x1F,
+
+		game_state = 0x21C45B8, -- 4 = wifiroom, 5 = underground, 6 = overworld, 0x10 = battle
+		battle_check = 0x221885E
 	},
 
 	--2 DP KOREAN version
@@ -756,7 +759,7 @@ end
 function wait_frames(frames)
 	current_frame = emu.framecount()
 	target_frame = current_frame + frames
-	while current_frame ~= target_frame do
+	while current_frame < target_frame do
 		emu.frameadvance()
 		current_frame = emu.framecount()
 		if current_frame == 0 then
@@ -781,7 +784,7 @@ end
 function tap_touch_screen(x_,y_,frames)
 	current_frame = emu.framecount()
 	target_frame = current_frame + frames
-	while current_frame ~= target_frame do
+	while current_frame < target_frame do
 		stylus_.x = x_
 		stylus_.y = y_
 		stylus_.touch = true
@@ -808,7 +811,7 @@ function press_buttons(btns,frames)
 	frames = frames or 2
 	current_frame = emu.framecount()
 	target_frame = current_frame + frames
-	while current_frame ~= target_frame do
+	while current_frame < target_frame do
 		for i = 1,#btns do
 			joy[btns[i]] = true
 		end 
@@ -820,6 +823,8 @@ function press_buttons(btns,frames)
 		joy[btn] = false
 	end 
 end 	
+
+-- menu selection 
 
 function use_menu(menu_index)
 	if memory.readword(base + mapdata_and_menu_struct["side_menu_state"]) == 0 then	
@@ -861,7 +866,6 @@ function find_item_address_from_pocket(item_id,pocket_id,item_id2)
 	return nil 
 end 
 
-
 function find_item_address(item_id)
 	for pocket_id = 0,#item_pocket_struct-1 do
 		current_addr = base + item_pocket_struct[pocket_id+1][2]
@@ -882,15 +886,6 @@ function find_item_address(item_id)
 	print("item with id "..fmt(item_id,4).." not found")
 	return {nil,nil}
 end 
-
-function use_item(item_id,menu_open)
-	menu_open = menu_open or false 
-	if menu_open == false then 
-		use_menu(2)
-		wait_frames(100)
-	end 
-	switch_to_item(item_id)
-end
 
 function switch_to_item(item_id)
 	item_data = find_item_address(item_id)
@@ -970,6 +965,15 @@ function switch_to_item(item_id)
 	wait_frames(120)
 end 
 
+function use_item(item_id,menu_open)
+	menu_open = menu_open or false 
+	if menu_open == false then 
+		use_menu(2)
+		wait_frames(100)
+	end 
+	switch_to_item(item_id)
+end
+
 function use_explorer_kit(full,crash,reset_,menu_open)
 	wait_frames(80)
 	use_item(0x01AC,menu_open)
@@ -1003,6 +1007,25 @@ function use_explorer_kit(full,crash,reset_,menu_open)
 	wait_frames(60)
 end
 
+function close_menu(close_side_menu)
+	press_button("B")
+	wait_frames(100)
+	if close_side_menu then
+		press_button("B")
+	end
+end
+
+--
+
+function ledgecancel(steps,keep_side_menu)
+	steps = steps or 0
+	wait_frames(steps*8+4)
+	press_button("X")
+	if keep_side_menu then return end
+	wait_frames(4)
+	press_button("B")
+end 
+
 mash_switch = {
 	A = "B",
 	B = "A"
@@ -1030,12 +1053,30 @@ function mash_button(btn,frames)
 	c_frame_mash = emu.framecount()
 	target_frame_mash = c_frame_mash+ frames
 	
-	while c_frame_mash ~= target_frame_mash do
+	while c_frame_mash < target_frame_mash do
 		press_button(btn)
 		wait_frames(2)
 		c_frame_mash = emu.framecount()
 	end 
 end
+
+function mash_pal_park_text(text_box)
+	text_box = text_box or 0
+
+	if text_box == 1 then
+		wait_frames(80)
+		mash_button("A",620)
+		wait_frames(60)
+		press_button("down")
+		wait_frames(90)
+		mash_button("A",12)
+		wait_frames(120)
+		mash_button("A",200)
+		wait_frames(120)
+		clear_stepcounter()
+		return 
+	end 
+end 
 
 function save()
 	use_menu(4)
@@ -1150,6 +1191,10 @@ function set_stepcounter(steps)
 	memory.writeword(step_addr,0)
 end 
 
+function clear_stepcounter()
+	tap_touch_screen(115,120,4)
+end 
+
 function check_bike_state()
 	bike_state = 0
 	if memory.readword(base+live_struct["movement_mode_32"]) == 1 then -- on bike
@@ -1207,7 +1252,7 @@ function up(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 	move_player(pos,target,live_struct["z_pos_32_r"],true)
 	if reset_stepcounter then
 		wait_frames(delay_before_reset*30)
-		tap_touch_screen(115,120,4)
+		clear_stepcounter()
 	end 
 	wait_frames(delay_after_reset*30)
 end
@@ -1235,7 +1280,7 @@ function left(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 	
 	if reset_stepcounter then
 		wait_frames(delay_before_reset*30)
-		tap_touch_screen(115,120,4)
+		clear_stepcounter()
 	end 
 	wait_frames(delay_after_reset*30)
 end
@@ -1257,7 +1302,7 @@ function down(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 	move_player(pos,target,live_struct["z_pos_32_r"],false,true)
 	if reset_stepcounter then
 		wait_frames(delay_before_reset*30)
-		tap_touch_screen(115,120,4)
+		clear_stepcounter()
 	end 
 	wait_frames(delay_after_reset*30)
 end
@@ -1280,7 +1325,7 @@ function right(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 	move_player(pos,target,live_struct["x_pos_32_r"],false,false,false,true)
 	if reset_stepcounter then
 		wait_frames(delay_before_reset*30)
-		tap_touch_screen(115,120,4)
+		clear_stepcounter()
 	end 
 	wait_frames(delay_after_reset*30)
 end
@@ -1292,55 +1337,156 @@ function go_direction_wait_warp(direction,frames)
 	wait_frames(frames)
 end
 
+function check_battle_state()
+	if memory.readword(data_table["battle_check"]) ~= 0 then
+		return true
+	end
+	return false 
+end 
+
+function turn_around(frames,until_encounter)
+	frames = frames or 400
+	until_encounter = return_arg(until_encounter,true)
+	if until_encounter then
+		while not check_battle_state() do
+			press_button("right",4)
+			wait_frames(4)
+			press_button("left",4)
+			wait_frames(4)
+		end 
+		return
+	end 
+	c_frame = emu.framecount()
+	t_frame = c_frame + frames
+	while c_frame < t_frame do
+		press_button("right",4)
+		wait_frames(4)
+		press_button("left",4)
+		wait_frames(4)
+		emu.frameadvance()
+		c_frame = emu.framecount()
+		if c_frame == 0 then
+		 	break
+		end 
+	end 
+end 
+
+function throw_ball(special_fight)
+	if special_fight then -- safari/pal park
+		tap_touch_screen(115,120,4)
+		return
+	end
+end 
+
+function catch_pal_park_mon(count)
+	count = count or 6
+	for i=0,count-1 do
+		turn_around()
+		wait_frames(200)
+		mash_button("A",120)
+		wait_frames(100)
+		throw_ball(true)
+		mash_button("A",200)
+		wait_frames(1000)
+	end 
+end 
+
 function auto_movement()
-	-- get_on_bike(0,0)
-	-- right(5,0,0,"false")
-	-- down(1,0,0,"false")
-	-- up(1,0,0,"false")
-	-- left(1,0,0,"false")
-	-- get_on_bike(1,0)
-	-- up(27,0,0,"false")
-	-- left(37,0,0,"false")
-	-- up(13,0,0,"false")
-	-- right(7,0,0,"false")
-	-- down(1)
-	-- graphic_reload()
-	-- go_direction_wait_warp("down")
+	get_on_bike(0,0)
+	right(5,0,0,"false")
+	down(1,0,0,"false")
+	up(1,0,0,"false")
+	left(1,0,0,"false")
+	get_on_bike(1,0)
+	up(27,0,0,"false")
+	left(37,0,0,"false")
+	up(13,0,0,"false")
+	right(7,0,0,"false")
+	down(1)
+	graphic_reload()
+	go_direction_wait_warp("down")
 
-	-- down(1)
-	-- right(16)
-	-- get_on_bike(1)
-	-- up(430)
-	-- left(1)
-	-- use_explorer_kit(true,true)
+	down(1)
+	right(16)
+	get_on_bike(1)
+	up(430)
+	left(1)
+	use_explorer_kit(true,true)
 
-	-- right(193)
-	-- up(64)
-	-- save_reset()
+	right(193)
+	up(64)
+	save_reset()
 
-	-- left(214)
-	-- down(479)
-	-- graphic_reload()
-	-- down(2)
-	-- graphic_reload()
-	-- down(3)
-	-- left(2)
-	-- wrong_warp_reset(true)
+	left(214)
+	down(479)
+	graphic_reload()
+	down(2)
+	graphic_reload()
+	down(3)
+	left(2)
+	wrong_warp_reset(true)
 	
-	-- wait_frames(100)
-	-- right(704)
-	-- down(725)
-	-- right(16)
-	-- use_explorer_kit(true,true)
-	-- wait(100)
-	-- right(2)
+	wait_frames(100)
+	right(704)
+	down(725)
+	right(16)
+	use_explorer_kit(true,true)
+	wait(100)
+
+	right(2)
 	use_item(0x4F)
 	wait_frames(30)
 	press_button("A")
+	wait_frames(8)
+	close_menu(true)
+	ledgecancel(2)
+	wait_frames(60)
+	down(10,0,0,"false")
+	right(8,0,0,"false")
+	up(8,0,0,"false")
+	right(9,0,0,"false")
+	up(2,0,0,"false")
+	right(5)
+	right(68,0,0,"false")
+	wait_frames(30)
+	mash_button("A",80)
+	wait_frames(8)
+	right(348)
+	down(1995)
+	right(96)
+	down(160)
+	right(32)
+	down(160)
+	right(32)
+	down(96)
+	right(160)
+	down(32)
+
+	wait_frames(80) -- pal park hub
+	right(64)
+	up(161,0,0,"false")
+	wait_frames(400)
+	clear_stepcounter()
+	wait_frames(60)
+	down(161)
+	left(33,0,0,"false")
+	mash_pal_park_text(1)
+
+	left(160)
+	up(551)
+	left(32)
+	up(224)
+	right(161)
+	up(1791)
+	right(370)
+	up(1)
+	graphic_reload()
+
+	catch_pal_park_mon()
+	wait_frames(20)
+	mash_button("A",32)
 	
-	use_explorer_kit(false,false,false,true)
-
-
+	print("auto_movement has finished")
 end 
 
 tp_amount = 31
