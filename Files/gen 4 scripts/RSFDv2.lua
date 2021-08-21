@@ -677,6 +677,7 @@ hovering_item_struct = {
 	hovering_item_text_pointer = 0x358,
 	hovering_item_id = 0x360,
 	unknown_16 = 0x362,
+	cursor_offset_16 = 0x364,
 }
 
 -- MATH, INPUT, FORMATTING, NON-GAMEPLAY RELATED FUNCTIONS
@@ -882,7 +883,16 @@ function find_item_address(item_id)
 	return {nil,nil}
 end 
 
-function use_item(item_id)
+function use_item(item_id,menu_open)
+	menu_open = menu_open or false 
+	if menu_open == false then 
+		use_menu(2)
+		wait_frames(100)
+	end 
+	switch_to_item(item_id)
+end
+
+function switch_to_item(item_id)
 	item_data = find_item_address(item_id)
 	item_address = item_data[1]
 	pocket_id = item_data[2]
@@ -891,10 +901,6 @@ function use_item(item_id)
 		print("use_item has failed, the requested item cannot be found in any pocket")
 		return
 	end
-	
-	item_id = item_id%0x100
-	use_menu(2)
-	wait_frames(100)
 	
 	current_pocket_id = memory.readbyte(base + data_table["current_pocket_index_offs"])
 	count_button_presses = math.abs(pocket_id - current_pocket_id)
@@ -909,26 +915,30 @@ function use_item(item_id)
 		press_button(direction)
 		wait_frames(4)
 	end 
-	wait_frames(20)
-	current_pocket_id = memory.readbyte(base + data_table["current_pocket_index_offs"])
-
+	wait_frames(40)
+	current_pocket_id = memory.readbyte(base + data_table["current_pocket_index_offs"])	
 	hovering_item_id_offs = memory.readdword(data_table["bag_hovering_data_ptr"])
-	hovering_item_id = memory.readbyte(hovering_item_id_offs + hovering_item_struct["hovering_item_id"])
-	hovering_item_address = find_item_address_from_pocket(hovering_item_id,current_pocket_id,hovering_item_id+0x100)
-		
-	if hovering_item_address == nil then 
-		print("use_item failed, current selected item couldn't be found in pocket "..current_pocket_id)
-		print("function will now return")
-		return
+
+	if memory.readword(hovering_item_id_offs + hovering_item_struct["cursor_offset_16"]) == 0x5A then -- hovering over "none"
+		direction = "up"
+	else	
+		hovering_item_id = memory.readbyte(hovering_item_id_offs + hovering_item_struct["hovering_item_id"])
+		hovering_item_address = find_item_address_from_pocket(hovering_item_id,current_pocket_id,hovering_item_id+0x100)
+
+		if hovering_item_address == nil then -- failed to find item in current pocket
+			print("use_item failed, item"..fmt(hovering_item_id,4).."couldn't be found in pocket "..current_pocket_id)
+			print("function will now return")
+			return
+		end
+
+		if item_address > hovering_item_address then
+			direction = "down"
+		else 
+			direction = "up"
+		end
 	end 
 
-	if item_address > hovering_item_address then
-		direction = "down"
-	else 
-		direction = "up"
-	end
-
-	-- slow, but efficient 
+	-- slow, but efficient, doesn't work with none sadly
 	-- count_button_presses = math.abs(item_address - hovering_item_address)/4
 
 	-- for i = 1,count_button_presses do
@@ -938,10 +948,12 @@ function use_item(item_id)
 
 	-- fast, but inefficient. the duality of man :/
 
-	while item_id ~= hovering_item_id do
+	while item_id%0x100 ~= hovering_item_id do
 		press_button(direction)
 		wait_frames(2)
 		hovering_item_id = memory.readbyte(hovering_item_id_offs + 0x360)
+		-- print(fmt(item_id,4),fmt(hovering_item_id,4))
+		
 		-- if hovering_item_id == 0xF8 then
 		-- 	print("Failed to find item")
 		-- 	press_button("B")
@@ -958,9 +970,9 @@ function use_item(item_id)
 	wait_frames(120)
 end 
 
-function use_explorer_kit(full,crash,reset_)
+function use_explorer_kit(full,crash,reset_,menu_open)
 	wait_frames(80)
-	use_item(0x01AC)
+	use_item(0x01AC,menu_open)
 
 	if full then 
 		mash_button("A",200)
@@ -1322,8 +1334,11 @@ function auto_movement()
 	-- use_explorer_kit(true,true)
 	-- wait(100)
 	-- right(2)
-	-- use_item(0x4F)
-	use_explorer_kit()
+	use_item(0x4F)
+	wait_frames(30)
+	press_button("A")
+	
+	use_explorer_kit(false,false,false,true)
 
 
 end 
