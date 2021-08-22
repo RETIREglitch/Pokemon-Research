@@ -1,45 +1,22 @@
----------------------------------------------
----- RSFD - Routing Script For Dummies ------
----------------------------------------------
-
----------------------------------------------
---Original versions 'void.lua' and 'loadline.lua' created by MKdasher, 
---Game version and Basepointer setup by Ganix
---RETIRE scriptcalling by Martmists
---All other features + modifications for DPPTHGSS support by RETIRE
-
---NOTE: don't enable infinite repel until actually in game, will reset the game if you select savefile with it active.
----------------------------------------------
+-------------------------------------------------
+----    RSFD - Routing Script For Dummies    ----
+-------------------------------------------------
+--              by RETIREglitch                --
+-------------------------------------------------
+--  base pointer addresses provided by Ganix   --
+--  void formula based on void.lua by MKdasher --
+-------------------------------------------------
 
 -- DATA TABLES
-
-local tile_names = {
-			"nothing","nothing","Grass","Grass","4","Cave","Cave/Tree","7","Cave","9","10", "HauntH","CaveW","13","14","15",
-			"Pond","Water","Water","WaterF","Water","Water","Puddle","ShallW","24","Water","26","27","28","29","30","31",
-			"Ice","Sand","Water","35","Cave","Cave","38","39","40","41","Water","43","44","45","46","47",
-			"OnesideW","OnesideW","OnesideW","OnesideW","OnesideW","OnesideW","OnesideW","OnesideW","LedgeR","LedgeL","LedgeU","LedgeD","60","61","62","LedgeCor",
-			"SpinR","SpinL","SpinU","SpinD","68","69","70","71","72","Stair","Stair","RockCVert","RockCHor","77","78","79",
-			"Water","Water","Water","Water","84","85","HightM","HightM","HightM","HightM","90","91","92","93","Warp","Warp",
-			"Warp","Warp","Doormat","Doormat","Doormat","Doormat","Warp","Warp","Warp","Warp","Warp","Warp","Warp","Warp","Warp","Warp",
-			"StartBr","BridgeNul","BridgeCave","BridgeWat","Bridge?","BridgeSn","BikeBr","BikeBr?","BikeBr","BikeBr","BikeBr","BBridgeEnc","BikeBr?","BikeBr","126","127",
-			"Counter","129","130","PC","132","Map","Television","135","Bookcases","137","138","139","140","141","Book","143",
-			"144","145","146","147","148","149","150","151","152","153","154","155","156","157","158","159",
-			"Soil","SnowSp2","SnowSp1","SnowSp0","Mud","MudBlock","MudGr","MudGrBlock","Snow","MeltSnow","170","171","172","173","174","175",
-			"176","177","178","179","180","181","182","183","184","185","186","187","188","189","190","191",
-			"192","193","194","195","196","197","198","199","200","201","202","203","204","205","206","207",
-			"208","209","210","211","212","213","214","BikeLR","BikeLL","SlopeTop","SlopeBot","bikeStall","220","221","222","223",
-			"Bookcases","Bookcases","Bookcases","227","ThrashBin","Obj","230","231","232","233","234","235","236","237","238","239",
-			"240","241","242","243","244","245","246","247","248","249","250","251","252","253","254","Void"
-}
 
 local map_id_list = {
 	Goal = {
 		color = '#f7bbf3',
-		ids = {32}
+		ids = {333,332}
 		},
 	Chains= {
 		color = '#DfA',
-		ids = {}
+		ids = {469,406,385,40, 442, 450, 457, 499, 501,342, 406, 501, 502, 503}
 	},
 	MysteryZone = {
 		color = '#88888866',
@@ -86,10 +63,33 @@ for k,v in pairs(map_id_list) do
 	end
 end
 
+local tile_names = {
+			"nothing","nothing","Grass","Grass","4","Cave","Cave","7","Cave","9","10", "Haunted House","Cave wall","13","14","15",
+			"Pond","Water","Water","WaterF","Water","Water","Puddle","ShallW","24","Water","26","27","28","29","30","31",
+			"Ice","Sand","Water","35","Cave","Cave","38","39","40","41","Water","43","44","45","46","47",
+			"Onesided Wall","Onesided Wall","Onesided Wall","Onesided Wall","Doublesided Wall","Doublesided Wall","Doublesided Wall","Doublesided Wall","Ledge (R)","Ledge (L)","Ledge (U)","Ledge (D)","60","61","62","Ledge Corner",
+			"Spin (R)","Spin (L)","Spin (U)","Spin (D)","68","69","70","71","72","Stair","Stair","Rockclimb (V)","Rockclimb (H)","77","78","79",
+			"Water","Water","Water","Water","84","85","Raised Model","Raised Model","Raised Model","Raised Model","90","91","92","93","Warp","Warp",
+			"Warp","Warp","Doormat","Doormat","Doormat","Doormat","Warp","Warp","Warp","Warp","Warp","Warp","Warp","Warp","Warp","Warp",
+			"Start Bridge","Bridge","Bridge (C)","Bridge (W)","Bridge","Bridge (Sn)","Bike Bridge","Bike Bridge","Bike Bridge","Bike Bridge","Bike Bridge","Bike Bridge (G)","Bike Bridge (W)","Bike Bridge","126","127",
+			"Counter","129","130","PC","132","Map","Television","135","Bookcases","137","138","139","140","141","Book","143",
+			"144","145","146","147","148","149","150","151","152","153","154","155","156","157","158","159",
+			"Soil","Deep Snow 1","Deep Snow 2","Deep Snow 3","Mud","Mud (B)","Mud Grass","Mud Grass (B)","Snow","Melting snow","170","171","172","173","174","175",
+			"176","177","178","179","180","181","182","183","184","185","186","187","188","189","190","191",
+			"192","193","194","195","196","197","198","199","200","201","202","203","204","205","206","207",
+			"208","209","210","211","212","213","214","Bike ramp (R)","Bikeramp (L)","Slope top","Slope bottom","Bikestall","220","221","222","223",
+			"Bookcases","Bookcases","Bookcases","227","Thrashbin","Misc Objects","230","231","232","233","234","235","236","237","238","239",
+			"240","241","242","243","244","245","246","247","248","249","250","251","252","253","254","Unloaded"
+} -- 6 is tree in HGSS
+
 tile_id_list = {
 	Grass = {
         color = '#40a',
-        ids = {0x2}
+        ids = {0x2,0x7B}
+    },
+	Normal = {
+        color = nil,
+        ids = {0xff}
     },
 	Warps = {
         color = '#f03',
@@ -97,25 +97,25 @@ tile_id_list = {
 	},
 	Cave = {
         color = '#bb7410',
-        ids = {0x8,0xC}
+        ids = {0x6,0x8,0xC}
 	},
 	Water = {
-        color = '#8888f',
-        ids = {0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x19,0x22,0x2A}
+        color = '#4888f',
+        ids = {0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x19,0x22,0x2A,0x7C}
     },
     Sand = {
         color = '#e3c',
         ids = {0x21,0x21}
 	},
-	SnowSlow = {
+	DeepSnow1 = {
         color = '#8da9cb',
         ids = {0xA1}
     },
-    Snow2xSlow = {
+    DeepSnow2 = {
         color = '#6483a7',
         ids = {0xA2}
     },
-    Snow3xslow = {
+    DeepSnow3 = {
         color = '#52749d',
         ids = {0xA3}
 	},
@@ -123,15 +123,15 @@ tile_id_list = {
         color = '#92897',
         ids = {0xA4}
     },
-    StuckMud = {
+    MudBlocking = {
         color = '#92704',
         ids = {0xA5}
     },
-    GrassMud = {
+    MudGrass = {
         color = '#4090',
         ids = {0xA6}
     },
-    GrassMudStuck = {
+    MudGrassBlocking = {
         color = '#55906',
         ids = {0xA7}
 	},
@@ -217,11 +217,12 @@ tile_id_list = {
     },
     Bridge = {
         color = '#C79',
-        ids = {0x70,0x71,0x72,0x73,0x74,0x75,}
+        ids = {0x70,0x71,0x72,0x73,0x74,0x75}
 	},
-    BridgeBike = {
+    BikeBridge= {
         color = '#C7A55',
-        ids = {0x76,0x77,0x78,0x79,0x7A,0x7B,0x7C,0x7D}
+        ids = {0x76,0x77,0x78,0x79,0x7A,0x7D}
+		-- BikeBridge 0x7C moves to water, 0x7B moved to grass
 	},
     Berrysoil = {
         color = '#b2703',
@@ -235,14 +236,10 @@ tile_id_list = {
         color = '#A880',
         ids = {0xD9,0xDA}
     },
-	Normal = {
-        color = '',
-        ids = {0xff}
-    },
-	Trees = {
-        color = '#CCCCC',
-        ids = {0x6}
-    },
+	-- Trees = {
+    --     color = '#CCCCC',
+    --     ids = {0x6}
+    -- }, -- HGSS, remove 0x6 from cave list if used
 }
 
 tile_ids = {}
@@ -254,13 +251,742 @@ for k,v in pairs(tile_id_list) do
 end
 
 
-scripts = {[0] = 1, [1] = 1, [2] = 6, [3] = 27, [4] = 4, [5] = 1, [6] = 4, [7] = 1, [8] = 4, [9] = 4, [10] = 7, [11] = 17, [12] = 3, [13] = 4, [14] = 2, [15] = 14, [16] = 7, [17] = 6, [18] = 1, [19] = 2, [20] = 2, [21] = 1, [22] = 1, [23] = 1, [24] = 4, [25] = 2, [26] = 2, [27] = 1, [28] = 11, [29] = 12, [30] = 3, [31] = 2, [32] = 1, [33] = 24, [34] = 4, [35] = 4, [36] = 4, [37] = 1, [38] = 4, [39] = 4, [40] = 12, [41] = 2, [42] = 1, [43] = 3, [44] = 3, [45] = 19, [46] = 4, [47] = 3, [48] = 4, [49] = 1, [50] = 3, [51] = 4, [52] = 2, [53] = 3, [54] = 2, [55] = 3, [56] = 3, [57] = 1, [58] = 2, [59] = 13, [60] = 3, [61] = 3, [62] = 4, [63] = 2, [64] = 1, [65] = 23, [66] = 4, [67] = 3, [68] = 7, [69] = 6, [70] = 1, [71] = 5, [72] = 2, [73] = 2, [74] = 1, [75] = 4, [76] = 3, [77] = 2, [78] = 4, [79] = 1, [80] = 4, [81] = 3, [82] = 1, [83] = 2, [84] = 5, [85] = 1, [86] = 33, [87] = 4, [88] = 6, [89] = 1, [90] = 1, [91] = 4, [92] = 1, [93] = 4, [94] = 1, [95] = 4, [96] = 1, [97] = 1, [98] = 1, [99] = 1, [100] = 120, [101] = 4, [102] = 1, [103] = 2, [104] = 2, [105] = 1, [106] = 6, [107] = 4, [108] = 3, [109] = 3, [110] = 1, [111] = 4, [112] = 9, [113] = 4, [114] = 1, [115] = 1, [116] = 5, [117] = 14, [118] = 1, [119] = 6, [120] = 16, [121] = 5, [122] = 7, [123] = 3, [124] = 1, [125] = 5, [126] = 5, [127] = 2, [128] = 2, [129] = 1, [130] = 2, [131] = 3, [132] = 30, [133] = 4, [134] = 3, [135] = 1, [136] = 21, [137] = 8, [138] = 7, [139] = 6, [140] = 6, [141] = 6, [142] = 1, [143] = 2, [144] = 3, [145] = 2, [146] = 3, [147] = 2, [148] = 3, [149] = 2, [150] = 19, [151] = 4, [152] = 1, [153] = 4, [154] = 4, [155] = 4, [156] = 4, [157] = 116, [158] = 1, [159] = 7, [160] = 2, [161] = 1, [162] = 1, [163] = 1, [164] = 4, [165] = 12, [166] = 4, [167] = 4, [168] = 4, [169] = 1, [170] = 2, [171] = 1, [172] = 3, [173] = 6, [174] = 1, [175] = 7, [176] = 3, [177] = 2, [178] = 3, [179] = 2, [180] = 3, [181] = 2, [182] = 3, [183] = 2, [184] = 3, [185] = 2, [186] = 2, [187] = 1, [188] = 17, [189] = 4, [190] = 1, [191] = 4, [192] = 7, [193] = 2, [194] = 2, [195] = 3, [196] = 1, [197] = 1, [198] = 3, [199] = 5, [200] = 7, [201] = 6, [202] = 4, [203] = 12, [204] = 1, [205] = 2, [206] = 1, [207] = 2, [208] = 1, [209] = 1, [210] = 1, [211] = 1, [212] = 1, [213] = 1, [214] = 1, [215] = 1, [216] = 1, [217] = 1, [218] = 1, [219] = 1, [220] = 14, [221] = 1, [222] = 1, [223] = 1, [224] = 1, [225] = 1, [226] = 2, [227] = 1, [228] = 1, [229] = 1, [230] = 1, [231] = 1, [232] = 1, [233] = 1, [234] = 1, [235] = 1, [236] = 1, [237] = 1, [238] = 1, [239] = 1, [240] = 1, [241] = 1, [242] = 1, [243] = 1, [244] = 9, [245] = 1, [246] = 1, [247] = 4, [248] = 1, [249] = 1, [250] = 1, [251] = 6, [252] = 1, [253] = 26, [254] = 1, [255] = 1, [256] = 7, [257] = 2, [258] = 3, [259] = 1, [260] = 2, [261] = 2, [262] = 2, [263] = 4, [264] = 6, [265] = 5, [266] = 1, [267] = 1, [268] = 2, [269] = 2, [270] = 5, [271] = 1, [272] = 1, [273] = 1, [274] = 3, [275] = 1, [276] = 1, [277] = 1, [278] = 1, [279] = 1, [280] = 1, [281] = 1, [282] = 1, [283] = 2, [284] = 6, [285] = 1, [286] = 2, [287] = 1, [288] = 2, [289] = 1, [290] = 1, [291] = 2, [292] = 1, [293] = 9, [294] = 3, [295] = 2, [296] = 2, [297] = 1, [298] = 1, [299] = 1, [300] = 1, [301] = 1, [302] = 2, [303] = 1, [304] = 1, [305] = 8, [306] = 6, [307] = 3, [308] = 4, [309] = 1, [310] = 3, [311] = 7, [312] = 7, [313] = 2, [314] = 4, [315] = 1, [316] = 4, [317] = 1, [318] = 1, [319] = 3, [320] = 2, [321] = 3, [322] = 12, [323] = 126, [324] = 1, [325] = 1, [326] = 23, [327] = 4, [328] = 3, [329] = 3, [330] = 5, [331] = 4, [332] = 1, [333] = 1, [334] = 6, [335] = 1, [336] = 10, [337] = 21, [338] = 1, [339] = 1, [340] = 5, [341] = 1, [342] = 12, [343] = 6, [344] = 6, [345] = 3, [346] = 3, [347] = 10, [348] = 2, [349] = 3, [350] = 8, [351] = 4, [352] = 1, [353] = 7, [354] = 5, [355] = 4, [356] = 9, [357] = 1, [358] = 1, [359] = 1, [360] = 1, [361] = 2, [362] = 7, [363] = 3, [364] = 2, [365] = 3, [366] = 4, [367] = 10, [368] = 7, [369] = 2, [370] = 7, [371] = 8, [372] = 4, [373] = 8, [374] = 2, [375] = 2, [376] = 3, [377] = 1, [378] = 3, [379] = 2, [380] = 4, [381] = 1, [382] = 8, [383] = 3, [384] = 3, [385] = 3, [386] = 1, [387] = 1, [388] = 2, [389] = 2, [390] = 2, [391] = 1, [392] = 4, [393] = 13, [394] = 2, [395] = 8, [396] = 7, [397] = 2, [398] = 2, [399] = 4, [400] = 2, [401] = 1, [402] = 1, [403] = 3, [404] = 1, [405] = 1, [406] = 2, [407] = 2, [408] = 1, [409] = 1, [410] = 1, [411] = 9, [412] = 1, [413] = 3, [414] = 11, [415] = 6, [416] = 1, [417] = 2, [418] = 12, [419] = 4, [420] = 4, [421] = 1, [422] = 14, [423] = 2, [424] = 2, [425] = 2, [426] = 11, [427] = 4, [428] = 4, [429] = 1, [430] = 3, [431] = 2, [432] = 3, [433] = 11, [434] = 4, [435] = 3, [436] = 1, [437] = 3, [438] = 2, [439] = 3, [440] = 2, [441] = 2, [442] = 11, [443] = 4, [444] = 1, [445] = 6, [446] = 4, [447] = 2, [448] = 2, [449] = 1, [450] = 5, [451] = 4, [452] = 4, [453] = 1, [454] = 2, [455] = 1, [456] = 1, [457] = 7, [458] = 2, [459] = 3, [460] = 1, [461] = 8, [462] = 4, [463] = 1, [464] = 3, [465] = 1, [466] = 8, [467] = 1, [468] = 1, [469] = 2, [470] = 1, [471] = 3, [472] = 1, [473] = 1, [474] = 1, [475] = 1, [476] = 1, [477] = 1, [478] = 1, [479] = 1, [480] = 1, [481] = 1, [482] = 1, [483] = 1, [484] = 1, [485] = 1, [486] = 1, [487] = 1, [488] = 1, [489] = 1, [490] = 1, [491] = 2, [492] = 4, [493] = 10, [494] = 14, [495] = 1, [496] = 1, [497] = 3, [498] = 1, [499] = 3, [500] = 1, [501] = 2, [502] = 2, [503] = 3, [504] = 2, [505] = 2, [506] = 2, [507] = 2, [508] = 2, [509] = 2, [510] = 4, [511] = 1, [512] = 1, [513] = 1, [514] = 2, [515] = 1, [516] = 1, [517] = 4, [518] = 1, [519] = 1, [520] = 1, [521] = 1, [522] = 1, [523] = 1, [524] = 1, [525] = 1, [526] = 1, [527] = 1, [528] = 1, [529] = 1, [530] = 1, [531] = 1, [532] = 1, [533] = 1, [534] = 1, [535] = 1, [536] = 1, [537] = 1, [538] = 1, [539] = 1, [540] = 1, [541] = 1, [542] = 1, [543] = 1, [544] = 1, [545] = 1, [546] = 1, [547] = 1, [548] = 1, [549] = 1, [550] = 1, [551] = 1, [552] = 1, [553] = 1, [554] = 1, [555] = 1, [556] = 1, [557] = 1, [558] = 4}
-opcodes = {[0xea] = 'ActLeagueBattlers', [0x2ac] = 'ActivateMysteryGift', [0x158] = 'ActivatePokedex', [0x133] = 'ActivatePoketchApp', [0x64] = 'AddPeople', [0x5e] = 'ApplyMovement', [0x2a1] = 'ApplyMovement2', [0x1d9] = 'BattleRoomResult', [0xcb] = 'BerryHiroAnimation', [0x1d7] = 'BerryPoffin', [0x2bf] = 'BikeRide', [0xab] = 'BoxPokemon', [0x1a] = 'Call', [0xa1] = 'CallEnd', [0x36] = 'CallMessageBox', [0x3a] = 'CallMessageBoxText', [0x14] = 'CallStandard', [0x29f] = 'CameraBumpEffect', [0xa9] = 'CapsuleEditor', [0x261] = 'CheckAccessories', [0x15b] = 'CheckBadge', [0xc7] = 'CheckBike', [0x252] = 'CheckBoxesNumber', [0x78] = 'CheckCoins', [0x12e] = 'CheckDress', [0x28f] = 'CheckFirstTimeChampion', [0x20] = 'CheckFlag', [0x11c] = 'CheckFloor', [0x1f1] = 'CheckFossil', [0x14d] = 'CheckGender', [0x1b9] = 'CheckHappiness', [0x7d] = 'CheckItem', [0xec] = 'CheckLost', [0x24e] = 'CheckLottoNumber', [0x71] = 'CheckMoney', [0x99] = 'CheckMove', [0x1e9] = 'CheckNationalPokedex', [0x177] = 'CheckPartyNumber', [0x19a] = 'CheckPartyNumber2', [0x6b] = 'CheckPersonPosition', [0x249] = 'CheckPhraseBoxInput', [0x9a] = 'CheckPlaceStored', [0x1c4] = 'CheckPokemonHeight', [0x1f6] = 'CheckPokemonLevel', [0x93] = 'CheckPokemonParty', [0x1c0] = 'CheckPokemonParty2', [0x228] = 'CheckPokemonTrade', [0x1bd] = 'CheckPosition', [0x1e8] = 'CheckSinnohPokedex', [0x69] = 'CheckSpritePosition', [0x7c] = 'CheckStoreItem', [0x225] = 'CheckTeachMove', [0x85] = 'CheckUndergroundPcStatus', [0x2c7] = 'CheckVersionGame', [0x2bc] = 'CheckWildBattle2', [0x29d] = 'ChoiceMulti', [0xf2] = 'ChooseFriend', [0xba] = 'ChoosePlayerName', [0x191] = 'ChoosePokemonMenu', [0x192] = 'ChoosePokemonMenu2', [0xbb] = 'ChoosePokemonName', [0xb4] = 'ChooseStarter', [0x2a5] = 'ChooseTradePokemon', [0x1e] = 'ClearFlag', [0x16c] = 'CloseDoor', [0x34] = 'CloseMessageOnKeyPress', [0x43] = 'CloseMulti', [0x24d] = 'ClosePcAnimation', [0x37] = 'ColorMessageBox', [0x1d] = 'CompareLastResultCall', [0x1c] = 'CompareLastResultJump', [0x24f] = 'CompareLottoNumber', [0x2aa] = 'ComparePhraseBoxInput', [0x1c3] = 'ComparePokemonHeight', [0x26] = 'CompareVarsToByte', [0x6c] = 'ContinueFollow', [0x1c1] = 'CopyPokemonHeight', [0x29] = 'CopyVar', [0x239] = 'DecideRules', [0x14b] = 'DefeatGoPokecenter', [0x1c9] = 'DeleteMove', [0x15d] = 'DisableBadge', [0xa8] = 'DisplayContestPokemon', [0xa7] = 'DisplayDressedPokemon', [0x347] = 'DisplayFloor', [0x2a0] = 'DoubleBattle', [0xac] = 'DrawUnion', [0xa6] = 'DressPokemon', [0x1ac] = 'EggAnimation', [0x259] = 'ElevLgAnimation', [0x15c] = 'EnableBadge', [0x2] = 'End', [0x112] = 'EndFlash', [0xb0] = 'EndGame', [0xe6] = 'EndTrainerBattle', [0x143] = 'ExpectDecisionOther', [0x126] = 'ExplanationBattle', [0x68] = 'FacePlayer', [0x4f] = 'FadeDefaultMusic', [0xbc] = 'FadeScreen', [0x111] = 'FlashContest', [0x2ca] = 'FloralClockAnimation', [0xc2] = 'FlyAnimation', [0x6d] = 'FollowHero', [0x35] = 'FreezeMessageBox', [0x205] = 'Geonet', [0x79] = 'GiveCoins', [0x97] = 'GiveEgg', [0x6f] = 'GiveMoney', [0x96] = 'GivePokemon', [0x131] = 'GivePoketch', [0x15a] = 'GiveRunningShoes', [0x206] = 'GreatMarshBynocule', [0xb1] = 'HallFameData', [0x14e] = 'HealPokemon', [0x23b] = 'HealPokemonAnimation', [0x29e] = 'HiddenMachineEffect', [0x295] = 'HideBattlePointsBox', [0x76] = 'HideCoins', [0x73] = 'HideMoney', [0x209] = 'HidePicture', [0x2c2] = 'HideSaveBox', [0x18e] = 'HideSavingClock', [0x127] = 'HoneyTreeBattle', [0x11] = 'If', [0x12] = 'If2', [0xa5] = 'Interview', [0x16] = 'Jump', [0x27a] = 'LeagueCastleView', [0x62] = 'Lock', [0x60] = 'LockAll', [0x66] = 'LockCam', [0xeb] = 'LostGoPokecenter', [0x1b3] = 'Mailbox', [0x3c] = 'Menu', [0x2c] = 'Message', [0x2d] = 'Message2', [0x2f] = 'Message3', [0x1c6] = 'MoveInfo', [0x40] = 'Multi', [0x41] = 'Multi2', [0x44] = 'Multi3', [0x48] = 'MultiRow', [0x39] = 'NoMapMessageBox', [0x0] = 'Nop', [0x1] = 'Nop1', [0xffff] = 'OpCode', [0x178] = 'OpenBerryPouch', [0x16b] = 'OpenDoor', [0x24c] = 'OpenPcAnimation', [0x243] = 'PhraseBox1W', [0x244] = 'PhraseBox2W', [0x4c] = 'PlayCry', [0x49] = 'PlayFanfare', [0x4a] = 'PlayFanfare2', [0x50] = 'PlayMusic', [0x4e] = 'PlaySound', [0x267] = 'Pokecasino', [0x147] = 'Pokemart', [0x148] = 'Pokemart1', [0x149] = 'Pokemart2', [0x14a] = 'Pokemart3', [0xf7] = 'PokemonContest', [0x195] = 'PokemonInfo', [0x28c] = 'PokemonPartyPicture', [0x208] = 'PokemonPicture', [0x328] = 'PortalEffect', [0x168] = 'PrepareDoorAnimation', [0x24b] = 'PreparePcAnimation', [0x129] = 'RandomBattle', [0x1b5] = 'RecordList', [0xaf] = 'RecordMixingUnion', [0x63] = 'Release', [0x61] = 'ReleaseAll', [0x189] = 'ReleaseOverworld', [0x221] = 'RememberMove', [0x65] = 'RemovePeople', [0xbd] = 'ResetScreen', [0x52] = 'RestartMusic', [0x258] = 'RetSprtSave', [0x1b] = 'Return', [0x3] = 'Return2', [0xc8] = 'RideBike', [0xbf] = 'RockClimbAnimation', [0x18b] = 'SetDoorLocked', [0x18a] = 'SetDoorPassable', [0x1f] = 'SetFlag', [0x188] = 'SetOverworldMovement', [0x186] = 'SetOverworldPosition', [0x95] = 'SetPokemonPartyStored', [0x120] = 'SetPositionAfterShip', [0x23] = 'SetValue', [0x28] = 'SetVar', [0xdd] = 'SetVarAlterStored', [0xdb] = 'SetVarHeroStored', [0xda] = 'SetVarPokemonStored', [0xdc] = 'SetVarRivalStored', [0xcf] = 'SetVariableAlter', [0xd4] = 'SetVariableAttack', [0xd3] = 'SetVariableAttackItem', [0xcd] = 'SetVariableHero', [0xd1] = 'SetVariableItem', [0xd6] = 'SetVariableNickname', [0xd5] = 'SetVariableNumber', [0xd7] = 'SetVariableObject', [0xd0] = 'SetVariablePokemon', [0x1c2] = 'SetVariablePokemonHeight', [0xce] = 'SetVariableRival', [0xd8] = 'SetVariableTrainer', [0x23d] = 'ShipAnimation', [0x294] = 'ShowBattlePointsBox', [0x75] = 'ShowCoins', [0x116] = 'ShowLinkCountRecord', [0x72] = 'ShowMoney', [0x1eb] = 'ShowNationalSheet', [0x2c1] = 'ShowSaveBox', [0x18d] = 'ShowSavingClock', [0x1ea] = 'ShowSinnohSheet', [0xaa] = 'SinnohMaps', [0x2c6] = 'SpinTradeUnion', [0x257] = 'SprtSave', [0x125] = 'StarterBattle', [0xcc] = 'StopBerryHiroAnimation', [0x6e] = 'StopFollowHero', [0x51] = 'StopMusic', [0x22a] = 'StopTrade', [0x1c7] = 'StoreMove', [0x193] = 'StorePokemonMenu2', [0x198] = 'StorePokemonNumber', [0x94] = 'StorePokemonParty', [0x134] = 'StorePoketchApp', [0xde] = 'StoreStarter', [0xc0] = 'SurfAnimation', [0x54] = 'SwitchMusic', [0x5a] = 'SwitchMusic2', [0x7a] = 'TakeCoins', [0x7b] = 'TakeItem', [0x70] = 'TakeMoney', [0x224] = 'TeachMove', [0x46] = 'TextMessageScriptMulti', [0x42] = 'TextScriptMulti', [0x271] = 'ThankNameInsert', [0x229] = 'TradeChosenPokemon', [0xae] = 'TradeUnion', [0xe5] = 'TrainerBattle', [0xad] = 'TrainerCaseUnion', [0xc6] = 'Tuxedo', [0x38] = 'TypeMessageBox', [0x153] = 'UnionRoom', [0x26d] = 'UnownMessageBox', [0x77] = 'UpdateCoins', [0x74] = 'UpdateMoney', [0xa3] = 'WFC', [0xb3] = 'WFC1', [0x169] = 'WaitAction', [0x31] = 'WaitButton', [0x16a] = 'WaitClose', [0x4d] = 'WaitCry', [0x4b] = 'WaitFanfare', [0x3f] = 'WaitFor', [0x5f] = 'WaitMovement', [0xbe] = 'Warp', [0x204] = 'WarpLastElevator', [0x11b] = 'WarpMapElevator', [0xc1] = 'WaterfallAnimation', [0x124] = 'WildBattle', [0x2bd] = 'WildBattle2', [0xf3] = 'WirelessBattleWait', [0x12b] = 'WriteAutograph', [0x3e] = 'YesNoBox'}
-img = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x10, 0x3c, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xf8, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x1, 0x0, 0x0, 0x0, 0x11, 0x7f, 0xff, 0xff, 0xe7, 0x0, 0x0, 0x0, 0x0, 0xc3, 0xc7, 0xcf, 0xcf, 0x0, 0x0, 0x0, 0xe0, 0xf8, 0xfc, 0xf9, 0x11, 0x0, 0x0, 0x0, 0x1e, 0x7f, 0xff, 0xff, 0xe3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x80, 0xc0, 0xc0, 0x0, 0x0, 0x0, 0x30, 0x71, 0x7b, 0x7f, 0x7f, 0x0, 0x0, 0x0, 0x86, 0xcf, 0xef, 0xff, 0xfe, 0x3c, 0x3c, 0x3c, 0x3d, 0x3f, 0x3f, 0x3f, 0x3e, 0x0, 0x0, 0x0, 0x80, 0xe0, 0xf0, 0xf9, 0x79, 0x0, 0x0, 0x0, 0x1e, 0x7f, 0xff, 0xff, 0xe3, 0x0, 0x0, 0x0, 0xc, 0x1f, 0x9f, 0xdf, 0xde, 0x0, 0x0, 0x0, 0xc0, 0xf0, 0xf8, 0xfc, 0x3c, 0x1, 0x3, 0x3, 0x3, 0x0, 0x0, 0x0, 0x0, 0xfc, 0xfe, 0xde, 0x8f, 0x1e, 0x3e, 0x7c, 0x78, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1, 0x1, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0xe3, 0xe7, 0xff, 0xff, 0xff, 0x3f, 0x0, 0x0, 0xcf, 0xdf, 0xcf, 0xc7, 0xc7, 0x81, 0x0, 0x0, 0x1, 0x3, 0xf9, 0xf9, 0xf8, 0xf0, 0x0, 0x0, 0xff, 0xff, 0xe0, 0xff, 0xff, 0x7f, 0x0, 0x0, 0x80, 0x80, 0x0, 0x80, 0x80, 0x80, 0x0, 0x0, 0x3f, 0x3f, 0x1f, 0x1f, 0xf, 0xe, 0x0, 0x0, 0xfe, 0xfc, 0xfc, 0x7c, 0x78, 0x38, 0x0, 0x0, 0x3c, 0x3c, 0x3c, 0x3c, 0x3c, 0x3c, 0x0, 0x0, 0x79, 0x79, 0x79, 0x79, 0x78, 0x78, 0x0, 0x0, 0xff, 0xff, 0xe0, 0xff, 0xff, 0x7f, 0x0, 0x0, 0x9e, 0x9e, 0x1e, 0x9e, 0x9e, 0x9e, 0x0, 0x0, 0x3c, 0x3c, 0x3c, 0x3c, 0x3c, 0x3c, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x70, 0x0, 0x70, 0xf8, 0x78, 0x70, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}
-steps_data = {
-    [1] = 11,
-    [2] = 7,
-    [3] = 3
+
+script_commands = {
+	[0x1BA] = {
+		color = "white",
+		param_count = 0
+	},
+	default = {
+		color = "white",
+		param_count = 0
+	},
+	stopcode = {
+		color = "#666666",
+		param_count = 0
+
+	},
+	[0] = {
+		color = "#666666",
+		param_count = 0
+	},
+}
+
+script_command_names = { 
+	[0x0] = 'Nop', 
+	[0x1] = 'Dummy',         
+	[0x2] = 'End', 
+	[0x3] = 'TimeWait',      
+	[0x4] = 'LoadRegValue',  
+	[0x5] = 'LoadRegWData',  
+	[0x6] = 'LoadRegAdrs',   
+	[0x7] = 'LoadAdrsValue', 
+	[0x8] = 'LoadAdrsReg',   
+	[0x9] = 'LoadRegReg',    
+	[0xa] = 'LoadAdrsAdrs',  
+	[0xb] = 'CmpRegReg',     
+	[0xc] = 'CmpRegValue',   
+	[0xd] = 'CmpRegAdrs',    
+	[0xe] = 'CmpAdrsReg',    
+	[0xf] = 'CmpAdrsValue',  
+	[0x10] = 'CmpAdrsAdrs',  
+	[0x11] = 'CmpWkValue',   
+	[0x12] = 'CmpWkWk',      
+	[0x13] = 'VMMachineAdd',
+	[0x14] = 'ChangeCommonScr',
+	[0x15] = 'ChangeLocalScr',
+	[0x16] = 'GlobalJump',
+	[0x17] = 'ObjIDJump',
+	[0x18] = 'BgIDJump',
+	[0x19] = 'PlayerDirJump',
+	[0x1a] = 'GlobalCall',
+	[0x1b] = 'Ret',
+	[0x1c] = 'IfJump',
+	[0x1d] = 'IfCall',
+	[0x1e] = 'FlagSet',
+	[0x1f] = 'FlagReset',
+	[0x20] = 'FlagCheck',
+	[0x21] = 'FlagCheckWk',
+	[0x22] = 'FlagSetWk',
+	[0x23] = 'TrainerFlagSet',
+	[0x24] = 'TrainerFlagReset',
+	[0x25] = 'TrainerFlagCheck',
+	[0x26] = 'WkAdd',
+	[0x27] = 'WkSub',
+	[0x28] = 'LoadWkValue',
+	[0x29] = 'LoadWkWk',
+	[0x2a] = 'LoadWkWkValue',
+	[0x2b] = 'TalkMsgAllPut',
+	[0x2c] = 'TalkMsg',
+	[0x2d] = 'TalkMsgSp',
+	[0x2e] = 'TalkMsgNoSkip',
+	[0x2f] = 'TalkConSioMsg',
+	[0x30] = 'ABKeyWait',
+	[0x31] = 'LastKeyWait',
+	[0x32] = 'NextAnmLastKeyWait',
+	[0x33] = 'TalkWinOpen',
+	[0x34] = 'TalkWinClose',
+	[0x35] = 'TalkWinCloseNoClear',
+	[0x36] = 'BoardMake',
+	[0x37] = 'InfoBoardMake',
+	[0x38] = 'BoardReq',
+	[0x39] = 'BoardWait',
+	[0x3a] = 'BoardMsg',
+	[0x3b] = 'BoardEndWait',
+	[0x3c] = 'MenuReq',
+	[0x3d] = 'BgScroll',
+	[0x3e] = 'YesNoWin',
+	[0x3f] = 'GuinnessWin',
+	[0x40] = 'BmpMenuInit',
+	[0x41] = 'BmpMenuInitEx',
+	[0x42] = 'BmpMenuMakeList',
+	[0x43] = 'BmpMenuStart',
+	[0x44] = 'BmpListInit',
+	[0x45] = 'BmpListInitEx',
+	[0x46] = 'BmpListMakeList',
+	[0x47] = 'BmpListStart',
+	[0x48] = 'BmpMenuHVStart',
+	[0x49] = 'SePlay',
+	[0x4a] = 'SeStop',
+	[0x4b] = 'SeWait',
+	[0x4c] = 'VoicePlay',
+	[0x4d] = 'VoicePlayWait',
+	[0x4e] = 'MePlay',
+	[0x4f] = 'MeWait',
+	[0x50] = 'BgmPlay',
+	[0x51] = 'BgmStop',
+	[0x52] = 'BgmNowMapPlay',
+	[0x53] = 'BgmSpecialSet',
+	[0x54] = 'BgmFadeOut',
+	[0x55] = 'BgmFadeIn',
+	[0x56] = 'BgmPlayerPause',
+	[0x57] = 'PlayerFieldDemoBgmPlay',
+	[0x58] = 'CtrlBgmFlagSet',
+	[0x59] = 'PerapDataCheck',
+	[0x5a] = 'PerapRecStart',
+	[0x5b] = 'PerapRecStop',
+	[0x5c] = 'PerapSave',
+	[0x5d] = 'SndClimaxDataLoad',
+	[0x5e] = 'ObjAnime',
+	[0x5f] = 'ObjAnimeWait',
+	[0x60] = 'ObjPauseAll',
+	[0x61] = 'ObjPauseClearAll',
+	[0x62] = 'ObjPause',
+	[0x63] = 'ObjPauseClear',
+	[0x64] = 'ObjAdd',
+	[0x65] = 'ObjDel',
+	[0x66] = 'VanishDummyObjAdd',
+	[0x67] = 'VanishDummyObjDel',
+	[0x68] = 'ObjTurn',
+	[0x69] = 'PlayerPosGet',
+	[0x6a] = 'ObjPosGet',
+	[0x6b] = 'PlayerPosOffsetSet',
+	[0x6c] = 'NotZoneDelSet',
+	[0x6d] = 'MoveCodeChange',
+	[0x6e] = 'PairObjIdSet',
+	[0x6f] = 'AddGold',
+	[0x70] = 'SubGold',
+	[0x71] = 'CompGold',
+	[0x72] = 'GoldWinWrite',
+	[0x73] = 'GoldWinDel',
+	[0x74] = 'GoldWrite',
+	[0x75] = 'CoinWinWrite',
+	[0x76] = 'CoinWinDel',
+	[0x77] = 'CoinWrite',
+	[0x78] = 'CheckCoin',
+	[0x79] = 'AddCoin',
+	[0x7a] = 'SubCoin',
+	[0x7b] = 'AddItem',
+	[0x7c] = 'SubItem',
+	[0x7d] = 'AddItemChk',
+	[0x7e] = 'CheckItem',
+	[0x7f] = 'WazaMachineItemNoCheck',
+	[0x80] = 'GetPocketNo',
+	[0x81] = 'AddPCBoxItem',
+	[0x82] = 'CheckPCBoxItem',
+	[0x83] = 'AddGoods',
+	[0x84] = 'SubGoods',
+	[0x85] = 'AddGoodsChk',
+	[0x86] = 'CheckGoods',
+	[0x87] = 'AddTrap',
+	[0x88] = 'SubTrap',
+	[0x89] = 'AddTrapChk',
+	[0x8a] = 'CheckTrap',
+	[0x8b] = 'AddTreasure',
+	[0x8c] = 'SubTreasure',
+	[0x8d] = 'AddTreasureChk',
+	[0x8e] = 'CheckTreasure',
+	[0x8f] = 'AddTama',
+	[0x90] = 'SubTama',
+	[0x91] = 'AddTamaChk',
+	[0x92] = 'CheckTama',
+	[0x93] = 'CBItemNumGet',
+	[0x94] = 'CBItemNumAdd',
+	[0x95] = 'UnknownFormGet',
+	[0x96] = 'AddPokemon',
+	[0x97] = 'AddTamago',
+	[0x98] = 'ChgPokeWaza',
+	[0x99] = 'ChkPokeWaza',
+	[0x9a] = 'ChkPokeWazaGroup',
+	[0x9b] = 'RevengeTrainerSearch',
+	[0x9c] = 'SetWeather',
+	[0x9d] = 'InitWeather',
+	[0x9e] = 'UpdateWeather',
+	[0x9f] = 'GetMapPosition',
+	[0xa0] = 'GetTemotiPokeNum',
+	[0xa1] = 'SetMapProc',
+	[0xa2] = 'WiFiAutoReg',
+	[0xa3] = 'WiFiP2PMatchEventCall',
+	[0xa4] = 'WiFiP2PMatchSetDel',
+	[0xa5] = 'MsgBoyEvent',
+	[0xa6] = 'ImageClipSetProc',
+	[0xa7] = 'ImageClipPreviewTvProc',
+	[0xa8] = 'ImageClipPreviewConProc',
+	[0xa9] = 'CustomBallEventCall',
+	[0xaa] = 'TMapBGSetProc',
+	[0xab] = 'BoxSetProc',
+	[0xac] = 'OekakiBoardSetProc',
+	[0xad] = 'CallTrCard',
+	[0xae] = 'TradeListSetProc',
+	[0xaf] = 'RecordCornerSetProc',
+	[0xb0] = 'DendouSetProc',
+	[0xb1] = 'PcDendouSetProc',
+	[0xb2] = 'WorldTradeSetProc',
+	[0xb3] = 'DPWInitProc',
+	[0xb4] = 'FirstPokeSelectProc',
+	[0xb5] = 'FirstPokeSelectSetAndDel',
+	[0xb6] = 'EyeTrainerMoveSet',
+	[0xb7] = 'EyeTrainerMoveCheck',
+	[0xb8] = 'EyeTrainerTypeGet',
+	[0xb9] = 'EyeTrainerIdGet',
+	[0xba] = 'NameIn',
+	[0xbb] = 'NameInPoke',
+	[0xbc] = 'WipeFadeStart',
+	[0xbd] = 'WipeFadeCheck',
+	[0xbe] = 'MapChange',
+	[0xbf] = 'KabeNobori',
+	[0xc0] = 'Naminori',
+	[0xc1] = 'Takinobori',
+	[0xc2] = 'Sorawotobu',
+	[0xc3] = 'HidenFlash',
+	[0xc4] = 'HidenKiribarai',
+	[0xc5] = 'CutIn',
+	[0xc6] = 'ConHeroChange',
+	[0xc7] = 'BicycleCheck',
+	[0xc8] = 'BicycleReq',
+	[0xc9] = 'CyclingRoadSet',
+	[0xca] = 'PlayerFormGet',
+	[0xcb] = 'PlayerReqBitOn',
+	[0xcc] = 'PlayerReqStart',
+	[0xcd] = 'PlayerName',
+	[0xce] = 'RivalName',
+	[0xcf] = 'SupportName',
+	[0xd0] = 'PokemonName',
+	[0xd1] = 'ItemName',
+	[0xd2] = 'PocketName',
+	[0xd3] = 'ItemWazaName',
+	[0xd4] = 'WazaName',
+	[0xd5] = 'NumberName',
+	[0xd6] = 'NickName',
+	[0xd7] = 'PoketchName',
+	[0xd8] = 'TrTypeName',
+	[0xd9] = 'MyTrTypeName',
+	[0xda] = 'PokemonNameExtra',
+	[0xdb] = 'FirstPokemonName',
+	[0xdc] = 'RivalPokemonName',
+	[0xdd] = 'SupportPokemonName',
+	[0xde] = 'FirstPokeNoGet',
+	[0xdf] = 'GoodsName',
+	[0xe0] = 'TrapName',
+	[0xe1] = 'TamaName',
+	[0xe2] = 'ZoneName',
+	[0xe3] = 'GenerateInfoGet',
+	[0xe4] = 'TrainerIdGet',
+	[0xe5] = 'TrainerBattleSet',
+	[0xe6] = 'TrainerMessageSet',
+	[0xe7] = 'TrainerTalkTypeGet',
+	[0xe8] = 'RevengeTrainerTalkTypeGet',
+	[0xe9] = 'TrainerTypeGet',
+	[0xea] = 'TrainerBgmSet',
+	[0xeb] = 'TrainerLose',
+	[0xec] = 'TrainerLoseCheck',
+	[0xed] = 'SeacretPokeRetryCheck',
+	[0xee] = '2vs2BattleCheck',
+	[0xef] = 'DebugBattleSet',
+	[0xf0] = 'DebugTrainerFlagSet',
+	[0xf1] = 'DebugTrainerFlagOnJump',
+	[0xf2] = 'ConnectSelParentWin',
+	[0xf3] = 'ConnectSelChildWin',
+	[0xf4] = 'ConnectDebugParentWin',
+	[0xf5] = 'ConnectDebugChildWin',
+	[0xf6] = 'DebugSioEncount',
+	[0xf7] = 'DebugSioContest',
+	[0xf8] = 'ConSioTimingSend',
+	[0xf9] = 'ConSioTimingCheck',
+	[0xfa] = 'ConSystemCreate',
+	[0xfb] = 'ConSystemExit',
+	[0xfc] = 'ConJudgeNameGet',
+	[0xfd] = 'ConBreederNameGet',
+	[0xfe] = 'ConNickNameGet',
+	[0xff] = 'ConNumTagSet',
+	[0x100] = 'ConSioParamInitSet',
+	[0x101] = 'ContestProc',
+	[0x102] = 'ConRankNameGet',
+	[0x103] = 'ConTypeNameGet',
+	[0x104] = 'ConVictoryBreederNameGet',
+	[0x105] = 'ConVictoryItemNoGet',
+	[0x106] = 'ConVictoryNickNameGet',
+	[0x107] = 'ConRankingCheck',
+	[0x108] = 'ConVictoryEntryNoGet',
+	[0x109] = 'ConMyEntryNoGet',
+	[0x10a] = 'ConObjCodeGet',
+	[0x10b] = 'ConPopularityGet',
+	[0x10c] = 'ConDeskModeGet',
+	[0x10d] = 'ConHaveRibbonCheck',
+	[0x10e] = 'ConRibbonNameGet',
+	[0x10f] = 'ConAcceNoGet',
+	[0x110] = 'ConEntryParamGet',
+	[0x111] = 'ConCameraFlashSet',
+	[0x112] = 'ConCameraFlashCheck',
+	[0x113] = 'ConHBlankStop',
+	[0x114] = 'ConHBlankStart',
+	[0x115] = 'ConEndingSkipCheck',
+	[0x116] = 'ConRecordDisp',
+	[0x117] = 'ConMsgPrintFlagSet',
+	[0x118] = 'ConMsgPrintFlagReset',
+	[0x119] = 'ChkTemotiPokerus',
+	[0x11a] = 'TemotiPokeSexGet',
+	[0x11b] = 'SpLocationSet',
+	[0x11c] = 'ElevatorNowFloorGet',
+	[0x11d] = 'ElevatorFloorWrite',
+	[0x11e] = 'GetShinouZukanSeeNum',
+	[0x11f] = 'GetShinouZukanGetNum',
+	[0x120] = 'GetZenkokuZukanSeeNum',
+	[0x121] = 'GetZenkokuZukanGetNum',
+	[0x122] = 'ChkZenkokuZukan',
+	[0x123] = 'GetZukanHyoukaMsgID',
+	[0x124] = 'WildBattleSet',
+	[0x125] = 'FirstBattleSet',
+	[0x126] = 'CaptureBattleSet',
+	[0x127] = 'HoneyTree',
+	[0x128] = 'GetHoneyTreeState',
+	[0x129] = 'HoneyTreeBattleSet',
+	[0x12a] = 'HoneyAfterTreeBattleSet',
+	[0x12b] = 'TSignSetProc',
+	[0x12c] = 'ReportSaveCheck',
+	[0x12d] = 'ReportSave',
+	[0x12e] = 'ImageClipTvSaveDataCheck',
+	[0x12f] = 'ImageClipConSaveDataCheck',
+	[0x130] = 'ImageClipTvSaveTitle',
+	[0x131] = 'GetPoketch',
+	[0x132] = 'GetPoketchFlag',
+	[0x133] = 'PoketchAppAdd',
+	[0x134] = 'PoketchAppCheck',
+	[0x135] = 'CommTimingSyncStart',
+	[0x136] = 'CommTempDataReset',
+	[0x137] = 'UnionParentCardTalkNo',
+	[0x138] = 'UnionGetInfoTalkNo',
+	[0x139] = 'UnionBeaconChange',
+	[0x13a] = 'UnionConnectTalkDenied',
+	[0x13b] = 'UnionConnectTalkOk',
+	[0x13c] = 'UnionTrainerNameRegist',
+	[0x13d] = 'UnionReturnSetUp',
+	[0x13e] = 'UnionConnectCutRestart',
+	[0x13f] = 'UnionGetTalkNumber',
+	[0x140] = 'UnionIdSet',
+	[0x141] = 'UnionResultGet',
+	[0x142] = 'UnionObjAllVanish',
+	[0x143] = 'UnionScriptResultSet',
+	[0x144] = 'UnionParentStartCommandSet',
+	[0x145] = 'UnionChildSelectCommandSet',
+	[0x146] = 'UnionConnectStart',
+	[0x147] = 'ShopCall',
+	[0x148] = 'FixShopCall',
+	[0x149] = 'FixGoodsCall',
+	[0x14a] = 'FixSealCall',
+	[0x14b] = 'GameOverCall',
+	[0x14c] = 'SetWarpId',
+	[0x14d] = 'GetMySex',
+	[0x14e] = 'PcKaifuku',
+	[0x14f] = 'UgManShopNpcRandomPlace',
+	[0x150] = 'CommDirectEnd',
+	[0x151] = 'CommDirectEnterBtlRoom',
+	[0x152] = 'CommPlayerSetDir',
+	[0x153] = 'UnionMapChange',
+	[0x154] = 'UnionViewSetUpTrainerTypeSelect',
+	[0x155] = 'UnionViewGetTrainerType',
+	[0x156] = 'UnionViewMyStatusSet',
+	[0x157] = 'SysFlagZukanGet',
+	[0x158] = 'SysFlagZukanSet',
+	[0x159] = 'SysFlagShoesGet',
+	[0x15a] = 'SysFlagShoesSet',
+	[0x15b] = 'SysFlagBadgeGet',
+	[0x15c] = 'SysFlagBadgeSet',
+	[0x15d] = 'SysFlagBadgeCount',
+	[0x15e] = 'SysFlagBagGet',
+	[0x15f] = 'SysFlagBagSet',
+	[0x160] = 'SysFlagPairGet',
+	[0x161] = 'SysFlagPairSet',
+	[0x162] = 'SysFlagPairReset',
+	[0x163] = 'SysFlagOneStepGet',
+	[0x164] = 'SysFlagOneStepSet',
+	[0x165] = 'SysFlagOneStepReset',
+	[0x166] = 'SysFlagGameClearGet',
+	[0x167] = 'SysFlagGameClearSet',
+	[0x168] = 'SetUpDoorAnime',
+	[0x169] = 'Wait3DAnime',
+	[0x16a] = 'Free3DAnime',
+	[0x16b] = 'OpenDoor',
+	[0x16c] = 'CloseDoor',
+	[0x16d] = 'GetSodateyaName',
+	[0x16e] = 'GetSodateyaZiisan',
+	[0x16f] = 'InitWaterGym',
+	[0x170] = 'PushWaterGymButton',
+	[0x171] = 'InitGhostGym',
+	[0x172] = 'MoveGhostGymLift',
+	[0x173] = 'InitSteelGym', 
+	[0x174] = 'InitCombatGym',
+	[0x175] = 'InitElecGym',
+	[0x176] = 'RotElecGymGear',
+	[0x177] = 'GetPokeCount',
+	[0x178] = 'BagSetProc',
+	[0x179] = 'BagGetResult',
+	[0x17a] = 'PocketCheck',
+	[0x17b] = 'NutsName',
+	[0x17c] = 'SeikakuName',
+	[0x17d] = 'SeedGetStatus',
+	[0x17e] = 'SeedGetType',
+	[0x17f] = 'SeedGetCompost',
+	[0x180] = 'SeedGetGroundStatus',
+	[0x181] = 'SeedGetNutsCount',
+	[0x182] = 'SeedSetCompost',
+	[0x183] = 'SeedSetNuts',
+	[0x184] = 'SeedSetWater',
+	[0x185] = 'SeedTakeNuts',
+	[0x186] = 'SxyPosChange',
+	[0x187] = 'ObjPosChange',
+	[0x188] = 'SxyMoveCodeChange',
+	[0x189] = 'SxyDirChange',
+	[0x18a] = 'SxyExitPosChange',
+	[0x18b] = 'SxyBgPosChange',
+	[0x18c] = 'ObjDirChange',
+	[0x18d] = 'TimeWaitIconAdd',
+	[0x18e] = 'TimeWaitIconDel',
+	[0x18f] = 'ReturnScriptWkSet',
+	[0x190] = 'ABKeyTimeWait',
+	[0x191] = 'PokeListSetProc',
+	[0x192] = 'UnionPokeListSetProc',
+	[0x193] = 'PokeListGetResult',
+	[0x194] = 'ConPokeListSetProc',
+	[0x195] = 'ConPokeListGetResult',
+	[0x196] = 'ConPokeStatusSetProc',
+	[0x197] = 'PokeStatusGetResult',
+	[0x198] = 'TemotiMonsNo',
+	[0x199] = 'MonsOwnChk',
+	[0x19a] = 'GetPokeCount2',
+	[0x19b] = 'GetPokeCount3',
+	[0x19c] = 'GetPokeCount4',
+	[0x19d] = 'GetTamagoCount',
+	[0x19e] = 'UgShopMenuInit',
+	[0x19f] = 'UgShopTalkStart',
+	[0x1a0] = 'UgShopTalkEnd',
+	[0x1a1] = 'UgShopTalkRegisterItemName',
+	[0x1a2] = 'UgShopTalkRegisterTrapName',
+	[0x1a3] = 'SubMyGold',
+	[0x1a4] = 'HikitoriPoke',
+	[0x1a5] = 'HikitoriList',
+	[0x1a6] = 'MsgSodateyaAishou',
+	[0x1a7] = 'MsgExpandBuf',
+	[0x1a8] = 'DelSodateyaEgg',
+	[0x1a9] = 'GetSodateyaEgg',
+	[0x1aa] = 'HikitoriRyoukin',
+	[0x1ab] = 'CompMyGold',
+	[0x1ac] = 'TamagoDemo',
+	[0x1ad] = 'SodateyaPokeList',
+	[0x1ae] = 'SodatePokeLevelStr',
+	[0x1af] = 'MsgAzukeSet',
+	[0x1b0] = 'SetSodateyaPoke',
+	[0x1b1] = 'ObjVisible',
+	[0x1b2] = 'ObjInvisible',
+	[0x1b3] = 'MailBox',
+	[0x1b4] = 'GetMailBoxDataNum',
+	[0x1b5] = 'RankingView',
+	[0x1b6] = 'GetTimeZone',
+	[0x1b7] = 'GetRand',
+	[0x1b8] = 'GetRandNext',
+	[0x1b9] = 'GetNatsuki',
+	[0x1ba] = 'AddNatsuki',
+	[0x1bb] = 'SubNatsuki',
+	[0x1bc] = 'HikitoriListNameSet',
+	[0x1bd] = 'PlayerDirGet',
+	[0x1be] = 'GetSodateyaAishou',
+	[0x1bf] = 'GetSodateyaTamagoCheck',
+	[0x1c0] = 'TemotiPokeChk',
+	[0x1c1] = 'OokisaRecordChk',
+	[0x1c2] = 'OokisaRecordSet',
+	[0x1c3] = 'OokisaTemotiSet',
+	[0x1c4] = 'OokisaKirokuSet',
+	[0x1c5] = 'OokisaKurabeInit',
+	[0x1c6] = 'WazaListSetProc',
+	[0x1c7] = 'WazaListGetResult',
+	[0x1c8] = 'WazaCount',
+	[0x1c9] = 'WazaDel',
+	[0x1ca] = 'TemotiWazaNo',
+	[0x1cb] = 'TemotiWazaName',
+	[0x1cc] = 'FNoteStartSet',
+	[0x1cd] = 'FNoteDataMake',
+	[0x1ce] = 'FNoteDataSave',
+	[0x1cf] = 'SysFlagKairiki',
+	[0x1d0] = 'SysFlagFlash',
+	[0x1d1] = 'SysFlagKiribarai',
+	[0x1d2] = 'ImcAcceAddItem',
+	[0x1d3] = 'ImcAcceAddItemChk',
+	[0x1d4] = 'ImcAcceCheckItem',
+	[0x1d5] = 'ImcBgAddItem',
+	[0x1d6] = 'ImcBgCheckItem',
+	[0x1d7] = 'NutMixerProc',
+	[0x1d8] = 'NutMixerPlayStateCheck',
+	[0x1d9] = 'BTowerAppSetProc',
+	[0x1da] = 'BattleTowerWorkClear',
+	[0x1db] = 'BattleTowerWorkInit',
+	[0x1dc] = 'BattleTowerWorkRelease',
+	[0x1dd] = 'BattleTowerTools',
+	[0x1de] = 'BattleTowerGetSevenPokeData',
+	[0x1df] = 'BattleTowerIsPrizeGet',
+	[0x1e0] = 'BattleTowerIsPrizemanSet',
+	[0x1e1] = 'BattleTowerSendBuf',
+	[0x1e2] = 'BattleTowerRecvBuf',
+	[0x1e3] = 'BattleTowerGetLeaderRoomID',
+	[0x1e4] = 'BattleTowerIsLeaderDataExist',
+	[0x1e5] = 'RecordInc',
+	[0x1e6] = 'RecordGet',
+	[0x1e7] = 'RecordSet',
+	[0x1e8] = 'ZukanChkShinou',
+	[0x1e9] = 'ZukanChkNational',
+	[0x1ea] = 'ZukanRecongnizeShinou',
+	[0x1eb] = 'ZukanRecongnizeNational',
+	[0x1ec] = 'UrayamaEncountSet',
+	[0x1ed] = 'UrayamaEncountNoChk',
+	[0x1ee] = 'PokeMailChk',
+	[0x1ef] = 'PaperplaneSet',
+	[0x1f0] = 'PokeMailDel',
+	[0x1f1] = 'KasekiCount',
+	[0x1f2] = 'ItemListSetProc',
+	[0x1f3] = 'ItemListGetResult',
+	[0x1f4] = 'ItemNoToMonsNo',
+	[0x1f5] = 'KasekiItemNo',
+	[0x1f6] = 'PokeLevelChk',
+	[0x1f7] = 'ApprovePoisonDead',
+	[0x1f8] = 'FinishMapProc',
+	[0x1f9] = 'DebugWatch',
+	[0x1fa] = 'TalkMsgAllPutOtherArc',
+	[0x1fb] = 'TalkMsgOtherArc',
+	[0x1fc] = 'TalkMsgAllPutPMS',
+	[0x1fd] = 'TalkMsgPMS',
+	[0x1fe] = 'TalkMsgTowerApper',
+	[0x1ff] = 'TalkMsgNgPokeName',
+	[0x200] = 'GetBeforeZoneID',
+	[0x201] = 'GetNowZoneID',
+	[0x202] = 'SafariControl',
+	[0x203] = 'ColosseumMapChangeIn',
+	[0x204] = 'ColosseumMapChangeOut',
+	[0x205] = 'WifiEarthSetProc',
+	[0x206] = 'CallSafariScope',
+	[0x207] = 'CommGetCurrentID',
+	[0x208] = 'PokeWindowPut',
+	[0x209] = 'PokeWindowDel',
+	[0x20a] = 'BtlSearcherEventCall',
+	[0x20b] = 'BtlSearcherDirMvSet',
+	[0x20c] = 'MsgAutoGet',
+	[0x20d] = 'ClimaxDemoCall',
+	[0x20e] = 'InitSafariTrain',
+	[0x20f] = 'MoveSafariTrain',
+	[0x210] = 'CheckSafariTrain',
+	[0x211] = 'PlayerHeightValid',
+	[0x212] = 'GetPokeSeikaku',
+	[0x213] = 'ChkPokeSeikakuAll',
+	[0x214] = 'UnderGroundTalkCount',
+	[0x215] = 'NaturalParkWalkCountClear',
+	[0x216] = 'NaturalParkWalkCountGet',
+	[0x217] = 'NaturalParkAccessoryNoGet',
+	[0x218] = 'GetNewsPokeNo',
+	[0x219] = 'NewsCountSet',
+	[0x21a] = 'NewsCountChk',
+	[0x21b] = 'StartGenerate',
+	[0x21c] = 'AddMovePoke',
+	[0x21d] = 'RandomGroup',
+	[0x21e] = 'OshieWazaCount',
+	[0x21f] = 'RemaindWazaCount',
+	[0x220] = 'OshieWazaListSetProc',
+	[0x221] = 'RemaindWazaListSetProc',
+	[0x222] = 'OshieWazaListGetResult',
+	[0x223] = 'RemaindWazaListGetResult',
+	[0x224] = 'NormalWazaListSetProc',
+	[0x225] = 'NormalWazaListGetResult',
+	[0x226] = 'FldTradeAlloc',
+	[0x227] = 'FldTradeMonsno',
+	[0x228] = 'FldTradeChgMonsno',
+	[0x229] = 'FldTradeEvent',
+	[0x22a] = 'FldTradeDel',
+	[0x22b] = 'ZukanTextVerUp',
+	[0x22c] = 'ZukanSexVerUp',
+	[0x22d] = 'ZenkokuZukanFlag',
+	[0x22e] = 'ChkRibbonCount',
+	[0x22f] = 'ChkRibbonCountAll',
+	[0x230] = 'ChkRibbon',
+	[0x231] = 'SetRibbon',
+	[0x232] = 'RibbonName',
+	[0x233] = 'ChkPrmExp',
+	[0x234] = 'ChkWeek',
+	[0x235] = 'BroadcastTV',
+	[0x236] = 'TVEntryWatchHideItem',
+	[0x237] = 'TVInterview',
+	[0x238] = 'TVInterviewerCheck',
+	[0x239] = 'RegulationListCall',
+	[0x23a] = 'AshiatoChk',
+	[0x23b] = 'PcRecoverAnm',
+	[0x23c] = 'ElevatorAnm',
+	[0x23d] = 'CallShipDemo',
+	[0x23e] = 'MysteryPostMan',
+	[0x23f] = 'DebugPrintWork',
+	[0x240] = 'DebugPrintFlag',
+	[0x241] = 'DebugPrintWorkStationed',
+	[0x242] = 'DebugPrintFlagStationed',
+	[0x243] = 'PMSInputSingleProc',
+	[0x244] = 'PMSInputDoubleProc',
+	[0x245] = 'PMSBuf',
+	[0x246] = 'PMVersionGet',
+	[0x247] = 'FrontPokemon',
+	[0x248] = 'TemotiPokeType',
+	[0x249] = 'AikotobaKabegamiSet',
+	[0x24a] = 'GetUgHataNum',
+	[0x24b] = 'SetUpPasoAnime',
+	[0x24c] = 'StartPasoOnAnime',
+	[0x24d] = 'StartPasoOffAnime',
+	[0x24e] = 'GetKujiAtariNum',
+	[0x24f] = 'KujiAtariChk',
+	[0x250] = 'KujiAtariInit',
+	[0x251] = 'NickNamePC',
+	[0x252] = 'PokeBoxCountEmptySpace',
+	[0x253] = 'PokeParkControl',
+	[0x254] = 'PokeParkDepositCount',
+	[0x255] = 'PokeParkTransMons',
+	[0x256] = 'PokeParkGetScore',
+	[0x257] = 'AcceShopCall',
+	[0x258] = 'ReportDrawProcSet',
+	[0x259] = 'ReportDrawProcDel',
+	[0x25a] = 'DendouBallAnm',
+	[0x25b] = 'InitFldLift',
+	[0x25c] = 'MoveFldLift',
+	[0x25d] = 'CheckFldLift',
+	[0x25e] = 'SetupRAHCyl',
+	[0x25f] = 'StartRAHCyl',
+	[0x260] = 'AddScore',
+	[0x261] = 'AcceName',
+	[0x262] = 'PartyMonsNoCheck',
+	[0x263] = 'PartyDeokisisuFormChange',
+	[0x264] = 'CheckMinomuchiComp',
+	[0x265] = 'PoketchHookSet',
+	[0x266] = 'PoketchHookReset',
+	[0x267] = 'SlotMachine',
+	[0x268] = 'GetNowHour',
+	[0x269] = 'ObjShakeAnm',
+	[0x26a] = 'ObjBlinkAnm',
+	[0x26b] = '_D20R0106Legend_IsUnseal',
+	[0x26c] = 'DressingImcAcceCheck',
+	[0x26d] = 'TalkMsgUnknownFont',
+	[0x26e] = 'AgbCartridgeVerGet',
+	[0x26f] = 'UnderGroundTalkCountClear',
+	[0x270] = 'HideMapStateChange',
+	[0x271] = 'NameInStone',
+	[0x272] = 'MonumantName',
+	[0x273] = 'ImcBgNameSet',
+	[0x274] = 'CompCoin',
+	[0x275] = 'SlotRentyanChk',
+	[0x276] = 'AddCoinChk',
+	[0x277] = 'LevelJijiiNo',
+	[0x278] = 'PokeLevelGet',
+	[0x279] = 'ImcAcceSubItem',
+	[0x27a] = 'c08r0801ScopeCameraSet',
+	[0x27b] = 'LevelJijiiInit',
+	[0x27c] = 'TVEntryParkInfo',
+	[0x27d] = 'NewNankaiWordSet',
+	[0x27e] = 'RegularCheck',
+	[0x27f] = 'NankaiWordCompleteCheck',
+	[0x280] = 'NumberNameEx',
+	[0x281] = 'TemotiPokeContestStatusGet',
+	[0x282] = 'BirthDayCheck',
+	[0x283] = 'SndInitialVolSet',
+	[0x284] = 'AnoonSeeNum',
+	[0x285] = 'D17SystemMapSelect',
+	[0x286] = 'UnderGroundToolGiveCount',
+	[0x287] = 'UnderGroundKasekiDigCount',
+	[0x288] = 'UnderGroundTrapHitCount',
+	[0x289] = 'PofinAdd',
+	[0x28a] = 'PofinAddCheck',
+	[0x28b] = 'IsHaihuEventEnable',
+	[0x28c] = 'PokeWindowPutPP',
+	[0x28d] = 'PokeWindowAnm',
+	[0x28e] = 'PokeWindowAnmWait',
+	[0x28f] = 'DendouNumGet',
+	[0x290] = 'SodateyaPokeListSetProc',
+	[0x291] = 'SodateyaPokeListGetResult',
+	[0x292] = 'GetRandomHit',
+	[0x293] = 'UnderGroundTalkCount2',
+	[0x294] = 'BtlPointWinWrite',
+	[0x295] = 'BtlPointWinDel',
+	[0x296] = 'BtlPointWrite',
+	[0x297] = 'CheckBtlPoint',
+	[0x298] = 'AddBtlPoint',
+	[0x299] = 'SubBtlPoint',
+	[0x29a] = 'CompBtlPoint',
+	[0x29b] = 'GetBtlPointGift',
+	[0x29c] = 'UnionViewGetTrainerTypeNo',
+	[0x29d] = 'BmpMenuMakeList16',
+	[0x29e] = 'HidenEffStart',
+	[0x29f] = 'Zishin',
+	[0x2a0] = 'TrainerMultiBattleSet',
+	[0x2a1] = 'ObjAnimePos',
+	[0x2a2] = 'UgBallCheck',
+	[0x2a3] = 'CheckMyGSID',
+	[0x2a4] = 'GetFriendDataNum',
+	[0x2a5] = 'NpcTradePokeListSetProc',
+	[0x2a6] = 'GetCoinGift',
+	[0x2a7] = 'AusuItemCheck',
+	[0x2a8] = 'SubWkCoin',
+	[0x2a9] = 'CompWkCoin',
+	[0x2aa] = 'AikotobaOkurimonoChk',
+	[0x2ab] = 'CBSealKindNumGet',
+	[0x2ac] = 'WifiHusiginaokurimonoOpenFlagSet',
+	[0x2ad] = 'MoveCodeGet',
+	[0x2ae] = 'BgmPlayCheck',
+	[0x2af] = 'UnionGetCardTalkNo',
+	[0x2b0] = 'WirelessIconEasy',
+	[0x2b1] = 'WirelessIconEasyEnd',
+	[0x2b2] = 'SaveFieldObj',
+	[0x2b3] = 'SealName',
+	[0x2b4] = 'TalkObjPauseAll',
+	[0x2b5] = 'SetEscapeLocation',
+	[0x2b6] = 'FieldObjBitSetFellowHit',
+	[0x2b7] = 'DameTamagoChkAll',
+	[0x2b8] = 'TVEntryWatchChangeName',
+	[0x2b9] = 'UnionBmpMenuStart',
+	[0x2ba] = 'UnionBattleStartCheck',
+	[0x2bb] = 'CommDirectEndTiming',
+	[0x2bc] = 'HaifuPokeRetryCheck',
+	[0x2bd] = 'SpWildBattleSet',
+	[0x2be] = 'GetCardRank',
+	[0x2bf] = 'BicycleReqNonBgm',
+	[0x2c0] = 'TalkMsgSpAuto',
+	[0x2c1] = 'ReportInfoWinOpen',
+	[0x2c2] = 'ReportInfoWinClose',
+	[0x2c3] = 'FieldScopeModeSet',
+	[0x2c6] = 'SpinTradeUnion',
+	[0x2c7] = 'CheckVersionGame',
+	[0x2ca] = 'FloralClockAnimation',
+	[0x328] = 'PortalEffect',
+	[0x347] = 'DisplayFloor',
+	[0x402] = 'ExitMarsh'
 }
 
 data_tables = {
@@ -271,7 +997,9 @@ data_tables = {
 
 		-- start of structure offsets/structure data
 		player_live_struct_offs = 0x1440,
-
+		signature_offs = 0x5B15,
+		signature_size = 0x600,
+	
 		mapdata_and_menu_struct_offs = 0x22964,
 		chunk_calculation_ptr = 0x229F0,
 		matrix_struct_offs = 0x22A84,
@@ -295,13 +1023,18 @@ data_tables = {
 		},
 		
 		memory_state_check_offs = 0x22A00, -- 0x22A00,0x22A04,0x22A20
-		memory_state_check_val = 0x2C9EC,
+		opcode_pointer =  0x29500, -- affected by bt
 
+		memory_state_check_val = 0x2C9EC,
+	
 		menu_data = 0x29434,
 		current_pocket_index_offs = 0x2977C,
+		hall_of_fame_struct_offs = 0x2C298,
+		hall_of_fame_entry_size = 0x3C,
+
 
 		ug_revealing_circle_struct_offs = 0x115150,
-		ug_trap_struct_offs =0x12B5B0,
+		ug_trap_struct_offs = 0x12B5B0,
 		ug_trap_struct_size = 0x6,
 		
 
@@ -543,8 +1276,14 @@ general_npc_struct = {
 
 start_npc_struct = data_table["npc_struct_offs"]
 
-generic_npc_struct = {
-	sprite_id_32 = start_npc_struct + 0x10,
+generic_npc_struct = { -- -0x10 everything bitch
+	sprite_id_16 = start_npc_struct + 0x10,
+	obj_code_16 = start_npc_struct + 0x12,
+	move_code_16 = start_npc_struct + 0x14,
+	event_type_16 = start_npc_struct + 0x16,
+	event_flag_16 = start_npc_struct + 0x18,
+	
+	event_index_16 = start_npc_struct + 0x20,
 	movement_32 = start_npc_struct + 0x24, --crashes after 0x10
 	facing_dir_32 = start_npc_struct + 0x28,
 	movement_32_r = start_npc_struct + 0x2C,
@@ -622,7 +1361,16 @@ chunk_struct = {
 	
 	chunk_pointer_offs = {0x90,0x94,0x98,0x9C},
 	current_chunk_8 = 0xAC,
-	current_subchunk_8 = 0xAD
+	current_subchunk_8 = 0xAD,
+	x_target_subpixel_16 = 0xCC,
+	x_target_16 = 0xCE,
+	y_target_subpixel_16 = 0xD0,
+	y_target_16 = 0xD2,
+	z_target_subpixel_16 = 0xD4,
+	z_target_16 = 0xD6,
+	load_state = 0xE4,
+	
+	
 }
 
 chunk_buffer_struct = {
@@ -636,7 +1384,7 @@ item_pocket_struct = {
 	{"balls_pocket",start_item_struct + 0x6BC,start_item_struct + 0x6F8},
 	{"tms_hms_pocket",start_item_struct + 0x35C,start_item_struct + 0x4EC},	
 	{"berries_pocket",start_item_struct + 0x5BC,start_item_struct + 0x6BC},
-	{"mails_pocket",start_item_struct + 0x4EC, start_item_struct + 0x5BC},
+	{"mails_pocket",start_item_struct + 0x4EC, start_item_struct + 0x51C},
 	{"battle_items_pocket",start_item_struct + 0x6F8,start_item_struct + 0x9A1},
 	{"key_items_pocket",start_item_struct + 0x294,start_item_struct + 0x35C}
 }
@@ -709,13 +1457,40 @@ hovering_item_struct = {
 	cursor_offset_16 = 0x364,
 }
 
+script_execution_struct = {
+	opcode_pointer = data_table["opcode_pointer"]
+}
+
+start_hall_of_fame_struct = data_table["hall_of_fame_struct_offs"]
+start_species_struct = 0x20
+
+hall_of_fame_struct = {
+	specie_struct = {
+		species_id_16 = 0x4,
+		level_16 = 0x6,
+		pid_32 = 0x8,
+		tid_16 = 0xC,
+		sid_16 = 0xE,
+		poke_name = 0x10,
+		trainer_name = 0x26,
+		move_1_16 = 0x36,
+		move_2_16 = 0x38,
+		move_3_16 = 0x3A,
+		move_4_16 = 0x3C,
+		dummy_16 = 0x3E
+		},
+	year_16 = 0x168,
+	month_8 = 0x18A,
+	day_8 = 0x18C
+}
+
 -- MATH, INPUT, FORMATTING, NON-GAMEPLAY RELATED FUNCTIONS
 
 function fmt(arg,len)
     return string.format("%0"..len.."X", bit.band(4294967295, arg))
 end
 
-function print_txt(x,y,txt,clr,screen)
+function print_to_screen(x,y,txt,clr,screen)
 	screen = screen or 1
 	gui.text(x,screen_y[screen]+y,txt,clr)
 end 
@@ -726,8 +1501,6 @@ function debug_print(text)
 	if debug then print(text) end 
 end 
 
-
-
 function draw_bounding_rectangle(x,y,width,height,fill,border_clr,screen)
 	screen = screen or 1
 	gui.box(x-(width/2),screen_y[screen]+y-(height/2),x+(width/2),screen_y[screen]+y+(height/2),fill,border_clr)
@@ -736,6 +1509,11 @@ end
 function draw_rectangle(x,y,width,height,fill,border_clr,screen)
 	screen = screen or 1
 	gui.box(x,screen_y[screen]+y,x+width,screen_y[screen]+y+height,fill,border_clr)
+end 
+
+function draw_line(x,y,width,height,clr,screen)
+	screen = screen or 1
+	gui.line(x,screen_y[screen]+y,x+width,screen_y[screen]+y+height,clr)
 end 
 
 
@@ -757,6 +1535,25 @@ last_joy = {}
 stylus_ = {}
 last_stylus = {}
 
+function check_btn_ints()
+	for i=0,9 do
+		if check_key(""..i) or check_key("Number"..i) then return i end 
+	end 
+end
+
+hex_num = {"A","B","C","D","E","F"}
+
+function check_btn_hex()
+	for i=0,9 do
+		if check_key(""..i) or check_key("Number"..i) then return i end 
+	end 
+
+	for i,hex in ipairs(hex_num) do
+		if check_key(hex) then return i+9 end
+	end 
+end
+
+
 function get_keys()
 	last_key = key
 	key = input.get()
@@ -776,6 +1573,16 @@ function check_keys(btns)
 	if not_prev_held then
 		return pressed_key_count
 	end 
+end 
+
+function check_keys_continuous(btns)
+	pressed_key_count = 0
+	for btn =1,#btns do
+		if key[btns[btn]] then 	
+				pressed_key_count = pressed_key_count + 1
+		end 
+	end
+	return pressed_key_count
 end 
 
 function check_key(btn)
@@ -843,6 +1650,8 @@ function tap_touch_screen(x_,y_,frames)
 		emu.frameadvance()
 		current_frame = emu.framecount()
 	end 
+	stylus_.touch = false
+	stylus.set(stylus_)
 end
 
 function press_button(btn,frames)
@@ -910,7 +1719,7 @@ function find_item_address_from_pocket(item_id,pocket_id,item_id2)
 	while (current_addr < end_addr) and (current_item_id ~= 0) do
 		current_item_id = memory.readword(current_addr)
 		if (current_item_id == item_id) or (current_item_id == item_id2)  then
-			debug_print("item found with id "..fmt(item_id,4).." or id "..fmt(item_id2,4).." at addr "..fmt(current_addr,8).." in "..item_pocket_struct[pocket_id+1][1])
+			-- debug_print("item found with id "..fmt(item_id,4).." or id "..fmt(item_id2,4).." at addr "..fmt(current_addr,8).." in "..item_pocket_struct[pocket_id+1][1])
 			return  current_addr
 		end 
 		current_addr = current_addr + 0x4
@@ -928,7 +1737,7 @@ function find_item_address(item_id)
 			-- debug_print("item with id "..fmt(current_item_id,4)..item_pocket_struct[pocket_id+1][1])
 			if current_item_id == item_id then
 				data = {current_addr,pocket_id}
-				debug_print("item found with id "..fmt(item_id,4).." at addr "..fmt(current_addr,8).." in "..item_pocket_struct[pocket_id+1][1])
+				-- debug_print("item found with id "..fmt(item_id,4).." at addr "..fmt(current_addr,8).." in "..item_pocket_struct[pocket_id+1][1])
 				return data
 			end 
 			
@@ -1017,7 +1826,12 @@ function switch_to_item(item_id)
 	wait_frames(120)
 end 
 
+item_list = {
+	[0x1AC]="Explorer Kit",
+	[0x4F]="Repel"}
+
 function use_item(item_id,menu_open)
+	debug_print("Using item: "..item_list[item_id])
 	menu_open = menu_open or false 
 	if menu_open == false then 
 		use_menu(2)
@@ -1035,17 +1849,14 @@ function use_explorer_kit(full,crash,reset_,menu_open)
 		wait_frames(400)
 		if crash then
 			wait_frames(400)
-			debug_print("crash A")
+			debug_print("crash handler")
 			press_button("A")
 			sleep(2)
 			wait_frames(650)
-			debug_print("A 1")
 			press_button("A")
 			wait_frames(80)
-			debug_print("A 2")
 			press_button("A")
 			wait_frames(200)
-			debug_print("A 3")
 			press_button("A")
 			wait_frames(100)
 			return
@@ -1076,6 +1887,7 @@ function ledgecancel(steps,keep_side_menu)
 	if keep_side_menu then return end
 	wait_frames(4)
 	press_button("B")
+	debug_print("Ledgecancel performed")
 end 
 
 mash_switch = {
@@ -1137,6 +1949,7 @@ function save()
 end 
 
 function reset(reset_type,wait_for_intro)
+	debug_print("resetting")
 	reset_type = reset_type or "hard"
 	if reset_type == "hard" then
 		-- debug_print("hard reset")
@@ -1173,10 +1986,11 @@ function save_reset(reset_type,wait_for_intro)
 end 
 
 function wrong_warp_reset(wait_for_intro)
+	debug_print("Performing wrong warp")
 	mash_button("A",400)
 	wait_frames(350)
 	mash_button("A",8)
-	wait_frames(200)
+	wait_frames(600)
 	reset("hard",wait_for_intro)
 end 
 
@@ -1237,6 +2051,7 @@ function get_on_bike(bike_gear,init_wait)
 end
 
 function graphic_reload()
+	debug_print("Graphic reload")
 	use_menu(5)
 	wait_frames(100)
 	press_button("B")
@@ -1262,7 +2077,7 @@ function set_stepcounter(steps)
 end 
 
 function clear_stepcounter()
-	tap_touch_screen(115,120,4)
+	tap_touch_screen(115,120,1)
 end 
 
 function check_bike_state()
@@ -1301,6 +2116,7 @@ function return_arg(input,other)
 end
 
 function up(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
+	if show_steps then debug_print(steps.." N") end
 	delay_before_reset = delay_before_reset or 2
 	delay_after_reset = delay_after_reset or 4
 	reset_stepcounter = return_arg(reset_stepcounter,true)
@@ -1328,6 +2144,7 @@ function up(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 end
 
 function left(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
+	if show_steps then debug_print(steps.." W") end
 	delay_before_reset = delay_before_reset or 2
 	delay_after_reset = delay_after_reset or 4
 	reset_stepcounter = return_arg(reset_stepcounter,true)
@@ -1356,6 +2173,7 @@ function left(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 end
 
 function down(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
+	if show_steps then debug_print(steps.." S") end
 	delay_before_reset = delay_before_reset or 2
 	delay_after_reset = delay_after_reset or 4
 	reset_stepcounter = return_arg(reset_stepcounter,true)
@@ -1378,6 +2196,7 @@ function down(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 end
 
 function right(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
+	if show_steps then debug_print(steps.." E") end
 	delay_before_reset = delay_before_reset or 2
 	delay_after_reset = delay_after_reset or 4
 	reset_stepcounter = return_arg(reset_stepcounter,true)
@@ -1415,6 +2234,7 @@ function check_battle_state()
 end 
 
 function turn_around(frames,until_encounter)
+	debug_print("Trying to get encounter...")
 	frames = frames or 400
 	until_encounter = return_arg(until_encounter,true)
 	if until_encounter then
@@ -1449,6 +2269,7 @@ function throw_ball(special_fight)
 end 
 
 function catch_pal_park_mon(count)
+	debug_print("Catching Pokemon")
 	count = count or 6
 	for i=0,count-1 do
 		turn_around()
@@ -1480,196 +2301,119 @@ function use_move(move)
 end 
 
 
-function auto_movement()
-	-- get_on_bike(0,0)
-	-- right(5,0,0,"false")
-	-- down(1,0,0,"false")
-	-- up(1,0,0,"false")
-	-- left(1,0,0,"false")
-	-- get_on_bike(1,0)
-	-- up(27,0,0,"false")
-	-- left(37,0,0,"false")
-	-- up(13,0,0,"false")
-	-- right(7,0,0,"false")
-	-- down(1)
-	-- graphic_reload()
-	-- go_direction_wait_warp("down")
+function nib(byte)
+	l_nib = bit.rshift(byte,4)
+	h_nib = bit.band(byte,0xF)
+	return {l_nib,h_nib}
 
-	-- down(1)
-	-- right(16)
-	-- get_on_bike(1)
-	-- up(430)
-	-- left(1)
-	-- use_explorer_kit(true,true)
-
-	-- right(193)
-	-- up(64)
-	-- save_reset()
-
-	-- left(214)
-	-- down(479)
-	-- graphic_reload()
-	-- down(2)
-	-- graphic_reload()
-	-- down(3)
-	-- left(2)
-	-- wrong_warp_reset(true)
-	
-	-- wait_frames(100)
-	-- right(704)
-	-- down(725)
-	-- right(16)
-	-- use_explorer_kit(true,true)
-	
-	-- -- reset shaymin sprite:
-	-- wait_frames(100)
-	-- right(2)
-	-- use_item(0x4F)
-	-- wait_frames(30)
-	-- press_button("A")
-	-- wait_frames(8)
-	-- close_menu(true)
-	-- ledgecancel(2)
-	-- wait_frames(60)
-	-- down(10,0,0,"false")
-	-- right(8,0,0,"false")
-	-- up(8,0,0,"false")
-	-- right(9,0,0,"false")
-	-- up(2,0,0,"false")
-	-- right(5)
-	-- right(68,0,0,"false")
-	-- wait_frames(30)
-	-- mash_button("A",80)
-	-- wait_frames(8)
-	-- right(348)
-	-- down(1995)
-	-- right(96)
-	-- down(160)
-	-- right(32)
-	-- down(160)
-	-- right(32)
-	-- down(96)
-	-- right(160)
-	-- down(32)
-
-	-- wait_frames(80) -- pal park hub
-	-- right(64)
-	-- up(161,0,0,"false")
-	-- wait_frames(400)
-	-- clear_stepcounter()
-	-- wait_frames(60)
-	-- down(161)
-	-- left(33,0,0,"false")
-	-- mash_pal_park_text(1)
-
-	-- left(160)
-	-- up(551)
-	-- left(32)
-	-- up(224)
-	-- right(161)
-	-- up(1791)
-	-- right(370)
-	-- up(1)
-	-- graphic_reload()
-
-	-- catch_pal_park_mon()
-	-- wait_frames(20)
-	-- mash_button("A",32)
-
-	-- -- lose the battle against shaymin
-
-	-- -- remove pal park menu
-	-- down(6,0,0,"false")
-	-- go_direction_wait_warp("down")
-	-- down(4,0,0,"false")
-	-- right(3,0,0,"false")
-	-- down(27,0,0,"false")
-	-- left(1,0,0,"false")
-	-- use_move()
-	-- down(11,0,0,"false")
-	-- left(1,0,0,"false")
-	-- down(4,0,0,"false")
-	-- use_move()
-	-- down(8,0,0,"false")
-	-- right(3,0,0,"false")
-	-- down(6,0,0,"false")
-	-- right(16,0,0,"false")
-	-- up(1,0,0,"false")
-	-- right(9,0,0,"false")
-	-- down(1,0,0,"false")
-	-- right(24,0,0,"false")
-	-- down(3,0,0,"false")
-	-- right(2,0,0,"false")
-	-- down(2,0,0,"false")
-	-- right(2,0,0,"false")
-	-- down(1,0,0,"false")
-	-- right(8,0,0,"false")
-	-- down(2,0,0,"false")
-	-- right(65,0,0,"false")
-	-- up(2,0,0,"false")
-	-- go_direction_wait_warp("up")
-	-- up(7,0,0,"false")
-
-	-- catching_show(true)
-	-- down(7,0,0,"false")
-	-- go_direction_wait_warp("down")
-
-	-- use_menu(1)
-	-- wait_frames(120)
-	-- press_button("right")
-	-- wait_frames(4)
-	-- press_button("A")
-	-- wait_frames(4)
-	-- press_button("down")
-	-- wait_frames(2)
-	-- press_button("down")
-	-- wait_frames(2)
-	-- press_button("down")
-	-- wait_frames(2)
-	-- press_button("A")
-	-- wait_frames(80)
-	-- press_buttons({"up","left"},24)
-	-- wait_frames(2)
-	-- press_button("A")
-	-- wait_frames(600)
-	-- press_button("up",4)
-
-	-- go_direction_wait_warp("up")
-	-- up(2,0,0,"false")
-	-- left(5,0,0,"false")
-
-	-- --  -- capture shaymin:
-	-- fast_warp()
-
-	wait_frames(100)
-
-	right(2)
-	get_on_bike(1)
-	use_item(0x4F)
-	wait_frames(30)
-	press_button("A")
-	wait_frames(8)
-	close_menu(true)
-	ledgecancel(2)
-	wait_frames(60)
-	down(10,0,0,"false")
-	right(8,0,0,"false")
-	up(8,0,0,"false")
-	right(9,0,0,"false")
-	up(2,0,0,"false")
-	right(5)
-	right(68,0,0,"false")
-	wait_frames(30)
-	mash_button("A",80)
-	wait_frames(8)
-	right(75)
-
-	save_reset()
-	up(105,0,0,"false")
-
-	
-	debug_print("auto_movement has finished")
 end 
+
+function bin(num,bits)
+	local t = {}
+	for b=bits,1,-1 do
+		rest = math.fmod(num,2)
+		t[b] = rest
+		num = (num-rest)/2
+	end 
+	return t
+end 
+
+start_signature_x = 30
+start_signature_y = 70
+
+function write_signature(byte_array)
+	row = 0
+	col = 0
+	region = 0
+
+	for byte = 0,#byte_array do
+
+		row = (row + 1)%8
+	end 
+
+
+
+end
+
+show_steps = true 
+
+function auto_calc_input()
+	for i = 0,calc_input do
+	end 
+end 
+
+function press_equal_sign()
+
+end 
+
+function auto_movement()
+	press_button("down",2)
+	wait_frames(20)
+	press_button("X",2)
+	mash_button("A",20)
+	-- print("Hello")
+	-- -- press_buttons({"up","down","left","right"},60)
+	-- tap_touch_screen(35,71,2)
+	-- tap_touch_screen(65,121,2)
+end 
+
+map_editing =  false 
+
+function toggle_map_editing()
+	map_editing = not map_editing 
+	temp_map_id = ""
+end
+
+
+function change_map_id()
+	value = check_btn_ints()
+	if value ~= nil then 
+		temp_map_id = temp_map_id..value
+		memory.writeword(base + live_struct["map_id_32"],tonumber(temp_map_id))
+	end
+	if (#temp_map_id > 4) or (key.enter) then
+		temp_map_id = tonumber(temp_map_id)
+		if temp_map_id > 65535 then
+			temp_map_id = 65535
+		end 
+		memory.writeword(base + live_struct["map_id_32"],temp_map_id)
+		map_editing = false
+	end
+end 
+
+memory_editing = false
+
+
+function toggle_memory_addr_editing()
+	memory_editing = not memory_editing
+	temp_memory_addr = 0
+	temp_str_memory_addr = "0"
+end
+
+function change_memory_addr()
+	value = check_btn_hex()
+	if value ~= nil then 
+		if #temp_str_memory_addr < 7 then 
+			temp_memory_addr = bit.lshift(temp_memory_addr,4) + value 
+			temp_str_memory_addr = fmt(temp_memory_addr,0)
+			return
+		end 
+	end
+
+	if key.enter then
+		memview_addr = temp_memory_addr - temp_memory_addr%16
+		memory_editing = false
+		scroll = 0
+		return
+	end
+
+	if check_key("backspace") then 
+		temp_memory_addr = bit.rshift(temp_memory_addr,4)
+		temp_str_memory_addr = fmt(temp_memory_addr,0)
+	end
+
+end 
+
 
 tp_amount = 31
 
@@ -1714,6 +2458,19 @@ function get_memory_state()
 end
 
 function show_player_data()
+	x_phys_32 = memory.readword(base + player_struct["x_phys_32"] + memory_shift)
+	z_phys_32 = memory.readword(base + player_struct["z_phys_32"] + memory_shift) 
+	map_id_phys_32 =  memory.readword(base + live_struct["map_id_32"])
+	print_to_screen(10,30,"Physical:","yellow")
+	print_to_screen(20,40,"X: "..x_phys_32..","..fmt(x_phys_32,4),"yellow")
+	print_to_screen(20,50,"Z: "..z_phys_32..","..fmt(z_phys_32,4),"yellow")
+	print_to_screen(20,60,"Map Id: "..map_id_phys_32..","..fmt(map_id_phys_32,4),"yellow")
+	x_stored_warp_16 = memory.readword(base + live_struct["x_stored_warp_16"])
+	z_stored_warp_16 = memory.readword(base + live_struct["z_stored_warp_16"])	
+	print_to_screen(10,70,"Stored Warp:","yellow")
+	print_to_screen(20,80,"X: "..x_stored_warp_16..","..fmt(x_stored_warp_16,4),"yellow")
+	print_to_screen(20,90,"Z: "..z_stored_warp_16..","..fmt(z_stored_warp_16,4),"yellow")
+	
 end
 
 function win_ug_minigame()
@@ -1726,6 +2483,11 @@ function remove_trap_effect()
 end 
 
 -- BOUNDING BOXES
+bounding_view = false
+function toggle_bounding_view()
+	bounding_view = not bounding_view
+end 
+
 
 function show_ug_gems() 
 	draw_bounding_boxes(data_table["ug_gem_count"],base + ug_gem_struct["x_phys_16"], base + ug_gem_struct["z_phys_16"],data_table["ug_gem_struct_size"],0x0,"#FFF8666","#FFF66")
@@ -1767,7 +2529,6 @@ end
 
 function show_npcs()
 	npc_count = memory.readbyte(base + general_npc_struct["npc_count"] + memory_shift) -1 -- subtracting player's npc from count
-	print_txt(5,40,npc_count,"blue")
 	if npc_count > 0 then -- prevent negative npc count when not initialized
 		draw_bounding_boxes(npc_count,base + generic_npc_struct["x_phys_32"],base + generic_npc_struct["z_phys_32"],data_table["npc_struct_size"],memory_shift,"#88FFFFA0","#0FB58")
 	end
@@ -1800,7 +2561,7 @@ function draw_bounding_box(x,z,fill_clr,border_clr)
 end
 
 function draw_player_pos(fill_clr,border_clr)
-	draw_bounding_rectangle(127,99,14,14,fill_clr,border_clr)
+	draw_bounding_rectangle(128,99,15,14,fill_clr,border_clr)
 end 
 
 function show_bounding_boxes(memory_state)
@@ -1818,7 +2579,6 @@ function show_bounding_boxes(memory_state)
 		return
 	end 
 	-- data that should only be shown when not in UG
-	show_player_data()
 	show_objects()
 	show_triggers()
 	show_warps()
@@ -1826,7 +2586,7 @@ function show_bounding_boxes(memory_state)
 end 
 
 --
-menu_id = 1
+menu_id = 0
 menu_count = 2
 
 function increment_menu()
@@ -1864,7 +2624,7 @@ function show_void_pos()
 				c_map_id = ">999"
 			end 
 
-			print_txt(3 + row*25,3 + col*10,c_map_id,clr,2)
+			print_to_screen(3 + row*25,3 + col*10,c_map_id,clr,2)
 		end 
 	end 
 end
@@ -1873,6 +2633,100 @@ function split_word_into_bytes(word)
 	h_byte = bit.rshift(word,8)
 	l_byte = bit.band(word,0xFF)
 	return {l_byte,h_byte}
+end 
+
+-- Loadlines and grid
+
+grid = false
+loadlines = true 
+maplines = false
+mapmodellines = false
+
+function toggle_grid()
+	grid = not grid
+end 
+
+function toggle_loadlines()
+	loadlines = not loadlines
+end 
+
+function toggle_maplines()
+	maplines = not maplines
+end
+
+function toggle_mapmodellines()
+	mapmodellines = not mapmodellines
+end
+
+function show_boundary_lines()
+	if grid then show_gridlines() end
+	if loadlines then show_loadlines() end
+	if maplines then show_maplines() end
+	if mapmodellines then show_mapmodellines() end 
+end 
+
+function show_gridlines()
+	for i = 0,15 do draw_line(i*16+7,0,0,200, "#0FB58") end 
+	for i = 0,7 do draw_line(0,i*13,256,0, "#0FB58") end
+	for i = 0,6 do draw_line(0,7*13+15.5*i,256,0, "#0FB58") end
+end 
+
+function show_loadlines()
+	x_cam_16 = memory.readword(base + player_struct["x_cam_16"] + memory_shift)
+	z_cam_16 = memory.readword(base + player_struct["z_cam_16"] + memory_shift)
+
+	add_x = 0
+	add_y = 0
+	if x_cam_16 > 0x7FFF then 
+		add_x = 1
+	end 
+	if z_cam_16 > 0x7FFF then 
+		add_y = 1
+	end 
+
+	x_line = (-x_cam_16+23)%32 - add_x
+	z_line = (-z_cam_16+23)%32 - add_y + add_x
+	draw_line(x_line*16+7,0,0,200, "red")
+	if z_line < 14 then 
+		if z_line > 7 then draw_line(0,7*13+(z_line-7)*15.5,256,0, "red") return end
+		draw_line(0,13*z_line,256,0, "red")
+	end 
+end
+
+function show_maplines()
+	x_phys_32 = memory.readdword(base + player_struct["x_phys_32"] + memory_shift)
+	z_phys_32 = memory.readdword(base + player_struct["z_phys_32"] + memory_shift)
+
+	add_x = 0
+	add_y = 0
+	if x_phys_32 > 0x7FFF then 
+		add_x = 1
+	end 
+	if z_phys_32 > 0x7FFF then 
+		add_y = 1
+	end 
+
+	x_line = (-x_phys_32+7)%32 + add_x
+	z_line = (-z_phys_32+7)%32 + add_y
+	draw_line(x_line*16+7,0,0,200, "blue")
+	if z_line < 14 then 
+		if z_line > 7 then draw_line(0,7*13+(z_line-7)*15.5,256,0, "blue") return end
+		draw_line(0,13*z_line,256,0, "blue")
+	end 
+
+end  
+
+function show_mapmodellines()
+	x_cam_16 = memory.readword(base + player_struct["x_cam_16"] + memory_shift)
+	z_cam_16 = memory.readword(base + player_struct["z_cam_16"] + memory_shift)
+	x_line = (-x_cam_16+7)%32
+	z_line = (-z_cam_16+7)%32
+	draw_line(x_line*16+7,0,0,200, "orange")
+	if z_line < 14 then 
+		if z_line > 7 then draw_line(0,7*13+(z_line-7)*15.5,256,0, "orange") return end
+		draw_line(0,13*z_line,256,0, "orange")
+	end
+
 end 
 
 function get_tile_color(tile_data)
@@ -1887,7 +2741,6 @@ function get_tile_color(tile_data)
 	return tile_ids[tile_id]
 
 end 
-
 
 function get_collision_color(collision)
 	if bit.rshift(collision,7) ~= 0 then return "#CCCCCC" end
@@ -1910,12 +2763,14 @@ function toggle_player_pos()
 end
 
 function show_chunks_ow()
+	show_tile_data()
 	-- draw_rectangle(0,0,256,200,"#000022ccc",0,2)
 	draw_rectangle(0,0,256,200,"#000001fff","#000001fff",2)
 	
 	additional_offset = 0
 	x_phys_32 = memory.readdword(base + player_struct["x_phys_32"] + memory_shift)
 	z_phys_32 = memory.readdword(base + player_struct["z_phys_32"] + memory_shift)
+
 	if x_phys_32 > 0x7FFFFFF then 
 		additional_offset = additional_offset -64
 	end 
@@ -1937,44 +2792,118 @@ function show_chunks_ow()
 	end 
 end 
 
-function show_tiles_ow(additional_offset)
-	print_txt(5,60,"chunks")
+show_load_calculations = false
+
+function toggle_load_calculations()
+	show_load_calculations = not show_load_calculations
+end 
+
+debug_tile_print = false
+function toggle_debug_tile_print()
+	debug_tile_print = not debug_tile_print
+end 
+
+function show_tile_data()
+	tile_id = memory.readbyte(base + player_struct["tile_type_16_1"] + memory_shift)
+	-- current_tile_2 = memory.readbyte(base + player_struct["tile_type_16_2"] + memory_shift) -- slower
+	print_to_screen(143,15,"Tile: "..tile_id..","..fmt(tile_id,2),'yellow')
+	print_to_screen(143,25,tile_names[tile_id+1],'yellow')
+
 	start_chunk_struct = memory.readdword(base+data_table["chunk_calculation_ptr"])
-	print_txt(5,70,"0x"..fmt(start_chunk_struct,8))
+	print_to_screen(143,35,"Loading:",'yellow')
+	load_state = memory.readbyte(start_chunk_struct + chunk_struct["load_state"])
+	if load_state == 0 then
+		print_to_screen(198,35,"true",'green')
+		
+	else 
+		print_to_screen(198,35,"false",'red')
+	end
+	
+	if show_load_calculations then 
+		x_target_16 = memory.readword(start_chunk_struct + chunk_struct["x_target_16"])
+		z_target_16 = memory.readword(start_chunk_struct + chunk_struct["z_target_16"])
+		print_to_screen(143,45,"Target:",'yellow')
+		print_to_screen(143,55,"    X: "..x_target_16..","..fmt(x_target_16,4),'yellow')
+		print_to_screen(143,65,"    Z: "..z_target_16..","..fmt(z_target_16,4),'yellow')
+
+		x_cam_16 = memory.readword(base + player_struct["x_cam_16"] + memory_shift)
+		z_cam_16 = memory.readword(base + player_struct["z_cam_16"] + memory_shift) 
+
+		print_to_screen(143,75,"Graphical:",'yellow')
+		print_to_screen(143,85,"    X: "..x_cam_16..","..fmt(x_cam_16,4),'yellow')
+		print_to_screen(143,95,"    Z: "..z_cam_16..","..fmt(z_cam_16,4),'yellow')
+	end 
+
+end 
+
+function show_tiles_ow(additional_offset)
+	start_chunk_struct = memory.readdword(base+data_table["chunk_calculation_ptr"])
+	print_to_screen(153,140,"0x"..fmt(start_chunk_struct,8))
 	chunk_pointer_offs = chunk_struct["chunk_pointer_offs"]
 	chunk_pointers = {}
+	print_to_screen(153,150,"Chunk addresses:")
+	debug_tile_dump = ""
+
 	for i = 1,#chunk_pointer_offs do
 		chunk_pointer = memory.readdword(chunk_pointer_offs[i] + start_chunk_struct)
-		print_txt(5,70+i*10,"0x"..fmt(chunk_pointer,7))
-		for row = 0,31 do 
-			for col = 0,31 do 
+		print_to_screen(153,150+i*10,"0x"..fmt(chunk_pointer,7))
+		for col = 0,31 do 
+			-- remove unless debug version
+			if col ~= 0 then 
+				debug_tile_dump = debug_tile_dump.."],"
+			end 
+			debug_tile_dump = debug_tile_dump.."["
+			--
+
+			for row = 0,31 do 
 				tile_data = memory.readword(chunk_pointer+row*2 + col*64+additional_offset)
 				tile_color = get_tile_color(tile_data)
-				draw_rectangle(chunk_scr_x[i]+row*4,chunk_scr_y[i] + col*3,5,3,tile_color,0,2)
+				draw_rectangle(chunk_scr_x[i]+row*4,chunk_scr_y[i] + col*3,5,4,tile_color,0,2)
+
+				-- remove unless debug version
+				if tile_color  == nil then
+					tile_color = "#000"
+				end 
+				debug_tile_dump = debug_tile_dump.."\""..tile_color.."\","
+				--
+
+								
+
 			end
 		end 
+		
+		-- remove unless debug version 
+		if debug_tile_print then
+			if i == 1 then  
+				debug_tile_dump = debug_tile_dump.."]"		
+				file = io.open("dump_test.txt","a")
+				io.output(file)
+				io.write("\nMap_"..map_id_phys_32.."=["..debug_tile_dump.."]")
+				io.close(file)
+				debug_tile_print = false 
+			end
+		end 
+		--
 
 	end 
 end
 
 function show_collision_ow(additional_offset)
-	print_txt(5,60,"chunks")
 	start_chunk_struct = memory.readdword(base+data_table["chunk_calculation_ptr"])
-	print_txt(5,70,"0x"..fmt(start_chunk_struct,8))
+	print_to_screen(153,140,"0x"..fmt(start_chunk_struct,8))
 	chunk_pointer_offs = chunk_struct["chunk_pointer_offs"]
 	chunk_pointers = {}
-
+	print_to_screen(153,150,"Chunk addresses:")
 	for i = 1,#chunk_pointer_offs do
-		chunk_pointers[i] = memory.readdword(chunk_pointer_offs[i] + start_chunk_struct)
-		print_txt(5,70+i*10,"0x"..fmt(chunk_pointers[i],7))
+		chunk_pointer = memory.readdword(chunk_pointer_offs[i] + start_chunk_struct)
+		print_to_screen(153,150+i*10,"0x"..fmt(chunk_pointer,7))
 		for row = 0,31 do 
 			for col = 0,31 do 
-				collision_color = nil
-				if (memory.readbyte(chunk_pointers[i]+row*2 + col*64+additional_offset)) ~= 0xff then
-					collision  = memory.readbyte(chunk_pointers[i]+row*2 + col*64+1+additional_offset)
+				if (memory.readbyte(chunk_pointer+row*2 + col*64+additional_offset)) ~= 0xff then
+					collision  = memory.readbyte(chunk_pointer+row*2 + col*64+1+additional_offset)
 					collision_color = get_collision_color(collision)
 				end 
-				draw_rectangle(chunk_scr_x[i]+row*4,chunk_scr_y[i] + col*3,5,3,collision_color,0,2)
+				draw_rectangle(chunk_scr_x[i]+row*4,chunk_scr_y[i] + col*3,5,4,collision_color,0,2)
 			end
 		end 
 
@@ -1995,7 +2924,7 @@ function show_chunk_position()
 		end 
 		row = x_phys_32%32
 		col = z_phys_32%32
-		draw_rectangle(chunk_scr_x[c_chunk+1]+row*4,chunk_scr_y[c_chunk+1] + col*3,5,3,"#00f0ff",0,2)
+		draw_rectangle(chunk_scr_x[c_chunk+1]+row*4,chunk_scr_y[c_chunk+1] + col*3,5,4,"#00f0ff",0,2)
 	
 	end
 	
@@ -2007,12 +2936,189 @@ end
 function show_chunks_ug()
 end
 
+function debug_script_calling()
+	get_internal_pointer()
+	show_script_start()
+	show_script_memory()
+end 
+
+show_script = false
+script_executed = false 
+update_variables = false
+last_script_map = 0 
+script_map = -1
+param_count = 0
+
+
+function swap_endian(num)
+
+	return bit.bor(bit.lshift(num%256,8),bit.rshift(num,8));
+end
+
+function get_script_command_color(cmd)
+	if cmd > 716 then return script_commands['stopcode']['color'] end 
+	if script_commands[cmd] then 
+		return script_commands[cmd]['color']
+	end 
+	return script_commands['default']['color']
+end 
+
+
+function get_param_count(cmd) -- incompatible with uneven script params so whatever fuck this
+	if cmd > 716 then return script_commands['default']['param_count'] end 
+	if script_commands[cmd] then 
+		return script_commands[cmd]['param_count']
+	end 
+	return script_commands['default']['param_count']
+end 
+
+function show_script_start()
+	last_script_map = script_map 
+	script_map = memory.readword(base + live_struct["map_id_32"])
+
+	script_array_pointer = base + 0x29574 + memory_shift-- this only accounts for normal RETIRE 
+	script_array_addr = memory.readdword(script_array_pointer)
+
+	temp_script_offs_4_addr = script_array_addr + 4*3 -- 4th index, 4 bytes each (indexing from 0 instead of 1)
+	temp_script_execution_start_addr = temp_script_offs_4_addr + memory.readdword(temp_script_offs_4_addr) + 0x4-- add the offset to its own address, add 4 bcs jump starts after the address
+
+	if script_array_addr == 0 then 
+		script_executed = false
+		print_to_screen(143,15,"No script loaded","#00f0f")
+		return 
+	end 
+
+	if last_script_map ~= script_map then
+		script_executed = false
+		print_to_screen(143,15,"No script loaded","#00f0f")
+		return
+	end 
+
+
+	if not script_executed then
+		if script_array_addr ~= 0 then 
+			script_executed = true
+			update_variables = true
+		end 
+
+	end
+
+	if (script_executed and update_variables) then
+		script_offs_4_addr = temp_script_offs_4_addr
+		script_offs_4 = memory.readdword(script_offs_4_addr)
+		script_execution_start_addr = temp_script_execution_start_addr
+		show_script = true
+		update_variables = false 
+	end 
+
+	if show_script then 
+		print_to_screen(143,15,"Next Command:\n    0x"..fmt(next_opcode_addr,8),"#00f0f")
+		-- print_to_screen(143,35,"Id: 0x"..fmt(opcode,0),"#00f0f")
+		-- print_to_screen(143,45,script_command_names[opcode],"#00f0f") --only accurate if the last script command doesn't contain any parameters
+
+		print_to_screen(143,65,"Script Data:","#00f0f")
+		print_to_screen(153,75,"Array:  0x"..fmt(script_array_addr,0),"#00f0f")
+		print_to_screen(153,85,"Offset: 0x"..fmt(script_offs_4,0),"#00f0f")
+		print_to_screen(153,95,"Exec:   0x"..fmt(script_execution_start_addr,0),"#00f0f")
+	else
+		print_to_screen(143,15,"No script loaded","#00f0f")
+	end 
+	
+end 
+
+function get_internal_pointer()
+	opcode_pointer = base + script_execution_struct["opcode_pointer"] + memory_shift
+	next_opcode_addr = memory.readdword(opcode_pointer)
+	-- opcode = memory.readword(next_opcode_addr-2)
+	-- if next_opcode_addr%2 == 1 then 
+	-- 	higher_byte = bit.band(memory.readword(next_opcode_addr),0xFF)
+	-- 	lower_byte = bit.rshift(memory.readword(next_opcode_addr-2),8)
+	-- 	opcode = bit.bor(bit.lshift(higher_byte,8),lower_byte)
+	-- end 
+	--print_to_screen(143,185,"Pointer addr:\n    "..fmt(opcode_pointer,8),"yellow")
+end
+
+function show_script_memory()
+	memory_viewer() -- remove this later when properly implemented
+end 
+
+scroll = 0
+temp_memory_addr = 0x22A044C
+temp_str_memory_addr = fmt(temp_memory_addr,0)
+
+memview_addr = temp_memory_addr - temp_memory_addr%16 
+
+function increment_scroll()
+	scroll = scroll - 16
+end 
+
+function decrement_scroll()
+	scroll = scroll + 16
+end 
+
+function reset_scroll()
+	scroll = 0
+end 
+
+function get_value_color(cmd)
+	if script_commands[cmd] then 
+		return script_commands[cmd]['color']
+	end 
+	return script_commands['default']['color']
+end 
+
+function memory_viewer()
+	draw_rectangle(0,0,256,200,"#000000AA","#000001888",2)
+	for y = 0,15 do
+		for x = 0,7 do
+			-- script_command = memory.readword(script_execution_start_addr+x*2+y*16)
+			current_addr = memview_addr+x*2+y*16 + scroll
+			value = memory.readword(current_addr)
+			color = get_value_color(value)
+			print_to_screen(48+x*26,20+y*10,fmt(value,4),color,2)
+		end
+		print_to_screen(2,20+y*10,fmt(memview_addr+y*16 + scroll,7),"#888888",2)
+	end  
+	for x = 0,15 do
+		print_to_screen(48+x*13,8,fmt(x,0),"#888888",2)
+		
+	end 
+	for x = 1,7 do
+		gui.drawline(46+(x*26),6,46+(x*26),179,"#444444")
+	end 
+
+	print_to_screen(2,8,temp_str_memory_addr,"yellow",2)
+	gui.drawline(45,6,45,179,"#888888")
+	gui.drawline(0,6,0,179,"#888888")
+	gui.drawline(255,6,255,179,"#888888")
+	gui.drawline(0,5,256,5,"#888888")
+	gui.drawline(0,17,256,17,"#888888")
+	gui.drawline(0,179,256,179,"#888888")
+
+end 
+
+-- Change game screen
+
+function write_image_to_calculator()
+	print("Changing calculator background")
+	start_a = 0x23409C0
+	block_length = 0xF
+	for i = 0,23 do 
+		for j = 0,23 do 
+		memory.writeword(start_a+block_length*i+j*2+(0xF*3*i),0xA1)
+		end 
+	end 
+
+end
+
+
+
 -- SHOW MENU DATA
 
 menu_choices = {
-	OW = {show_void_pos,show_chunks_ow},
-	UG = {show_void_pos,show_chunks_ug},
-	BT = {show_void_pos,show_chunks_bt}
+	OW = {show_void_pos,show_chunks_ow,debug_script_calling,memory_viewer},
+	UG = {show_void_pos,show_chunks_ug,memory_viewer},
+	BT = {show_void_pos,show_chunks_bt,debug_script_calling,memory_viewer}
 	}
 
 function show_menu_choices()
@@ -2026,6 +3132,8 @@ end
 
 key_configuration = {
 	switch_wtw_state = {"W"},
+	toggle_map_editing = {"M"},
+	toggle_memory_addr_editing = {"shift","U"},
 	auto_movement = {"shift","M"},
 	increment_menu = {"shift","V"},
 	teleport_up = {"shift","up"},
@@ -2033,7 +3141,21 @@ key_configuration = {
 	teleport_down = {"shift","down"},
 	teleport_right = {"shift","right"},
 	toggle_tile_view = {"shift","T"},
-	toggle_player_pos = {"shift","P"}
+	toggle_player_pos = {"shift","P"},
+	toggle_bounding_view = {"shift","I"},
+	toggle_grid = {"shift","G"},
+	toggle_loadlines = {"shift","L"},
+	toggle_maplines = {"shift","K"},
+	toggle_mapmodellines = {"shift","H"},
+	toggle_load_calculations = {"L","C"},
+	toggle_debug_tile_print = {"T","C"},
+	write_image_to_calculator = {"S","C"},
+	reset_scroll = {"S","space"}
+}
+
+key_configuration_cont = {
+	increment_scroll = {"S","up"},
+	decrement_scroll = {"S","down"}
 }
 
 function run_functions_on_keypress()
@@ -2043,6 +3165,15 @@ function run_functions_on_keypress()
 		end 
 	end
 end
+
+function run_continuous_function_on_keypress()
+	for funct,config_keys in pairs(key_configuration_cont) do
+		if check_keys_continuous(config_keys) == #config_keys then
+			loadstring(funct.."()")()
+		end 
+	end
+end 
+
 
 option_x = 20
 option_y = 20
@@ -2056,10 +3187,14 @@ function display_options()
 	draw_rectangle(option_x,option_y,100,60)
 	if is_clicking_area(option_x,option_y-200,100,60) then clicking_option_menu = true end
 	for i = 0,#function_options-1 do
-		print_txt(option_x + 5,option_y + 18 + i*10,function_options[i+1][2])
+		print_to_screen(option_x + 5,option_y + 18 + i*10,function_options[i+1][2])
 	end 
 end 
 
+function run_functions()
+	if map_editing then change_map_id() end 
+	if memory_editing then change_memory_addr() end 
+end 
 
 function main_gui()
 	base = memory.readdword(lang_data["base_addr"]) -- check base every loop in case of reset
@@ -2069,13 +3204,19 @@ function main_gui()
 	screen_y = set_screen_params(memory_state)
 	
 	-- main 
-	show_bounding_boxes(memory_state)
+	if bounding_view then 
+		show_bounding_boxes(memory_state)
+	end 
+	show_boundary_lines()
 	show_menu(menu_id)
 
 	-- temporary gui before I implement gui screens
-	print_txt(5,10,fmt(base,7),"yellow")
-	print_txt(5,20,memory_state,"red")
-	print_txt(5,30,fmt(memory_shift,4),"red")
+	print_to_screen(5,15,"Base:"..fmt(base,8),'yellow')
+	show_player_data()
+
+	-- print_to_screen(5,10,fmt(base,7),"yellow")
+	-- print_to_screen(5,20,memory_state,"red")
+	-- print_to_screen(5,30,fmt(memory_shift,4),"red")
 
 	-- display_options()
 
@@ -2084,6 +3225,8 @@ function main_gui()
 	get_joy()
 	get_stylus()
 	run_functions_on_keypress()
+	run_continuous_function_on_keypress()
+	run_functions()
 end
 
 
