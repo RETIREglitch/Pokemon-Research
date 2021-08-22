@@ -726,8 +726,6 @@ function debug_print(text)
 	if debug then print(text) end 
 end 
 
-
-
 function draw_bounding_rectangle(x,y,width,height,fill,border_clr,screen)
 	screen = screen or 1
 	gui.box(x-(width/2),screen_y[screen]+y-(height/2),x+(width/2),screen_y[screen]+y+(height/2),fill,border_clr)
@@ -736,6 +734,11 @@ end
 function draw_rectangle(x,y,width,height,fill,border_clr,screen)
 	screen = screen or 1
 	gui.box(x,screen_y[screen]+y,x+width,screen_y[screen]+y+height,fill,border_clr)
+end 
+
+function draw_line(x,y,width,height,clr,screen)
+	screen = screen or 1
+	gui.line(x,screen_y[screen]+y,x+width,screen_y[screen]+y+height,clr)
 end 
 
 
@@ -1481,165 +1484,165 @@ end
 
 
 function auto_movement()
-	-- get_on_bike(0,0)
-	-- right(5,0,0,"false")
-	-- down(1,0,0,"false")
-	-- up(1,0,0,"false")
-	-- left(1,0,0,"false")
-	-- get_on_bike(1,0)
-	-- up(27,0,0,"false")
-	-- left(37,0,0,"false")
-	-- up(13,0,0,"false")
-	-- right(7,0,0,"false")
-	-- down(1)
-	-- graphic_reload()
-	-- go_direction_wait_warp("down")
+	get_on_bike(0,0)
+	right(5,0,0,"false")
+	down(1,0,0,"false")
+	up(1,0,0,"false")
+	left(1,0,0,"false")
+	get_on_bike(1,0)
+	up(27,0,0,"false")
+	left(37,0,0,"false")
+	up(13,0,0,"false")
+	right(7,0,0,"false")
+	down(1)
+	graphic_reload()
+	go_direction_wait_warp("down")
 
-	-- down(1)
-	-- right(16)
-	-- get_on_bike(1)
-	-- up(430)
-	-- left(1)
-	-- use_explorer_kit(true,true)
+	down(1)
+	right(16)
+	get_on_bike(1)
+	up(430)
+	left(1)
+	use_explorer_kit(true,true)
 
-	-- right(193)
-	-- up(64)
-	-- save_reset()
+	right(193)
+	up(64)
+	save_reset()
 
-	-- left(214)
-	-- down(479)
-	-- graphic_reload()
-	-- down(2)
-	-- graphic_reload()
-	-- down(3)
-	-- left(2)
-	-- wrong_warp_reset(true)
+	left(214)
+	down(479)
+	graphic_reload()
+	down(2)
+	graphic_reload()
+	down(3)
+	left(2)
+	wrong_warp_reset(true)
 	
-	-- wait_frames(100)
-	-- right(704)
-	-- down(725)
-	-- right(16)
-	-- use_explorer_kit(true,true)
+	wait_frames(100)
+	right(704)
+	down(725)
+	right(16)
+	use_explorer_kit(true,true)
 	
-	-- -- reset shaymin sprite:
-	-- wait_frames(100)
-	-- right(2)
-	-- use_item(0x4F)
-	-- wait_frames(30)
-	-- press_button("A")
-	-- wait_frames(8)
-	-- close_menu(true)
-	-- ledgecancel(2)
-	-- wait_frames(60)
-	-- down(10,0,0,"false")
-	-- right(8,0,0,"false")
-	-- up(8,0,0,"false")
-	-- right(9,0,0,"false")
-	-- up(2,0,0,"false")
-	-- right(5)
-	-- right(68,0,0,"false")
-	-- wait_frames(30)
-	-- mash_button("A",80)
-	-- wait_frames(8)
-	-- right(348)
-	-- down(1995)
-	-- right(96)
-	-- down(160)
-	-- right(32)
-	-- down(160)
-	-- right(32)
-	-- down(96)
-	-- right(160)
-	-- down(32)
+	-- reset shaymin sprite:
+	wait_frames(100)
+	right(2)
+	use_item(0x4F)
+	wait_frames(30)
+	press_button("A")
+	wait_frames(8)
+	close_menu(true)
+	ledgecancel(2)
+	wait_frames(60)
+	down(10,0,0,"false")
+	right(8,0,0,"false")
+	up(8,0,0,"false")
+	right(9,0,0,"false")
+	up(2,0,0,"false")
+	right(5)
+	right(68,0,0,"false")
+	wait_frames(30)
+	mash_button("A",80)
+	wait_frames(8)
+	right(348)
+	down(1995)
+	right(96)
+	down(160)
+	right(32)
+	down(160)
+	right(32)
+	down(96)
+	right(160)
+	down(32)
 
-	-- wait_frames(80) -- pal park hub
-	-- right(64)
-	-- up(161,0,0,"false")
-	-- wait_frames(400)
-	-- clear_stepcounter()
-	-- wait_frames(60)
-	-- down(161)
-	-- left(33,0,0,"false")
-	-- mash_pal_park_text(1)
+	wait_frames(80) -- pal park hub
+	right(64)
+	up(161,0,0,"false")
+	wait_frames(400)
+	clear_stepcounter()
+	wait_frames(60)
+	down(161)
+	left(33,0,0,"false")
+	mash_pal_park_text(1)
 
-	-- left(160)
-	-- up(551)
-	-- left(32)
-	-- up(224)
-	-- right(161)
-	-- up(1791)
-	-- right(370)
-	-- up(1)
-	-- graphic_reload()
+	left(160)
+	up(551)
+	left(32)
+	up(224)
+	right(161)
+	up(1791)
+	right(370)
+	up(1)
+	graphic_reload()
 
-	-- catch_pal_park_mon()
-	-- wait_frames(20)
-	-- mash_button("A",32)
+	catch_pal_park_mon()
+	wait_frames(20)
+	mash_button("A",32)
 
-	-- -- lose the battle against shaymin
+	-- lose the battle against shaymin
 
-	-- -- remove pal park menu
-	-- down(6,0,0,"false")
-	-- go_direction_wait_warp("down")
-	-- down(4,0,0,"false")
-	-- right(3,0,0,"false")
-	-- down(27,0,0,"false")
-	-- left(1,0,0,"false")
-	-- use_move()
-	-- down(11,0,0,"false")
-	-- left(1,0,0,"false")
-	-- down(4,0,0,"false")
-	-- use_move()
-	-- down(8,0,0,"false")
-	-- right(3,0,0,"false")
-	-- down(6,0,0,"false")
-	-- right(16,0,0,"false")
-	-- up(1,0,0,"false")
-	-- right(9,0,0,"false")
-	-- down(1,0,0,"false")
-	-- right(24,0,0,"false")
-	-- down(3,0,0,"false")
-	-- right(2,0,0,"false")
-	-- down(2,0,0,"false")
-	-- right(2,0,0,"false")
-	-- down(1,0,0,"false")
-	-- right(8,0,0,"false")
-	-- down(2,0,0,"false")
-	-- right(65,0,0,"false")
-	-- up(2,0,0,"false")
-	-- go_direction_wait_warp("up")
-	-- up(7,0,0,"false")
+	-- remove pal park menu
+	down(6,0,0,"false")
+	go_direction_wait_warp("down")
+	down(4,0,0,"false")
+	right(3,0,0,"false")
+	down(27,0,0,"false")
+	left(1,0,0,"false")
+	use_move()
+	down(11,0,0,"false")
+	left(1,0,0,"false")
+	down(4,0,0,"false")
+	use_move()
+	down(8,0,0,"false")
+	right(3,0,0,"false")
+	down(6,0,0,"false")
+	right(16,0,0,"false")
+	up(1,0,0,"false")
+	right(9,0,0,"false")
+	down(1,0,0,"false")
+	right(24,0,0,"false")
+	down(3,0,0,"false")
+	right(2,0,0,"false")
+	down(2,0,0,"false")
+	right(2,0,0,"false")
+	down(1,0,0,"false")
+	right(8,0,0,"false")
+	down(2,0,0,"false")
+	right(65,0,0,"false")
+	up(2,0,0,"false")
+	go_direction_wait_warp("up")
+	up(7,0,0,"false")
 
-	-- catching_show(true)
-	-- down(7,0,0,"false")
-	-- go_direction_wait_warp("down")
+	catching_show(true)
+	down(7,0,0,"false")
+	go_direction_wait_warp("down")
 
-	-- use_menu(1)
-	-- wait_frames(120)
-	-- press_button("right")
-	-- wait_frames(4)
-	-- press_button("A")
-	-- wait_frames(4)
-	-- press_button("down")
-	-- wait_frames(2)
-	-- press_button("down")
-	-- wait_frames(2)
-	-- press_button("down")
-	-- wait_frames(2)
-	-- press_button("A")
-	-- wait_frames(80)
-	-- press_buttons({"up","left"},24)
-	-- wait_frames(2)
-	-- press_button("A")
-	-- wait_frames(600)
-	-- press_button("up",4)
+	use_menu(1)
+	wait_frames(120)
+	press_button("right")
+	wait_frames(4)
+	press_button("A")
+	wait_frames(4)
+	press_button("down")
+	wait_frames(2)
+	press_button("down")
+	wait_frames(2)
+	press_button("down")
+	wait_frames(2)
+	press_button("A")
+	wait_frames(80)
+	press_buttons({"up","left"},24)
+	wait_frames(2)
+	press_button("A")
+	wait_frames(600)
+	press_button("up",4)
 
-	-- go_direction_wait_warp("up")
-	-- up(2,0,0,"false")
-	-- left(5,0,0,"false")
+	go_direction_wait_warp("up")
+	up(2,0,0,"false")
+	left(5,0,0,"false")
 
-	-- --  -- capture shaymin:
-	-- fast_warp()
+	--  -- capture shaymin:
+	fast_warp()
 
 	wait_frames(100)
 
@@ -1726,6 +1729,11 @@ function remove_trap_effect()
 end 
 
 -- BOUNDING BOXES
+bounding_view = false
+function toggle_bounding_view()
+	bounding_view = not bounding_view
+end 
+
 
 function show_ug_gems() 
 	draw_bounding_boxes(data_table["ug_gem_count"],base + ug_gem_struct["x_phys_16"], base + ug_gem_struct["z_phys_16"],data_table["ug_gem_struct_size"],0x0,"#FFF8666","#FFF66")
@@ -1800,7 +1808,7 @@ function draw_bounding_box(x,z,fill_clr,border_clr)
 end
 
 function draw_player_pos(fill_clr,border_clr)
-	draw_bounding_rectangle(127,99,14,14,fill_clr,border_clr)
+	draw_bounding_rectangle(128,99,15,14,fill_clr,border_clr)
 end 
 
 function show_bounding_boxes(memory_state)
@@ -1875,6 +1883,55 @@ function split_word_into_bytes(word)
 	return {l_byte,h_byte}
 end 
 
+-- Loadlines and grid
+
+grid = true 
+loadlines = true 
+maplines = true 
+
+function toggle_grid()
+	grid = not grid
+	loadlines = not loadlines
+	maplines = not maplines
+end 
+
+function show_boundary_lines()
+	if grid then show_gridlines() end
+	if loadlines then show_loadlines() end
+	if maplines then show_maplines() end
+end 
+
+function show_gridlines()
+	for i = 0,15 do draw_line(i*16+7,0,0,200, "#0FB58") end 
+	for i = 0,7 do draw_line(0,i*13,256,0, "#0FB58") end
+	for i = 0,6 do draw_line(0,7*13+15.5*i,256,0, "#0FB58") end
+end 
+
+function show_loadlines()
+	x_cam_16 = memory.readword(base + player_struct["x_cam_16"] + memory_shift)
+	z_cam_16 = memory.readword(base + player_struct["z_cam_16"] + memory_shift)
+	x_line = (-x_cam_16+23)%32
+	z_line = (-z_cam_16+23)%32
+	draw_line(x_line*16+7,0,0,200, "red")
+	if z_line > 7 then draw_line(0,7*13+(z_line-7)*15.5,256,0, "red") return end
+	draw_line(0,13*z_line,256,0, "red")
+end
+
+function show_maplines()
+	x_phys_32 = memory.readdword(base + player_struct["x_phys_32"] + memory_shift)
+	z_phys_32 = memory.readdword(base + player_struct["z_phys_32"] + memory_shift)
+	x_line = (-x_phys_32+7)%32
+	z_line = (-z_phys_32+7)%32
+	draw_line(x_line*16+7,0,0,200, "blue")
+	if z_line > 7 then draw_line(0,7*13+(z_line-7)*15.5,256,0, "blue") return end
+	draw_line(0,13*z_line,256,0, "blue")
+
+end  
+
+
+
+
+
 function get_tile_color(tile_data)
 	tile_id = bit.band(tile_data,0xff)
 	collision = bit.rshift(tile_data,8)
@@ -1887,7 +1944,6 @@ function get_tile_color(tile_data)
 	return tile_ids[tile_id]
 
 end 
-
 
 function get_collision_color(collision)
 	if bit.rshift(collision,7) ~= 0 then return "#CCCCCC" end
@@ -2033,7 +2089,9 @@ key_configuration = {
 	teleport_down = {"shift","down"},
 	teleport_right = {"shift","right"},
 	toggle_tile_view = {"shift","T"},
-	toggle_player_pos = {"shift","P"}
+	toggle_player_pos = {"shift","P"},
+	toggle_bounding_view = {"shift","I"},
+	toggle_grid = {"shift","L"}
 }
 
 function run_functions_on_keypress()
@@ -2069,7 +2127,10 @@ function main_gui()
 	screen_y = set_screen_params(memory_state)
 	
 	-- main 
-	show_bounding_boxes(memory_state)
+	if bounding_view then 
+		show_bounding_boxes(memory_state)
+	end 
+	show_boundary_lines()
 	show_menu(menu_id)
 
 	-- temporary gui before I implement gui screens
