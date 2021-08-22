@@ -1912,21 +1912,32 @@ end
 function show_chunks_ow()
 	-- draw_rectangle(0,0,256,200,"#000022ccc",0,2)
 	draw_rectangle(0,0,256,200,"#000001fff","#000001fff",2)
+	
+	additional_offset = 0
+	x_phys_32 = memory.readdword(base + player_struct["x_phys_32"] + memory_shift)
+	z_phys_32 = memory.readdword(base + player_struct["z_phys_32"] + memory_shift)
+	if x_phys_32 > 0x7FFFFFF then 
+		additional_offset = additional_offset -64
+	end 
+	if z_phys_32 > 0x7FFFFFF then 
+		additional_offset = additional_offset -64
+	end 
+
 	if tile_view then 
-		show_tiles_ow()
+		show_tiles_ow(additional_offset)
 		if player_view then
-			show_player_pos()
+			show_chunk_position()
 		end 
 		return
 	end 
-	show_collision_ow()
+	show_collision_ow(additional_offset)
 	if player_view then
-		show_player_pos()
+		show_chunk_position()
 		return
 	end 
 end 
 
-function show_tiles_ow()
+function show_tiles_ow(additional_offset)
 	print_txt(5,60,"chunks")
 	start_chunk_struct = memory.readdword(base+data_table["chunk_calculation_ptr"])
 	print_txt(5,70,"0x"..fmt(start_chunk_struct,8))
@@ -1937,7 +1948,7 @@ function show_tiles_ow()
 		print_txt(5,70+i*10,"0x"..fmt(chunk_pointer,7))
 		for row = 0,31 do 
 			for col = 0,31 do 
-				tile_data = memory.readword(chunk_pointer+row*2 + col*64)
+				tile_data = memory.readword(chunk_pointer+row*2 + col*64+additional_offset)
 				tile_color = get_tile_color(tile_data)
 				draw_rectangle(chunk_scr_x[i]+row*4,chunk_scr_y[i] + col*3,5,3,tile_color,0,2)
 			end
@@ -1946,7 +1957,7 @@ function show_tiles_ow()
 	end 
 end
 
-function show_collision_ow()
+function show_collision_ow(additional_offset)
 	print_txt(5,60,"chunks")
 	start_chunk_struct = memory.readdword(base+data_table["chunk_calculation_ptr"])
 	print_txt(5,70,"0x"..fmt(start_chunk_struct,8))
@@ -1958,8 +1969,11 @@ function show_collision_ow()
 		print_txt(5,70+i*10,"0x"..fmt(chunk_pointers[i],7))
 		for row = 0,31 do 
 			for col = 0,31 do 
-				collision  = memory.readbyte(chunk_pointers[i]+row*2 + col*64+1)
-				collision_color = get_collision_color(collision)
+				collision_color = nil
+				if (memory.readbyte(chunk_pointers[i]+row*2 + col*64+additional_offset)) ~= 0xff then
+					collision  = memory.readbyte(chunk_pointers[i]+row*2 + col*64+1+additional_offset)
+					collision_color = get_collision_color(collision)
+				end 
 				draw_rectangle(chunk_scr_x[i]+row*4,chunk_scr_y[i] + col*3,5,3,collision_color,0,2)
 			end
 		end 
@@ -1967,15 +1981,21 @@ function show_collision_ow()
 	end 
 end
 
-function show_player_pos()
+function show_chunk_position()
 	start_chunk_struct = memory.readdword(base+data_table["chunk_calculation_ptr"])
 	c_chunk = memory.readbyte(chunk_struct["current_chunk_8"] + start_chunk_struct)
 	if c_chunk < 4 then 
 		x_phys_32 = memory.readdword(base + player_struct["x_phys_32"] + memory_shift)
 		z_phys_32 = memory.readdword(base + player_struct["z_phys_32"] + memory_shift)
+		if x_phys_32 > 0x7FFFFFF then 
+			c_chunk = 1
+		end 
+		if z_phys_32 > 0x7FFFFFF then 
+			z_phys_32 = z_phys_32 + 1
+		end 
 		row = x_phys_32%32
 		col = z_phys_32%32
-		draw_rectangle(chunk_scr_x[c_chunk+1]+row*4,chunk_scr_y[c_chunk+1] + col*3,5,3,"red",0,2)
+		draw_rectangle(chunk_scr_x[c_chunk+1]+row*4,chunk_scr_y[c_chunk+1] + col*3,5,3,"#00f0ff",0,2)
 	
 	end
 	
