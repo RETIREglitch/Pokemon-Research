@@ -32,7 +32,7 @@ local tile_names = {
 			"240","241","242","243","244","245","246","247","248","249","250","251","252","253","254","Void"
 }
 
-local map_ids = {
+local map_id_list = {
 	Goal = {
 		color = '#f7bbf3',
 		ids = {32}
@@ -78,168 +78,181 @@ local map_ids = {
 	}
 }
 
-local collision_ids = {
-    Custom = {
-        color = '#f7bbf3',
-        number = {}
-    },
-	RandomObj = {
-        color = 'white',
-        number = {0xE5,0X8E,0X8f}
-    },
-    Grass = {
+map_ids = {}
+
+for k,v in pairs(map_id_list) do
+	for i=1,#map_id_list[k]['ids'] do
+		map_ids[map_id_list[k]['ids'][i]] = map_id_list[k]['color']
+	end
+end
+
+tile_id_list = {
+	Grass = {
         color = '#40a',
-        number = {0x2}
-    },
-	Trees = {
-        color = '#CCCCC',
-        number = {0x6}
-    },
-    TallGrass = {
-        color = '#2aa615',
-        number = {0x3}		
-	},
-    Cave = {
-        color = '#a070006',
-        number = {0x8,0xC}
-	},
-	Spinners = {
-        color = '#ffd',
-        number = {0x40,0x41,0x42,0x43}
-    },
-	icestair = {
-        color = '#ffd',
-        number = {0x49,0x4A}
+        ids = {0x2}
     },
 	Warps = {
         color = '#f03',
-        number ={0x5E,0x5f,0x62,0x63,0x69,0x65,0x6f,0x6D,0x6A,0x6C,0x6E}
+        ids ={0x5E,0x5f,0x62,0x63,0x69,0x65,0x6f,0x6D,0x6A,0x6C,0x6E}
 	},
-	CircleWarps = {
-        color = '#a0a',
-        number = {0x67}
-    },
-	Modelfl = {
-        color = '#afb',
-       number = {0x56,0x57,0x58,} 
-    },
-	ModelFloor = {
-        color = '#a090f',
-       number = {0x59}
-    },
-	OnesidedWall = {
-        color = '#a090f',
-       number = {0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37}
-    },
-	Bikestalls = {
-        color = '#0690a',
-       number = {0xDB}
-    },
-	Counter = {
-        color = '#f7a',
-        number = {0x80}
-    },
-	PC = {
-       color = '#0690b',
-       number = {0x83}
-    },
-	Map = {
-       color = '#00eee',
-       number = {0x85}
-    },
-	TV = {
-       color = '#4290e',
-       number = {0x86}
-    },
-	Bookcases = {
-        color = '#0ddd7',
-        number = {0x88,0xE1,0xE0,0xE2}
-    },
-	Bin = {
-        color = '#06b04',
-       number = {0xE4}
+	Cave = {
+        color = '#bb7410',
+        ids = {0x8,0xC}
 	},
-    HauntedHouse = {
-        color = '#A292BC',
-        number = {0xB}
-    },
-    Water = {
-        color = '#8888f06',
-        number = {0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x19,0x22,0x2A}
-    },
-    Ice = {
-        color = '#56b3e0',
-        number = {0x20,0x20}
+	Water = {
+        color = '#8888f',
+        ids = {0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x19,0x22,0x2A}
     },
     Sand = {
         color = '#e3c',
-        number = {0x21,0x21}
+        ids = {0x21,0x21}
 	},
-    Ledge = {
-        color = '#D3A',
-        number = {0x38,0x39,0x3A,0x3B,0x3C,0x3D,0x3E,0x3F}
-    },
-    RockClimb = {
-        color = '#C76',
-        number = {0x4B,0x4C}
-    },
-    Bridge = {
-        color = '#C79',
-        number = {0x70,0x71,0x72,0x73,0x74,0x75,}
-	},
-    BridgeBike = {
-        color = '#C7A55',
-        number = {0x76,0x77,0x78,0x79,0x7A,0x7B,0x7C,0x7D}
-	},
-    Berrysoil = {
-        color = '#b2703',
-        number = {0xA0}
-    },
-    SnowSlow = {
+	SnowSlow = {
         color = '#8da9cb',
-        number = {0xA1}
+        ids = {0xA1}
     },
     Snow2xSlow = {
         color = '#6483a7',
-        number = {0xA2}
+        ids = {0xA2}
     },
     Snow3xslow = {
         color = '#52749d',
-        number = {0xA3}
+        ids = {0xA3}
 	},
     Mud = {
         color = '#92897',
-        number = {0xA4}
+        ids = {0xA4}
     },
     StuckMud = {
         color = '#92704',
-        number = {0xA5}
+        ids = {0xA5}
     },
     GrassMud = {
         color = '#4090',
-        number = {0xA6}
+        ids = {0xA6}
     },
     GrassMudStuck = {
         color = '#55906',
-        number = {0xA7}
+        ids = {0xA7}
 	},
     Snow = {
         color = '#b9d0eb',
-        number = {0xA8}
+        ids = {0xA8}
 	},
+	TallGrass = {
+        color = '#2aa615',
+        ids = {0x3}		
+	},
+	RandomObj = {
+        color = 'white',
+        ids = {0xE5,0X8E,0X8f}
+    },
+	Spinners = {
+        color = '#ffd',
+        ids = {0x40,0x41,0x42,0x43}
+    },
+	Ice = {
+        color = '#56b3e0',
+        ids = {0x20,0x20}
+    },
+	icestair = {
+        color = '#ffd',
+        ids = {0x49,0x4A}
+    },
+	CircleWarps = {
+        color = '#a0a',
+        ids = {0x67}
+    },
+	Modelfl = {
+        color = '#afb',
+       ids = {0x56,0x57,0x58,} 
+    },
+	ModelFloor = {
+        color = '#a090f',
+       ids = {0x59}
+    },
+	OnesidedWall = {
+        color = '#a090f',
+       ids = {0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37}
+    },
+	Bikestalls = {
+        color = '#0690a',
+       ids = {0xDB}
+    },
+	Counter = {
+        color = '#f7a',
+        ids = {0x80}
+    },
+	PC = {
+       color = '#0690b',
+       ids = {0x83}
+    },
+	Map = {
+       color = '#00eee',
+       ids = {0x85}
+    },
+	TV = {
+       color = '#4290e',
+       ids = {0x86}
+    },
+	Bookcases = {
+        color = '#0ddd7',
+        ids = {0x88,0xE1,0xE0,0xE2}
+    },
+	Bin = {
+        color = '#06b04',
+       ids = {0xE4}
+	},
+    HauntedHouse = {
+        color = '#A292BC',
+        ids = {0xB}
+    },
+    Ledge = {
+        color = '#D3A',
+        ids = {0x38,0x39,0x3A,0x3B,0x3C,0x3D,0x3E,0x3F}
+    },
+    RockClimb = {
+        color = '#C76',
+        ids = {0x4B,0x4C}
+    },
+    Bridge = {
+        color = '#C79',
+        ids = {0x70,0x71,0x72,0x73,0x74,0x75,}
+	},
+    BridgeBike = {
+        color = '#C7A55',
+        ids = {0x76,0x77,0x78,0x79,0x7A,0x7B,0x7C,0x7D}
+	},
+    Berrysoil = {
+        color = '#b2703',
+        ids = {0xA0}
+    },
     BikeRamp = {
         color = '#B890',
-        number = {0xD7,0xD8}
+        ids = {0xD7,0xD8}
 	},
     Quicksand = {
         color = '#A880',
-        number = {0xD9,0xDA}
+        ids = {0xD9,0xDA}
     },
-    Normal = {
-        color = '#8888a06',
-        number = {}
-    }
+	Normal = {
+        color = '',
+        ids = {0xff}
+    },
+	Trees = {
+        color = '#CCCCC',
+        ids = {0x6}
+    },
 }
+
+tile_ids = {}
+
+for k,v in pairs(tile_id_list) do
+	for i=1,#tile_id_list[k]['ids'] do
+		tile_ids[tile_id_list[k]['ids'][i]] = tile_id_list[k]['color']
+	end
+end
+
 
 scripts = {[0] = 1, [1] = 1, [2] = 6, [3] = 27, [4] = 4, [5] = 1, [6] = 4, [7] = 1, [8] = 4, [9] = 4, [10] = 7, [11] = 17, [12] = 3, [13] = 4, [14] = 2, [15] = 14, [16] = 7, [17] = 6, [18] = 1, [19] = 2, [20] = 2, [21] = 1, [22] = 1, [23] = 1, [24] = 4, [25] = 2, [26] = 2, [27] = 1, [28] = 11, [29] = 12, [30] = 3, [31] = 2, [32] = 1, [33] = 24, [34] = 4, [35] = 4, [36] = 4, [37] = 1, [38] = 4, [39] = 4, [40] = 12, [41] = 2, [42] = 1, [43] = 3, [44] = 3, [45] = 19, [46] = 4, [47] = 3, [48] = 4, [49] = 1, [50] = 3, [51] = 4, [52] = 2, [53] = 3, [54] = 2, [55] = 3, [56] = 3, [57] = 1, [58] = 2, [59] = 13, [60] = 3, [61] = 3, [62] = 4, [63] = 2, [64] = 1, [65] = 23, [66] = 4, [67] = 3, [68] = 7, [69] = 6, [70] = 1, [71] = 5, [72] = 2, [73] = 2, [74] = 1, [75] = 4, [76] = 3, [77] = 2, [78] = 4, [79] = 1, [80] = 4, [81] = 3, [82] = 1, [83] = 2, [84] = 5, [85] = 1, [86] = 33, [87] = 4, [88] = 6, [89] = 1, [90] = 1, [91] = 4, [92] = 1, [93] = 4, [94] = 1, [95] = 4, [96] = 1, [97] = 1, [98] = 1, [99] = 1, [100] = 120, [101] = 4, [102] = 1, [103] = 2, [104] = 2, [105] = 1, [106] = 6, [107] = 4, [108] = 3, [109] = 3, [110] = 1, [111] = 4, [112] = 9, [113] = 4, [114] = 1, [115] = 1, [116] = 5, [117] = 14, [118] = 1, [119] = 6, [120] = 16, [121] = 5, [122] = 7, [123] = 3, [124] = 1, [125] = 5, [126] = 5, [127] = 2, [128] = 2, [129] = 1, [130] = 2, [131] = 3, [132] = 30, [133] = 4, [134] = 3, [135] = 1, [136] = 21, [137] = 8, [138] = 7, [139] = 6, [140] = 6, [141] = 6, [142] = 1, [143] = 2, [144] = 3, [145] = 2, [146] = 3, [147] = 2, [148] = 3, [149] = 2, [150] = 19, [151] = 4, [152] = 1, [153] = 4, [154] = 4, [155] = 4, [156] = 4, [157] = 116, [158] = 1, [159] = 7, [160] = 2, [161] = 1, [162] = 1, [163] = 1, [164] = 4, [165] = 12, [166] = 4, [167] = 4, [168] = 4, [169] = 1, [170] = 2, [171] = 1, [172] = 3, [173] = 6, [174] = 1, [175] = 7, [176] = 3, [177] = 2, [178] = 3, [179] = 2, [180] = 3, [181] = 2, [182] = 3, [183] = 2, [184] = 3, [185] = 2, [186] = 2, [187] = 1, [188] = 17, [189] = 4, [190] = 1, [191] = 4, [192] = 7, [193] = 2, [194] = 2, [195] = 3, [196] = 1, [197] = 1, [198] = 3, [199] = 5, [200] = 7, [201] = 6, [202] = 4, [203] = 12, [204] = 1, [205] = 2, [206] = 1, [207] = 2, [208] = 1, [209] = 1, [210] = 1, [211] = 1, [212] = 1, [213] = 1, [214] = 1, [215] = 1, [216] = 1, [217] = 1, [218] = 1, [219] = 1, [220] = 14, [221] = 1, [222] = 1, [223] = 1, [224] = 1, [225] = 1, [226] = 2, [227] = 1, [228] = 1, [229] = 1, [230] = 1, [231] = 1, [232] = 1, [233] = 1, [234] = 1, [235] = 1, [236] = 1, [237] = 1, [238] = 1, [239] = 1, [240] = 1, [241] = 1, [242] = 1, [243] = 1, [244] = 9, [245] = 1, [246] = 1, [247] = 4, [248] = 1, [249] = 1, [250] = 1, [251] = 6, [252] = 1, [253] = 26, [254] = 1, [255] = 1, [256] = 7, [257] = 2, [258] = 3, [259] = 1, [260] = 2, [261] = 2, [262] = 2, [263] = 4, [264] = 6, [265] = 5, [266] = 1, [267] = 1, [268] = 2, [269] = 2, [270] = 5, [271] = 1, [272] = 1, [273] = 1, [274] = 3, [275] = 1, [276] = 1, [277] = 1, [278] = 1, [279] = 1, [280] = 1, [281] = 1, [282] = 1, [283] = 2, [284] = 6, [285] = 1, [286] = 2, [287] = 1, [288] = 2, [289] = 1, [290] = 1, [291] = 2, [292] = 1, [293] = 9, [294] = 3, [295] = 2, [296] = 2, [297] = 1, [298] = 1, [299] = 1, [300] = 1, [301] = 1, [302] = 2, [303] = 1, [304] = 1, [305] = 8, [306] = 6, [307] = 3, [308] = 4, [309] = 1, [310] = 3, [311] = 7, [312] = 7, [313] = 2, [314] = 4, [315] = 1, [316] = 4, [317] = 1, [318] = 1, [319] = 3, [320] = 2, [321] = 3, [322] = 12, [323] = 126, [324] = 1, [325] = 1, [326] = 23, [327] = 4, [328] = 3, [329] = 3, [330] = 5, [331] = 4, [332] = 1, [333] = 1, [334] = 6, [335] = 1, [336] = 10, [337] = 21, [338] = 1, [339] = 1, [340] = 5, [341] = 1, [342] = 12, [343] = 6, [344] = 6, [345] = 3, [346] = 3, [347] = 10, [348] = 2, [349] = 3, [350] = 8, [351] = 4, [352] = 1, [353] = 7, [354] = 5, [355] = 4, [356] = 9, [357] = 1, [358] = 1, [359] = 1, [360] = 1, [361] = 2, [362] = 7, [363] = 3, [364] = 2, [365] = 3, [366] = 4, [367] = 10, [368] = 7, [369] = 2, [370] = 7, [371] = 8, [372] = 4, [373] = 8, [374] = 2, [375] = 2, [376] = 3, [377] = 1, [378] = 3, [379] = 2, [380] = 4, [381] = 1, [382] = 8, [383] = 3, [384] = 3, [385] = 3, [386] = 1, [387] = 1, [388] = 2, [389] = 2, [390] = 2, [391] = 1, [392] = 4, [393] = 13, [394] = 2, [395] = 8, [396] = 7, [397] = 2, [398] = 2, [399] = 4, [400] = 2, [401] = 1, [402] = 1, [403] = 3, [404] = 1, [405] = 1, [406] = 2, [407] = 2, [408] = 1, [409] = 1, [410] = 1, [411] = 9, [412] = 1, [413] = 3, [414] = 11, [415] = 6, [416] = 1, [417] = 2, [418] = 12, [419] = 4, [420] = 4, [421] = 1, [422] = 14, [423] = 2, [424] = 2, [425] = 2, [426] = 11, [427] = 4, [428] = 4, [429] = 1, [430] = 3, [431] = 2, [432] = 3, [433] = 11, [434] = 4, [435] = 3, [436] = 1, [437] = 3, [438] = 2, [439] = 3, [440] = 2, [441] = 2, [442] = 11, [443] = 4, [444] = 1, [445] = 6, [446] = 4, [447] = 2, [448] = 2, [449] = 1, [450] = 5, [451] = 4, [452] = 4, [453] = 1, [454] = 2, [455] = 1, [456] = 1, [457] = 7, [458] = 2, [459] = 3, [460] = 1, [461] = 8, [462] = 4, [463] = 1, [464] = 3, [465] = 1, [466] = 8, [467] = 1, [468] = 1, [469] = 2, [470] = 1, [471] = 3, [472] = 1, [473] = 1, [474] = 1, [475] = 1, [476] = 1, [477] = 1, [478] = 1, [479] = 1, [480] = 1, [481] = 1, [482] = 1, [483] = 1, [484] = 1, [485] = 1, [486] = 1, [487] = 1, [488] = 1, [489] = 1, [490] = 1, [491] = 2, [492] = 4, [493] = 10, [494] = 14, [495] = 1, [496] = 1, [497] = 3, [498] = 1, [499] = 3, [500] = 1, [501] = 2, [502] = 2, [503] = 3, [504] = 2, [505] = 2, [506] = 2, [507] = 2, [508] = 2, [509] = 2, [510] = 4, [511] = 1, [512] = 1, [513] = 1, [514] = 2, [515] = 1, [516] = 1, [517] = 4, [518] = 1, [519] = 1, [520] = 1, [521] = 1, [522] = 1, [523] = 1, [524] = 1, [525] = 1, [526] = 1, [527] = 1, [528] = 1, [529] = 1, [530] = 1, [531] = 1, [532] = 1, [533] = 1, [534] = 1, [535] = 1, [536] = 1, [537] = 1, [538] = 1, [539] = 1, [540] = 1, [541] = 1, [542] = 1, [543] = 1, [544] = 1, [545] = 1, [546] = 1, [547] = 1, [548] = 1, [549] = 1, [550] = 1, [551] = 1, [552] = 1, [553] = 1, [554] = 1, [555] = 1, [556] = 1, [557] = 1, [558] = 4}
 opcodes = {[0xea] = 'ActLeagueBattlers', [0x2ac] = 'ActivateMysteryGift', [0x158] = 'ActivatePokedex', [0x133] = 'ActivatePoketchApp', [0x64] = 'AddPeople', [0x5e] = 'ApplyMovement', [0x2a1] = 'ApplyMovement2', [0x1d9] = 'BattleRoomResult', [0xcb] = 'BerryHiroAnimation', [0x1d7] = 'BerryPoffin', [0x2bf] = 'BikeRide', [0xab] = 'BoxPokemon', [0x1a] = 'Call', [0xa1] = 'CallEnd', [0x36] = 'CallMessageBox', [0x3a] = 'CallMessageBoxText', [0x14] = 'CallStandard', [0x29f] = 'CameraBumpEffect', [0xa9] = 'CapsuleEditor', [0x261] = 'CheckAccessories', [0x15b] = 'CheckBadge', [0xc7] = 'CheckBike', [0x252] = 'CheckBoxesNumber', [0x78] = 'CheckCoins', [0x12e] = 'CheckDress', [0x28f] = 'CheckFirstTimeChampion', [0x20] = 'CheckFlag', [0x11c] = 'CheckFloor', [0x1f1] = 'CheckFossil', [0x14d] = 'CheckGender', [0x1b9] = 'CheckHappiness', [0x7d] = 'CheckItem', [0xec] = 'CheckLost', [0x24e] = 'CheckLottoNumber', [0x71] = 'CheckMoney', [0x99] = 'CheckMove', [0x1e9] = 'CheckNationalPokedex', [0x177] = 'CheckPartyNumber', [0x19a] = 'CheckPartyNumber2', [0x6b] = 'CheckPersonPosition', [0x249] = 'CheckPhraseBoxInput', [0x9a] = 'CheckPlaceStored', [0x1c4] = 'CheckPokemonHeight', [0x1f6] = 'CheckPokemonLevel', [0x93] = 'CheckPokemonParty', [0x1c0] = 'CheckPokemonParty2', [0x228] = 'CheckPokemonTrade', [0x1bd] = 'CheckPosition', [0x1e8] = 'CheckSinnohPokedex', [0x69] = 'CheckSpritePosition', [0x7c] = 'CheckStoreItem', [0x225] = 'CheckTeachMove', [0x85] = 'CheckUndergroundPcStatus', [0x2c7] = 'CheckVersionGame', [0x2bc] = 'CheckWildBattle2', [0x29d] = 'ChoiceMulti', [0xf2] = 'ChooseFriend', [0xba] = 'ChoosePlayerName', [0x191] = 'ChoosePokemonMenu', [0x192] = 'ChoosePokemonMenu2', [0xbb] = 'ChoosePokemonName', [0xb4] = 'ChooseStarter', [0x2a5] = 'ChooseTradePokemon', [0x1e] = 'ClearFlag', [0x16c] = 'CloseDoor', [0x34] = 'CloseMessageOnKeyPress', [0x43] = 'CloseMulti', [0x24d] = 'ClosePcAnimation', [0x37] = 'ColorMessageBox', [0x1d] = 'CompareLastResultCall', [0x1c] = 'CompareLastResultJump', [0x24f] = 'CompareLottoNumber', [0x2aa] = 'ComparePhraseBoxInput', [0x1c3] = 'ComparePokemonHeight', [0x26] = 'CompareVarsToByte', [0x6c] = 'ContinueFollow', [0x1c1] = 'CopyPokemonHeight', [0x29] = 'CopyVar', [0x239] = 'DecideRules', [0x14b] = 'DefeatGoPokecenter', [0x1c9] = 'DeleteMove', [0x15d] = 'DisableBadge', [0xa8] = 'DisplayContestPokemon', [0xa7] = 'DisplayDressedPokemon', [0x347] = 'DisplayFloor', [0x2a0] = 'DoubleBattle', [0xac] = 'DrawUnion', [0xa6] = 'DressPokemon', [0x1ac] = 'EggAnimation', [0x259] = 'ElevLgAnimation', [0x15c] = 'EnableBadge', [0x2] = 'End', [0x112] = 'EndFlash', [0xb0] = 'EndGame', [0xe6] = 'EndTrainerBattle', [0x143] = 'ExpectDecisionOther', [0x126] = 'ExplanationBattle', [0x68] = 'FacePlayer', [0x4f] = 'FadeDefaultMusic', [0xbc] = 'FadeScreen', [0x111] = 'FlashContest', [0x2ca] = 'FloralClockAnimation', [0xc2] = 'FlyAnimation', [0x6d] = 'FollowHero', [0x35] = 'FreezeMessageBox', [0x205] = 'Geonet', [0x79] = 'GiveCoins', [0x97] = 'GiveEgg', [0x6f] = 'GiveMoney', [0x96] = 'GivePokemon', [0x131] = 'GivePoketch', [0x15a] = 'GiveRunningShoes', [0x206] = 'GreatMarshBynocule', [0xb1] = 'HallFameData', [0x14e] = 'HealPokemon', [0x23b] = 'HealPokemonAnimation', [0x29e] = 'HiddenMachineEffect', [0x295] = 'HideBattlePointsBox', [0x76] = 'HideCoins', [0x73] = 'HideMoney', [0x209] = 'HidePicture', [0x2c2] = 'HideSaveBox', [0x18e] = 'HideSavingClock', [0x127] = 'HoneyTreeBattle', [0x11] = 'If', [0x12] = 'If2', [0xa5] = 'Interview', [0x16] = 'Jump', [0x27a] = 'LeagueCastleView', [0x62] = 'Lock', [0x60] = 'LockAll', [0x66] = 'LockCam', [0xeb] = 'LostGoPokecenter', [0x1b3] = 'Mailbox', [0x3c] = 'Menu', [0x2c] = 'Message', [0x2d] = 'Message2', [0x2f] = 'Message3', [0x1c6] = 'MoveInfo', [0x40] = 'Multi', [0x41] = 'Multi2', [0x44] = 'Multi3', [0x48] = 'MultiRow', [0x39] = 'NoMapMessageBox', [0x0] = 'Nop', [0x1] = 'Nop1', [0xffff] = 'OpCode', [0x178] = 'OpenBerryPouch', [0x16b] = 'OpenDoor', [0x24c] = 'OpenPcAnimation', [0x243] = 'PhraseBox1W', [0x244] = 'PhraseBox2W', [0x4c] = 'PlayCry', [0x49] = 'PlayFanfare', [0x4a] = 'PlayFanfare2', [0x50] = 'PlayMusic', [0x4e] = 'PlaySound', [0x267] = 'Pokecasino', [0x147] = 'Pokemart', [0x148] = 'Pokemart1', [0x149] = 'Pokemart2', [0x14a] = 'Pokemart3', [0xf7] = 'PokemonContest', [0x195] = 'PokemonInfo', [0x28c] = 'PokemonPartyPicture', [0x208] = 'PokemonPicture', [0x328] = 'PortalEffect', [0x168] = 'PrepareDoorAnimation', [0x24b] = 'PreparePcAnimation', [0x129] = 'RandomBattle', [0x1b5] = 'RecordList', [0xaf] = 'RecordMixingUnion', [0x63] = 'Release', [0x61] = 'ReleaseAll', [0x189] = 'ReleaseOverworld', [0x221] = 'RememberMove', [0x65] = 'RemovePeople', [0xbd] = 'ResetScreen', [0x52] = 'RestartMusic', [0x258] = 'RetSprtSave', [0x1b] = 'Return', [0x3] = 'Return2', [0xc8] = 'RideBike', [0xbf] = 'RockClimbAnimation', [0x18b] = 'SetDoorLocked', [0x18a] = 'SetDoorPassable', [0x1f] = 'SetFlag', [0x188] = 'SetOverworldMovement', [0x186] = 'SetOverworldPosition', [0x95] = 'SetPokemonPartyStored', [0x120] = 'SetPositionAfterShip', [0x23] = 'SetValue', [0x28] = 'SetVar', [0xdd] = 'SetVarAlterStored', [0xdb] = 'SetVarHeroStored', [0xda] = 'SetVarPokemonStored', [0xdc] = 'SetVarRivalStored', [0xcf] = 'SetVariableAlter', [0xd4] = 'SetVariableAttack', [0xd3] = 'SetVariableAttackItem', [0xcd] = 'SetVariableHero', [0xd1] = 'SetVariableItem', [0xd6] = 'SetVariableNickname', [0xd5] = 'SetVariableNumber', [0xd7] = 'SetVariableObject', [0xd0] = 'SetVariablePokemon', [0x1c2] = 'SetVariablePokemonHeight', [0xce] = 'SetVariableRival', [0xd8] = 'SetVariableTrainer', [0x23d] = 'ShipAnimation', [0x294] = 'ShowBattlePointsBox', [0x75] = 'ShowCoins', [0x116] = 'ShowLinkCountRecord', [0x72] = 'ShowMoney', [0x1eb] = 'ShowNationalSheet', [0x2c1] = 'ShowSaveBox', [0x18d] = 'ShowSavingClock', [0x1ea] = 'ShowSinnohSheet', [0xaa] = 'SinnohMaps', [0x2c6] = 'SpinTradeUnion', [0x257] = 'SprtSave', [0x125] = 'StarterBattle', [0xcc] = 'StopBerryHiroAnimation', [0x6e] = 'StopFollowHero', [0x51] = 'StopMusic', [0x22a] = 'StopTrade', [0x1c7] = 'StoreMove', [0x193] = 'StorePokemonMenu2', [0x198] = 'StorePokemonNumber', [0x94] = 'StorePokemonParty', [0x134] = 'StorePoketchApp', [0xde] = 'StoreStarter', [0xc0] = 'SurfAnimation', [0x54] = 'SwitchMusic', [0x5a] = 'SwitchMusic2', [0x7a] = 'TakeCoins', [0x7b] = 'TakeItem', [0x70] = 'TakeMoney', [0x224] = 'TeachMove', [0x46] = 'TextMessageScriptMulti', [0x42] = 'TextScriptMulti', [0x271] = 'ThankNameInsert', [0x229] = 'TradeChosenPokemon', [0xae] = 'TradeUnion', [0xe5] = 'TrainerBattle', [0xad] = 'TrainerCaseUnion', [0xc6] = 'Tuxedo', [0x38] = 'TypeMessageBox', [0x153] = 'UnionRoom', [0x26d] = 'UnownMessageBox', [0x77] = 'UpdateCoins', [0x74] = 'UpdateMoney', [0xa3] = 'WFC', [0xb3] = 'WFC1', [0x169] = 'WaitAction', [0x31] = 'WaitButton', [0x16a] = 'WaitClose', [0x4d] = 'WaitCry', [0x4b] = 'WaitFanfare', [0x3f] = 'WaitFor', [0x5f] = 'WaitMovement', [0xbe] = 'Warp', [0x204] = 'WarpLastElevator', [0x11b] = 'WarpMapElevator', [0xc1] = 'WaterfallAnimation', [0x124] = 'WildBattle', [0x2bd] = 'WildBattle2', [0xf3] = 'WirelessBattleWait', [0x12b] = 'WriteAutograph', [0x3e] = 'YesNoBox'}
@@ -599,9 +612,22 @@ trigger_struct = {
 	flag_index_32 = 0xC, -- not 100% certain
 }
 
+
 chunk_struct = {
+	pointer_32 = 0x0,
+	buffer_1 = {},
+	buffer_2 = {},
+	buffer_3 = {},
+	buffer_4 = {},
+	
+	chunk_pointer_offs = {0x90,0x94,0x98,0x9C},
+	current_chunk_8 = 0xAC,
+	current_subchunk_8 = 0xAD
 }
 
+chunk_buffer_struct = {
+
+}
 start_item_struct = data_table["item_struct_offs"]
 
 item_pocket_struct = {
@@ -694,10 +720,24 @@ function print_txt(x,y,txt,clr,screen)
 	gui.text(x,screen_y[screen]+y,txt,clr)
 end 
 
-function draw_rectangle(x,y,width,height,fill,border_clr,screen)
+debug = true 
+
+function debug_print(text)
+	if debug then print(text) end 
+end 
+
+
+
+function draw_bounding_rectangle(x,y,width,height,fill,border_clr,screen)
 	screen = screen or 1
 	gui.box(x-(width/2),screen_y[screen]+y-(height/2),x+(width/2),screen_y[screen]+y+(height/2),fill,border_clr)
 end 
+
+function draw_rectangle(x,y,width,height,fill,border_clr,screen)
+	screen = screen or 1
+	gui.box(x,screen_y[screen]+y,x+width,screen_y[screen]+y+height,fill,border_clr)
+end 
+
 
 screen_options = {
 	OW={-200,0},
@@ -755,6 +795,17 @@ function get_stylus()
 	last_stylus = stylus_
 	stylus_ = stylus.get()
 end
+
+function is_clicking_area(x,y,x2,y2,click_type)
+	click_type = click_type or "leftclick"
+	if key[click_type] then 
+		if (key["xmouse"] >= x) and (key["xmouse"] <= (x + x2)) then
+			if (key["ymouse"] >= y) and (key["ymouse"] <= (y + y2)) then
+				return true
+			end
+		end
+	end 
+end 
 
 function wait_frames(frames)
 	current_frame = emu.framecount()
@@ -859,7 +910,7 @@ function find_item_address_from_pocket(item_id,pocket_id,item_id2)
 	while (current_addr < end_addr) and (current_item_id ~= 0) do
 		current_item_id = memory.readword(current_addr)
 		if (current_item_id == item_id) or (current_item_id == item_id2)  then
-			print("item found with id "..fmt(item_id,4).." or id "..fmt(item_id2,4).." at addr "..fmt(current_addr,8).." in "..item_pocket_struct[pocket_id+1][1])
+			debug_print("item found with id "..fmt(item_id,4).." or id "..fmt(item_id2,4).." at addr "..fmt(current_addr,8).." in "..item_pocket_struct[pocket_id+1][1])
 			return  current_addr
 		end 
 		current_addr = current_addr + 0x4
@@ -874,17 +925,17 @@ function find_item_address(item_id)
 		current_item_id = memory.readword(current_addr)
 		while (current_addr < end_addr) and (current_item_id ~= 0) do
 			current_item_id = memory.readword(current_addr)
-			-- print("item with id "..fmt(current_item_id,4)..item_pocket_struct[pocket_id+1][1])
+			-- debug_print("item with id "..fmt(current_item_id,4)..item_pocket_struct[pocket_id+1][1])
 			if current_item_id == item_id then
 				data = {current_addr,pocket_id}
-				print("item found with id "..fmt(item_id,4).." at addr "..fmt(current_addr,8).." in "..item_pocket_struct[pocket_id+1][1])
+				debug_print("item found with id "..fmt(item_id,4).." at addr "..fmt(current_addr,8).." in "..item_pocket_struct[pocket_id+1][1])
 				return data
 			end 
 			
 			current_addr = current_addr + 0x4
 		end 
 	end
-	print("item with id "..fmt(item_id,4).." not found")
+	debug_print("item with id "..fmt(item_id,4).." not found")
 	return {nil,nil}
 end 
 
@@ -894,7 +945,7 @@ function switch_to_item(item_id)
 	pocket_id = item_data[2]
 
 	if item_address == nil then
-		print("use_item has failed, the requested item cannot be found in any pocket")
+		debug_print("use_item has failed, the requested item cannot be found in any pocket")
 		return
 	end
 	
@@ -922,8 +973,8 @@ function switch_to_item(item_id)
 		hovering_item_address = find_item_address_from_pocket(hovering_item_id,current_pocket_id,hovering_item_id+0x100)
 
 		if hovering_item_address == nil then -- failed to find item in current pocket
-			print("use_item failed, item"..fmt(hovering_item_id,4).."couldn't be found in pocket "..current_pocket_id)
-			print("function will now return")
+			debug_print("use_item failed, item"..fmt(hovering_item_id,4).."couldn't be found in pocket "..current_pocket_id)
+			debug_print("function will now return")
 			return
 		end
 
@@ -948,10 +999,10 @@ function switch_to_item(item_id)
 		press_button(direction)
 		wait_frames(2)
 		hovering_item_id = memory.readbyte(hovering_item_id_offs + 0x360)
-		-- print(fmt(item_id,4),fmt(hovering_item_id,4))
+		-- debug_print(fmt(item_id,4),fmt(hovering_item_id,4))
 		
 		-- if hovering_item_id == 0xF8 then
-		-- 	print("Failed to find item")
+		-- 	debug_print("Failed to find item")
 		-- 	press_button("B")
 		-- 	wait_frames(120)
 		-- 	press_button("B")
@@ -984,17 +1035,17 @@ function use_explorer_kit(full,crash,reset_,menu_open)
 		wait_frames(400)
 		if crash then
 			wait_frames(400)
-			print("crash A")
+			debug_print("crash A")
 			press_button("A")
 			sleep(2)
 			wait_frames(650)
-			print("A 1")
+			debug_print("A 1")
 			press_button("A")
 			wait_frames(80)
-			print("A 2")
+			debug_print("A 2")
 			press_button("A")
 			wait_frames(200)
-			print("A 3")
+			debug_print("A 3")
 			press_button("A")
 			wait_frames(100)
 			return
@@ -1088,10 +1139,10 @@ end
 function reset(reset_type,wait_for_intro)
 	reset_type = reset_type or "hard"
 	if reset_type == "hard" then
-		-- print("hard reset")
+		-- debug_print("hard reset")
 		emu.reset()
 	elseif reset == "soft" then
-		-- print("soft reset")
+		-- debug_print("soft reset")
 		press_buttons({"start","select","L","R"},2)
 		wait_for_reset()
 		wait_frames(40)
@@ -1617,7 +1668,7 @@ function auto_movement()
 	up(105,0,0,"false")
 
 	
-	print("auto_movement has finished")
+	debug_print("auto_movement has finished")
 end 
 
 tp_amount = 31
@@ -1745,11 +1796,11 @@ function draw_bounding_box(x,z,fill_clr,border_clr)
 	else
 		y_v = y_v*15.5
 	end
-	draw_rectangle(127-x_v,99-y_v,12,12,fill_clr,border_clr)
+	draw_bounding_rectangle(127-x_v,99-y_v,12,12,fill_clr,border_clr)
 end
 
 function draw_player_pos(fill_clr,border_clr)
-	draw_rectangle(127,99,14,14,fill_clr,border_clr)
+	draw_bounding_rectangle(127,99,14,14,fill_clr,border_clr)
 end 
 
 function show_bounding_boxes(memory_state)
@@ -1775,7 +1826,7 @@ function show_bounding_boxes(memory_state)
 end 
 
 --
-menu_id = 0
+menu_id = 1
 menu_count = 2
 
 function increment_menu()
@@ -1783,18 +1834,8 @@ function increment_menu()
 end 
 
 function get_map_id_color(map_id)
-	if map_id > 558 then
-		return map_ids['Jubilife']['color']
-	else
-		for k,v in pairs(map_ids) do
-			for i=1,#map_ids[k]['ids'] do
-				if map_ids[k]['ids'][i] == map_id then 
-					return map_ids[k]['color']
-				end
-			end
-		end
-	end
-	return map_ids['Normal']['color']
+	if map_id > 558 then return map_id_list['Jubilife']['color'] end
+	return map_ids[map_id] or map_id_list['Normal']['color']
 end 
 
 
@@ -1828,9 +1869,117 @@ function show_void_pos()
 	end 
 end
 
-function show_chunks_ow()
-	print('chunks')
+function split_word_into_bytes(word)
+	h_byte = bit.rshift(word,8)
+	l_byte = bit.band(word,0xFF)
+	return {l_byte,h_byte}
+end 
+
+function get_tile_color(tile_data)
+	tile_id = bit.band(tile_data,0xff)
+	collision = bit.rshift(tile_data,8)
+
+	if tile_id == 0x00 then 
+		if collision > 0x7F then return "#CCCCCC" end
+		return
+	end 
+
+	return tile_ids[tile_id]
+
+end 
+
+
+function get_collision_color(collision)
+	if bit.rshift(collision,7) ~= 0 then return "#CCCCCC" end
+	return tile_id_list['Normal']['color']
+end 
+
+chunk_scr_x = {0,128,0,128}
+chunk_scr_y = {0,0,96,96}
+
+tile_view = true 
+
+function toggle_tile_view()
+	tile_view = not tile_view
+end 
+
+player_view = true 
+
+function toggle_player_pos()
+	player_view = not player_view
 end
+
+function show_chunks_ow()
+	-- draw_rectangle(0,0,256,200,"#000022ccc",0,2)
+	draw_rectangle(0,0,256,200,"#000001fff","#000001fff",2)
+	if tile_view then 
+		show_tiles_ow()
+		if player_view then
+			show_player_pos()
+		end 
+		return
+	end 
+	show_collision_ow()
+	if player_view then
+		show_player_pos()
+		return
+	end 
+end 
+
+function show_tiles_ow()
+	print_txt(5,60,"chunks")
+	start_chunk_struct = memory.readdword(base+data_table["chunk_calculation_ptr"])
+	print_txt(5,70,"0x"..fmt(start_chunk_struct,8))
+	chunk_pointer_offs = chunk_struct["chunk_pointer_offs"]
+	chunk_pointers = {}
+	for i = 1,#chunk_pointer_offs do
+		chunk_pointer = memory.readdword(chunk_pointer_offs[i] + start_chunk_struct)
+		print_txt(5,70+i*10,"0x"..fmt(chunk_pointer,7))
+		for row = 0,31 do 
+			for col = 0,31 do 
+				tile_data = memory.readword(chunk_pointer+row*2 + col*64)
+				tile_color = get_tile_color(tile_data)
+				draw_rectangle(chunk_scr_x[i]+row*4,chunk_scr_y[i] + col*3,5,3,tile_color,0,2)
+			end
+		end 
+
+	end 
+end
+
+function show_collision_ow()
+	print_txt(5,60,"chunks")
+	start_chunk_struct = memory.readdword(base+data_table["chunk_calculation_ptr"])
+	print_txt(5,70,"0x"..fmt(start_chunk_struct,8))
+	chunk_pointer_offs = chunk_struct["chunk_pointer_offs"]
+	chunk_pointers = {}
+
+	for i = 1,#chunk_pointer_offs do
+		chunk_pointers[i] = memory.readdword(chunk_pointer_offs[i] + start_chunk_struct)
+		print_txt(5,70+i*10,"0x"..fmt(chunk_pointers[i],7))
+		for row = 0,31 do 
+			for col = 0,31 do 
+				collision  = memory.readbyte(chunk_pointers[i]+row*2 + col*64+1)
+				collision_color = get_collision_color(collision)
+				draw_rectangle(chunk_scr_x[i]+row*4,chunk_scr_y[i] + col*3,5,3,collision_color,0,2)
+			end
+		end 
+
+	end 
+end
+
+function show_player_pos()
+	start_chunk_struct = memory.readdword(base+data_table["chunk_calculation_ptr"])
+	c_chunk = memory.readbyte(chunk_struct["current_chunk_8"] + start_chunk_struct)
+	if c_chunk < 4 then 
+		x_phys_32 = memory.readdword(base + player_struct["x_phys_32"] + memory_shift)
+		z_phys_32 = memory.readdword(base + player_struct["z_phys_32"] + memory_shift)
+		row = x_phys_32%32
+		col = z_phys_32%32
+		draw_rectangle(chunk_scr_x[c_chunk+1]+row*4,chunk_scr_y[c_chunk+1] + col*3,5,3,"red",0,2)
+	
+	end
+	
+end 
 
 function show_chunks_battle_tower()
 end
@@ -1857,12 +2006,14 @@ end
 
 key_configuration = {
 	switch_wtw_state = {"W"},
-	auto_movement = {"shift","T"},
+	auto_movement = {"shift","M"},
 	increment_menu = {"shift","V"},
 	teleport_up = {"shift","up"},
 	teleport_left = {"shift","left"},
 	teleport_down = {"shift","down"},
-	teleport_right = {"shift","right"}
+	teleport_right = {"shift","right"},
+	toggle_tile_view = {"shift","T"},
+	toggle_player_pos = {"shift","P"}
 }
 
 function run_functions_on_keypress()
@@ -1873,6 +2024,22 @@ function run_functions_on_keypress()
 	end
 end
 
+option_x = 20
+option_y = 20
+
+function_options = {
+	{show_void_pos,"Void viewer"},
+	{show_chunks_ow,"Chunks viewer"}
+}
+
+function display_options()
+	draw_rectangle(option_x,option_y,100,60)
+	if is_clicking_area(option_x,option_y-200,100,60) then clicking_option_menu = true end
+	for i = 0,#function_options-1 do
+		print_txt(option_x + 5,option_y + 18 + i*10,function_options[i+1][2])
+	end 
+end 
+
 
 function main_gui()
 	base = memory.readdword(lang_data["base_addr"]) -- check base every loop in case of reset
@@ -1880,15 +2047,19 @@ function main_gui()
 	memory_shift = data_table["memory_shift"][memory_state] -- get memory shift based on state
 
 	screen_y = set_screen_params(memory_state)
-
-	-- temporary gui before I implement gui screens
-	print_txt(5,20,memory_state,"red")
-	print_txt(5,30,fmt(memory_shift,4),"red")
 	
 	-- main 
 	show_bounding_boxes(memory_state)
 	show_menu(menu_id)
 
+	-- temporary gui before I implement gui screens
+	print_txt(5,10,fmt(base,7),"yellow")
+	print_txt(5,20,memory_state,"red")
+	print_txt(5,30,fmt(memory_shift,4),"red")
+
+	-- display_options()
+
+	-- input functions
 	get_keys()
 	get_joy()
 	get_stylus()
