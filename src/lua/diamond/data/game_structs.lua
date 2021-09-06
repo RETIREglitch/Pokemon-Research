@@ -1,21 +1,7 @@
-local struct_tools = require("util/structs")
+local struct_tools = require("common/util/structs")
 local struct = struct_tools.struct
 local ptr = struct_tools.ptr
 local array = struct_tools.arr
-
---=== NITRO TYPES ===--
-
-local BOOL = 0
-local u8 = 1
-local s8 = 2
-local u16 = 3
-local s16 = 4
-local u32 = 5
-local s32 = 6
-local fx32 = 7  -- Fixed point
-local int = 5
-local voidp = 8
-local enum = 5
 
 --=== NITRO STRUCTS ===--
 

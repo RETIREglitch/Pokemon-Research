@@ -1,13 +1,17 @@
-local json = require("lib/json")
-local moses = require("lib/moses")
-local helpers = require("util/helpers")
-local struct_tools = require("util/structs")
-local structs = require("game_structs")
-local Context = require("util/context")
-require("ext/memory")  -- More funcs on memory
+if not string.find(package.path, ";\.\./?\.lua") then
+    package.path = package.path .. ";../?.lua"
+end
 
-local LOAD_LINE = 16
-local CHUNK_BORDER = 0
+--=== Libraries ===--
+local json = require("common/lib/json")
+local moses = require("common/lib/moses")
+local helpers = require("common/util/helpers")
+local struct_tools = require("common/util/structs")
+local Context = require("common/util/context")
+require("common/ext/memory")  -- More funcs on memory
+
+-- Local required files --
+local structs = require("data/game_structs")
 
 --=== LOGIC ===--
 
@@ -17,16 +21,15 @@ function Context:initSettings()
         loadLineView = true,
         subChunkView = true,
 
-        cheatWTW = true,
-        cheatRepel = true
+        wideScreen = false,
     }
+
+    self.draw = 0
+    self.tiles = require("data/tiles")
 end
 
 function Context:drawGrid()
     if not self.settings.gridView then return end
-
-    local camPos = self.fsys.camera.lookat.target
-    self:log(camPos.x)
 
     local c1 = self:transformInverse(0, 0)
     local c2 = self:transformInverse(255, 0)
@@ -34,6 +37,7 @@ function Context:drawGrid()
     local c4 = self:transformInverse(0, 191)
     local xvals = { c1[1], c2[1], c3[1], c4[1] }
     local yvals = { c1[2], c2[2], c3[2], c4[2] }
+
     local min_x = moses.min(xvals)
     local min_y = moses.min(yvals)
     local max_x = moses.max(xvals)
@@ -45,6 +49,8 @@ function Context:drawGrid()
     local yend = max_y - (max_y % 16) + 16
 
     local color
+    local LOAD_LINE = 16
+    local CHUNK_BORDER = 0
 
     for x = xstart, xend, 16 do
         if self.settings.loadLineView and (x/16) % 32 == LOAD_LINE then color = "red" elseif self.settings.subChunkView and (x/16)%32 == CHUNK_BORDER then color = "lightblue" else color = "blue" end
@@ -67,12 +73,25 @@ function Context:tickStart()
     struct_tools.clear_cache()
     -- Load all data
     local fsys_ptr = memory.read_u32_le(0x021c5a08) -- US
+
     self.fsys = structs.FIELDSYS_WORK(fsys_ptr)
     self.line = 0
 
-    -- memory.write_u32_le(self.fsys.camera.__addr + 8, helpers.tofixed(16/9))
-    -- memory.write_u32_le(self.fsys.camera.__addr + 20, helpers.tofixed(self.fsys.camera.lookat.camPos.x + 0.1))
-    -- memory.write_u32_le(self.fsys.camera.__addr + 24, helpers.tofixed(self.fsys.camera.lookat.camPos.y + 0.1))
+    if self.settings.wideScreen then
+        memory.write_u32_le(self.fsys.camera.persp.__addr + 8, helpers.tofixed(16/9))
+
+        if (self.info == nil) then
+            self.info = 1
+            print(json.encode(struct_tools.dump(self.fsys.camera)))
+        end
+
+        -- DEBUG FOR CAM MOVEMENT
+        -- memory.write_u32_le(self.fsys.camera.lookat.camPos.__addr, helpers.tofixed(3100))
+        -- memory.write_u32_le(self.fsys.camera.lookat.camPos.__addr + 4, helpers.tofixed(350))
+        -- memory.write_u32_le(self.fsys.camera.lookat.camPos.__addr + 8, helpers.tofixed(13000))
+        -- memory.write_u32_le(self.fsys.camera.persp.__addr + 12, helpers.tofixed(-10000))
+        -- memory.write_u32_le(self.fsys.camera.persp.__addr + 16, helpers.tofixed(500))
+    end
 end
 
 function Context:tickEnd()
@@ -80,7 +99,10 @@ function Context:tickEnd()
         return  -- Not initialized yet
     end
 
-    self:drawGrid()
+    self.draw = (self.draw + 1) % 3
+    if self.draw == 0 then
+        self:drawGrid()
+    end
     -- self:log(memory.read_string(0x02000B8D))
 
     -- Use data

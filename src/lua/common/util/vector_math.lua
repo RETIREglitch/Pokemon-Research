@@ -4,6 +4,10 @@ function vmath.vec(x, y, z)
     return {x = x, y = y, z = z}
 end
 
+function vmath.vec4(x, y, z, e)
+    return {x = x, y = y, z = z, e = e}
+end
+
 function vmath.unit(v)
     local size = math.sqrt(v.x*v.x + v.y*v.y +v.z*v.z)
     if (size == 0) then return vmath.vec(1, 1, 1) end

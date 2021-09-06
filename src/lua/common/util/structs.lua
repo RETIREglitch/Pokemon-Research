@@ -1,4 +1,5 @@
-local helpers = require("util/helpers")
+require("common/util/basic_types")
+local helpers = require("common/util/helpers")
 
 local module = {}
 
@@ -7,23 +8,23 @@ local cacheref = {
 }
 
 local function sizeof(t)
-    if (t == 0) then
+    if (t == BOOL) then
         return 4
-    elseif (t == 1) then
+    elseif (t == u8) then
         return 1
-    elseif (t == 2) then
+    elseif (t == s8) then
         return 1
-    elseif (t == 3) then
+    elseif (t == u16) then
         return 2
-    elseif (t == 4) then
+    elseif (t == s16) then
         return 2
-    elseif (t == 5) then
+    elseif (t == u32) then
         return 4
-    elseif (t == 6) then
+    elseif (t == s32) then
         return 4
-    elseif (t == 7) then
+    elseif (t == fx32) then
         return 4
-    elseif (t == 8) then
+    elseif (t == voidp) then
         return 4
     else
         -- check array, struct
@@ -33,9 +34,10 @@ local function sizeof(t)
             return t.length * sizeof(t.struct)
         elseif t.__name ~= nil then
             local i = 0
-            for j, k in ipairs(t) do
-                i = i + sizeof(k)
+            for j, k in pairs(t.__indices) do
+                i = i + sizeof(t[k])
             end
+            return i
         end
     end
 
@@ -47,29 +49,37 @@ local function do_write(val, ptr)
 end
 
 local function instance(typ, ptr)
-    local x = cacheref.cache[ptr]
-    if x ~= nil then
-        return x
-    end
+    if typ == nil then return nil end
+    if ptr == 0 then return nil end
 
-    if (typ == 0) then
+    local x
+    --local x = cacheref.cache[ptr]
+    --if x ~= nil and x[typ] ~= nil then
+    --    return x[typ]
+    --end
+    --
+    --if x == nil then
+    --    cacheref.cache[ptr] = {}
+    --end
+
+    if (typ == BOOL) then
         x = (memory.read_u32_le(ptr) == 1)
-    elseif (typ == 1) then
+    elseif (typ == u8) then
         x = memory.read_u8(ptr)
-    elseif (typ == 2) then
+    elseif (typ == s8) then
         x = memory.read_s8(ptr)
-    elseif (typ == 3) then
+    elseif (typ == u16) then
         x = memory.read_u16_le(ptr)
-    elseif (typ == 4) then
+    elseif (typ == s16) then
         x = memory.read_s16_le(ptr)
-    elseif (typ == 5) then
+    elseif (typ == u32) then
         x = memory.read_u32_le(ptr)
-    elseif (typ == 6) then
+    elseif (typ == s32) then
         x = memory.read_s32_le(ptr)
-    elseif (typ == 7) then
+    elseif (typ == fx32) then
         x = helpers.tofloat(memory.read_s32_le(ptr))
-    elseif (typ == 8) then
-        x = helpers.tofixed(memory.read_u32_le(ptr))
+    elseif (typ == voidp) then
+        x = helpers.hex_8(memory.read_u32_le(ptr))
     else
         -- check array, struct
         if typ.is_ptr then
@@ -96,30 +106,41 @@ local function instance(typ, ptr)
             local o = {}
             local t = {}
             local i = 0
-            for k, v in pairs(typ) do
+            for j = 0, #typ.__indices do
+                local k = typ.__indices[j]
+                local v = typ[k]
                 o[k] = i
                 t[k] = v
-                i = i + sizeof(v)
+                local s = sizeof(v)
+                i = i + s
             end
             local meta = {}
 
             function meta:__index(key)
-                print(rawget(t, key), ptr, key, o[key])  -- error here
-                return instance(rawget(t, key), ptr + o[key])
+                local obj = instance(t[key], ptr + o[key])
+                rawset(self, key, obj)
+                return obj
             end
 
             function meta:__newindex(key, value)
-                if (type(t[key]) ~= "number") then
+                if (type(t[key]) == "number") then
+                    rawset(self, key, value)
                     do_write(value, ptr + o[key])
                 end
             end
 
-            x = setmetatable({__addr = ptr, __name = typ.__name}, meta)
+            x = setmetatable({__addr = ptr, __name = typ.__name, __indices = typ.__indices}, meta)
         end
     end
 
-    cacheref.cache[ptr] = x
+    --cacheref.cache[ptr][typ] = x
     return x
+end
+
+local function tablelength(T)
+    local count = 0
+    for _ in pairs(T) do count = count + 1 end
+    return count
 end
 
 function module.struct(t)
@@ -130,6 +151,12 @@ function module.struct(t)
         return instance(t, addr)
     end
 
+    function meta:__newindex(k, v)
+        t.__indices[tablelength(t.__indices)] = k
+        rawset(self, k, v)
+    end
+
+    t.__indices = {}
     t = setmetatable(t, meta)
     return t
 end
@@ -145,6 +172,18 @@ end
 
 function module.clear_cache()
     cacheref.cache = {}
+end
+
+function module.dump(obj)
+    local o = {}
+    for i, k in pairs(obj.__indices) do
+        local v = obj[k]
+        if type(v) == "table" and v.__name then
+            v = module.dump(v)
+        end
+        o[k] = v
+    end
+    return o
 end
 
 return module
