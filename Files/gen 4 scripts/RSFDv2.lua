@@ -2334,6 +2334,7 @@ function press_equal_sign()
 end 
 
 function auto_movement()
+<<<<<<< HEAD
 	press_button("down",2)
 	wait_frames(20)
 	press_button("X",2)
@@ -2624,6 +2625,7 @@ end
 
 -- Loadlines and grid
 
+<<<<<<< HEAD
 grid = false
 loadlines = true 
 maplines = false
@@ -2644,12 +2646,26 @@ end
 function toggle_mapmodellines()
 	mapmodellines = not mapmodellines
 end
+=======
+grid = true 
+loadlines = true 
+maplines = true 
+
+function toggle_grid()
+	grid = not grid
+	loadlines = not loadlines
+	maplines = not maplines
+end 
+>>>>>>> d2857c0289bb382d35d3061bcd828240fdd9b9b0
 
 function show_boundary_lines()
 	if grid then show_gridlines() end
 	if loadlines then show_loadlines() end
 	if maplines then show_maplines() end
+<<<<<<< HEAD
 	if mapmodellines then show_mapmodellines() end 
+=======
+>>>>>>> d2857c0289bb382d35d3061bcd828240fdd9b9b0
 end 
 
 function show_gridlines()
@@ -2661,6 +2677,7 @@ end
 function show_loadlines()
 	x_cam_16 = memory.readword(base + player_struct["x_cam_16"] + memory_shift)
 	z_cam_16 = memory.readword(base + player_struct["z_cam_16"] + memory_shift)
+<<<<<<< HEAD
 
 	add_x = 0
 	add_y = 0
@@ -2678,11 +2695,19 @@ function show_loadlines()
 		if z_line > 7 then draw_line(0,7*13+(z_line-7)*15.5,256,0, "red") return end
 		draw_line(0,13*z_line,256,0, "red")
 	end 
+=======
+	x_line = (-x_cam_16+23)%32
+	z_line = (-z_cam_16+23)%32
+	draw_line(x_line*16+7,0,0,200, "red")
+	if z_line > 7 then draw_line(0,7*13+(z_line-7)*15.5,256,0, "red") return end
+	draw_line(0,13*z_line,256,0, "red")
+>>>>>>> d2857c0289bb382d35d3061bcd828240fdd9b9b0
 end
 
 function show_maplines()
 	x_phys_32 = memory.readdword(base + player_struct["x_phys_32"] + memory_shift)
 	z_phys_32 = memory.readdword(base + player_struct["z_phys_32"] + memory_shift)
+<<<<<<< HEAD
 
 	add_x = 0
 	add_y = 0
@@ -2715,6 +2740,19 @@ function show_mapmodellines()
 	end
 
 end 
+=======
+	x_line = (-x_phys_32+7)%32
+	z_line = (-z_phys_32+7)%32
+	draw_line(x_line*16+7,0,0,200, "blue")
+	if z_line > 7 then draw_line(0,7*13+(z_line-7)*15.5,256,0, "blue") return end
+	draw_line(0,13*z_line,256,0, "blue")
+
+end  
+
+
+
+
+>>>>>>> d2857c0289bb382d35d3061bcd828240fdd9b9b0
 
 function get_tile_color(tile_data)
 	tile_id = bit.band(tile_data,0xff)
@@ -3263,6 +3301,7 @@ key_configuration = {
 	toggle_tile_view = {"shift","T"},
 	toggle_player_pos = {"shift","P"},
 	toggle_bounding_view = {"shift","I"},
+<<<<<<< HEAD
 	toggle_grid = {"shift","G"},
 	toggle_loadlines = {"shift","L"},
 	toggle_maplines = {"shift","K"},
@@ -3276,6 +3315,9 @@ key_configuration = {
 key_configuration_cont = {
 	increment_scroll = {"shift","U"},
 	decrement_scroll = {"shift","J"}
+=======
+	toggle_grid = {"shift","L"}
+>>>>>>> d2857c0289bb382d35d3061bcd828240fdd9b9b0
 }
 
 function run_functions_on_keypress()
