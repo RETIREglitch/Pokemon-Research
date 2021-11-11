@@ -1,55 +1,60 @@
 -------------------------------------------------
-----    RSFD - Routing Script For Dummies    ----
+--                  grasp.lua                  --
+--  [Glitchin Research and Speedrunning lua]   --
+-------------------------------------------------
+
 -------------------------------------------------
 --              by RETIREglitch                --
 -------------------------------------------------
+
+-------------------------------------------------
 --  base pointer addresses provided by Ganix   --
---  void formula based on void.lua by MKdasher --
+--           void formulas by MKdasher         --
 -------------------------------------------------
 
 -- DATA TABLES
 
 local map_id_list = {
-	Goal = {
+	goal = {
 		color = '#f7bbf3',
 		ids = {333,332}
 		},
-	Chains= {
+	chain = {
 		color = '#DfA',
 		ids = {469,406,385,40, 442, 450, 457, 499, 501,342, 406, 501, 502, 503}
 	},
-	MysteryZone = {
+	mystery_zone = {
 		color = '#88888866',
 		ids = {0}
 	},
-	Blackout = {
+	blackout = {
 		color = 'orange',
 		ids = {332, 333}
 	},
-	Movement = {
+	movement = {
 		color = 'purple',
 		ids = {117, 177, 179, 181, 183, 192, 393,
             474, 475, 476, 477, 478, 479, 480, 481, 482, 483,
             484, 485, 486, 487, 488, 489, 490, 496}
 	},
-	VoidExit = {
+	warp = {
 		color = 'yellow',
 		ids = {105, 114, 337, 461, 516, 186, 187}
 	},
-	DANGER = {
+	bsod_model = {
 		color = 'red',
 		ids = {35, 88, 93, 95, 122,133, 150 ,154, 155, 156, 176, 178, 180, 182,
 				184, 185, 188, 291, 293, 295, 504, 505, 506, 507, 508, 509}
 	},
-	Wrongwarp = {
+	wrong_warp = {
 		color = '#666fd',
 		ids = {7,37,49,70,102,124,135,152,169,174,190,421,429,436,444,453,460,495}
 	},
-	Jubilife = {
+	jubilife_city = {
 		color = '#66ffbbff',
 		ids = {3}
 	},
-	Normal = {
+	default = {
 		color = '#00bb00ff',
 		ids = {}
 	}
@@ -83,160 +88,160 @@ local tile_names = {
 } -- 6 is tree in HGSS
 
 tile_id_list = {
-	Grass = {
+	grass = {
         color = '#40a',
         ids = {0x2,0x7B}
     },
-	Normal = {
+	default = {
         color = nil,
         ids = {0xff}
     },
-	Warps = {
+	warps = {
         color = '#f03',
         ids ={0x5E,0x5f,0x62,0x63,0x69,0x65,0x6f,0x6D,0x6A,0x6C,0x6E}
 	},
-	Cave = {
+	cave = {
         color = '#bb7410',
         ids = {0x6,0x8,0xC}
 	},
-	Water = {
+	water = {
         color = '#4888f',
         ids = {0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x19,0x22,0x2A,0x7C}
     },
-    Sand = {
+    sand = {
         color = '#e3c',
         ids = {0x21,0x21}
 	},
-	DeepSnow1 = {
+	deep_snow1 = {
         color = '#8da9cb',
         ids = {0xA1}
     },
-    DeepSnow2 = {
+    deep_snow2 = {
         color = '#6483a7',
         ids = {0xA2}
     },
-    DeepSnow3 = {
+    deep_snow3 = {
         color = '#52749d',
         ids = {0xA3}
 	},
-    Mud = {
+    mud = {
         color = '#92897',
         ids = {0xA4}
     },
-    MudBlocking = {
+    mud_block = {
         color = '#92704',
         ids = {0xA5}
     },
-    MudGrass = {
+    mud_grass = {
         color = '#4090',
         ids = {0xA6}
     },
-    MudGrassBlocking = {
+    mud_grass_block = {
         color = '#55906',
         ids = {0xA7}
 	},
-    Snow = {
+    snow = {
         color = '#b9d0eb',
         ids = {0xA8}
 	},
-	TallGrass = {
+	tall_grass = {
         color = '#2aa615',
         ids = {0x3}		
 	},
-	RandomObj = {
+	misc_obj = {
         color = 'white',
         ids = {0xE5,0X8E,0X8f}
     },
-	Spinners = {
+	spin_tile = {
         color = '#ffd',
         ids = {0x40,0x41,0x42,0x43}
     },
-	Ice = {
+	ice = {
         color = '#56b3e0',
         ids = {0x20,0x20}
     },
-	icestair = {
+	ice_stair = {
         color = '#ffd',
         ids = {0x49,0x4A}
     },
-	CircleWarps = {
+	circle_warp = {
         color = '#a0a',
         ids = {0x67}
     },
-	Modelfl = {
+	model_fl = {
         color = '#afb',
        ids = {0x56,0x57,0x58,} 
     },
-	ModelFloor = {
+	model_floor = {
         color = '#a090f',
        ids = {0x59}
     },
-	OnesidedWall = {
+	special_collision = {
         color = '#a090f',
        ids = {0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37}
     },
-	Bikestalls = {
+	bike_stall = {
         color = '#0690a',
        ids = {0xDB}
     },
-	Counter = {
+	counter = {
         color = '#f7a',
         ids = {0x80}
     },
-	PC = {
+	pc = {
        color = '#0690b',
        ids = {0x83}
     },
-	Map = {
+	map = {
        color = '#00eee',
        ids = {0x85}
     },
-	TV = {
+	tv = {
        color = '#4290e',
        ids = {0x86}
     },
-	Bookcases = {
+	bookcases = {
         color = '#0ddd7',
         ids = {0x88,0xE1,0xE0,0xE2}
     },
-	Bin = {
+	bin = {
         color = '#06b04',
        ids = {0xE4}
 	},
-    HauntedHouse = {
+    haunted_house = {
         color = '#A292BC',
         ids = {0xB}
     },
-    Ledge = {
+    ledge = {
         color = '#D3A',
         ids = {0x38,0x39,0x3A,0x3B,0x3C,0x3D,0x3E,0x3F}
     },
-    RockClimb = {
+    rock_climb = {
         color = '#C76',
         ids = {0x4B,0x4C}
     },
-    Bridge = {
+    bridge = {
         color = '#C79',
         ids = {0x70,0x71,0x72,0x73,0x74,0x75}
 	},
-    BikeBridge= {
+    bike_bridge = {
         color = '#C7A55',
         ids = {0x76,0x77,0x78,0x79,0x7A,0x7D}
 		-- BikeBridge 0x7C moves to water, 0x7B moved to grass
 	},
-    Berrysoil = {
+    soil = {
         color = '#b2703',
         ids = {0xA0}
     },
-    BikeRamp = {
+    bike_ramp = {
         color = '#B890',
         ids = {0xD7,0xD8}
 	},
-    Quicksand = {
+    quick_sand = {
         color = '#A880',
         ids = {0xD9,0xDA}
     },
-	-- Trees = {
+	-- trees = {
     --     color = '#CCCCC',
     --     ids = {0x6}
     -- }, -- HGSS, remove 0x6 from cave list if used
@@ -977,6 +982,76 @@ script_commands = {
 	[0x402] = {color = '#5555FFF', script_command = 'ExitMarsh', parameters = {}},
 	default = {color = '#222222'}
 }
+
+pokemon_names =  {"0x0", "Bulbasaur", "Ivysaur", "Venusaur", "Charmander", "Charmeleon", "Charizard",
+			"Squirtle", "Wartortle", "Blastoise", "Caterpie", "Metapod", "Butterfree",
+			"Weedle", "Kakuna", "Beedrill", "Pidgey", "Pidgeotto", "Pidgeot", "Rattata", "Raticate",
+			"Spearow", "Fearow", "Ekans", "Arbok", "Pikachu", "Raichu", "Sandshrew", "Sandslash",
+			"Nidoran F", "Nidorina", "Nidoqueen", "Nidoran M", "Nidorino", "Nidoking",
+			"Clefairy", "Clefable", "Vulpix", "Ninetales", "Jigglypuff", "Wigglytuff",
+			"Zubat", "Golbat", "Oddish", "Gloom", "Vileplume", "Paras", "Parasect", "Venonat", "Venomoth",
+			"Diglett", "Dugtrio", "Meowth", "Persian", "Psyduck", "Golduck", "Mankey", "Primeape",
+			"Growlithe", "Arcanine", "Poliwag", "Poliwhirl", "Poliwrath", "Abra", "Kadabra", "Alakazam",
+			"Machop", "Machoke", "Machamp", "Bellsprout", "Weepinbell", "Victreebel", "Tentacool", "Tentacruel",
+			"Geodude", "Graveler", "Golem", "Ponyta", "Rapidash", "Slowpoke", "Slowbro",
+			"Magnemite", "Magneton", "Farfetch'd", "Doduo", "Dodrio", "Seel", "Dewgong", "Grimer", "Muk",
+			"Shellder", "Cloyster", "Gastly", "Haunter", "Gengar", "Onix", "Drowzee", "Hypno",
+			"Krabby", "Kingler", "Voltorb", "Electrode", "Exeggcute", "Exeggutor", "Cubone", "Marowak",
+			"Hitmonlee", "Hitmonchan", "Lickitung", "Koffing", "Weezing", "Rhyhorn", "Rhydon", "Chansey",
+			"Tangela", "Kangaskhan", "Horsea", "Seadra", "Goldeen", "Seaking", "Staryu", "Starmie",
+			"Mr. Mime", "Scyther", "Jynx", "Electabuzz", "Magmar", "Pinsir", "Tauros", "Magikarp", "Gyarados",
+			"Lapras", "Ditto", "Eevee", "Vaporeon", "Jolteon", "Flareon", "Porygon", "Omanyte", "Omastar",
+			"Kabuto", "Kabutops", "Aerodactyl", "Snorlax", "Articuno", "Zapdos", "Moltres",
+			"Dratini", "Dragonair", "Dragonite", "Mewtwo", "Mew",
+			"Chikorita", "Bayleef", "Meganium", "Cyndaquil", "Quilava", "Typhlosion",
+			"Totodile", "Croconaw", "Feraligatr", "Sentret", "Furret", "Hoothoot", "Noctowl",
+			"Ledyba", "Ledian", "Spinarak", "Ariados", "Crobat", "Chinchou", "Lanturn", "Pichu", "Cleffa",
+			"Igglybuff", "Togepi", "Togetic", "Natu", "Xatu", "Mareep", "Flaaffy", "Ampharos", "Bellossom",
+			"Marill", "Azumarill", "Sudowoodo", "Politoed", "Hoppip", "Skiploom", "Jumpluff", "Aipom",
+			"Sunkern", "Sunflora", "Yanma", "Wooper", "Quagsire", "Espeon", "Umbreon", "Murkrow", "Slowking",
+			"Misdreavus", "Unown", "Wobbuffet", "Girafarig", "Pineco", "Forretress", "Dunsparce", "Gligar",
+			"Steelix", "Snubbull", "Granbull", "Qwilfish", "Scizor", "Shuckle", "Heracross", "Sneasel",
+			"Teddiursa", "Ursaring", "Slugma", "Magcargo", "Swinub", "Piloswine", "Corsola", "Remoraid", "Octillery",
+			"Delibird", "Mantine", "Skarmory", "Houndour", "Houndoom", "Kingdra", "Phanpy", "Donphan",
+			"Porygon2", "Stantler", "Smeargle", "Tyrogue", "Hitmontop", "Smoochum", "Elekid", "Magby", "Miltank",
+			"Blissey", "Raikou", "Entei", "Suicune", "Larvitar", "Pupitar", "Tyranitar", "Lugia", "Ho-Oh", "Celebi",
+			"Treecko", "Grovyle", "Sceptile", "Torchic", "Combusken", "Blaziken", "Mudkip", "Marshtomp",
+			"Swampert", "Poochyena", "Mightyena", "Zigzagoon", "Linoone", "Wurmple", "Silcoon", "Beautifly",
+			"Cascoon", "Dustox", "Lotad", "Lombre", "Ludicolo", "Seedot", "Nuzleaf", "Shiftry",
+			"Taillow", "Swellow", "Wingull", "Pelipper", "Ralts", "Kirlia", "Gardevoir", "Surskit",
+			"Masquerain", "Shroomish", "Breloom", "Slakoth", "Vigoroth", "Slaking", "Nincada", "Ninjask",
+			"Shedinja", "Whismur", "Loudred", "Exploud", "Makuhita", "Hariyama", "Azurill", "Nosepass",
+			"Skitty", "Delcatty", "Sableye", "Mawile", "Aron", "Lairon", "Aggron", "Meditite", "Medicham",
+			"Electrike", "Manectric", "Plusle", "Minun", "Volbeat", "Illumise", "Roselia", "Gulpin",
+			"Swalot", "Carvanha", "Sharpedo", "Wailmer", "Wailord", "Numel", "Camerupt", "Torkoal",
+			"Spoink", "Grumpig", "Spinda", "Trapinch", "Vibrava", "Flygon", "Cacnea", "Cacturne", "Swablu",
+			"Altaria", "Zangoose", "Seviper", "Lunatone", "Solrock", "Barboach", "Whiscash", "Corphish",
+			"Crawdaunt", "Baltoy", "Claydol", "Lileep", "Cradily", "Anorith", "Armaldo", "Feebas",
+			"Milotic", "Castform", "Kecleon", "Shuppet", "Banette", "Duskull", "Dusclops", "Tropius",
+			"Chimecho", "Absol", "Wynaut", "Snorunt", "Glalie", "Spheal", "Sealeo", "Walrein", "Clamperl",
+			"Huntail", "Gorebyss", "Relicanth", "Luvdisc", "Bagon", "Shelgon", "Salamence", "Beldum",
+			"Metang", "Metagross", "Regirock", "Regice", "Registeel", "Latias", "Latios", "Kyogre",
+			"Groudon", "Rayquaza", "Jirachi", "Deoxys",
+			"Turtwig", "Grotle", "Torterra", "Chimchar", "Monferno", "Infernape", "Piplup", "Prinplup",
+			"Empoleon", "Starly", "Staravia", "Staraptor", "Bidoof", "Bibarel", "Kricketot", "Kricketune",
+			"Shinx", "Luxio", "Luxray", "Budew", "Roserade", "Cranidos", "Rampardos", "Shieldon", "Bastiodon",
+			"Burmy", "Wormadam", "Mothim", "Combee", "Vespiquen", "Pachirisu", "Buizel", "Floatzel", "Cherubi",
+			"Cherrim", "Shellos", "Gastrodon", "Ambipom", "Drifloon", "Drifblim", "Buneary", "Lopunny",
+			"Mismagius", "Honchkrow", "Glameow", "Purugly", "Chingling", "Stunky", "Skuntank", "Bronzor",
+			"Bronzong", "Bonsly", "Mime Jr.", "Happiny", "Chatot", "Spiritomb", "Gible", "Gabite", "Garchomp",
+			"Munchlax", "Riolu", "Lucario", "Hippopotas", "Hippowdon", "Skorupi", "Drapion", "Croagunk",
+			"Toxicroak", "Carnivine", "Finneon", "Lumineon", "Mantyke", "Snover", "Abomasnow", "Weavile",
+			"Magnezone", "Lickilicky", "Rhyperior", "Tangrowth", "Electivire", "Magmortar", "Togekiss",
+			"Yanmega", "Leafeon", "Glaceon", "Gliscor", "Mamoswine", "Porygon-Z", "Gallade", "Probopass",
+			"Dusknoir", "Froslass", "Rotom", "Uxie", "Mesprit", "Azelf", "Dialga", "Palkia", "Heatran",
+			"Regigigas", "Giratina", "Cresselia", "Phione", "Manaphy", "Darkrai", "Shaymin", "Arceus",
+}
+
+nature_list = {"Hardy","Lonely","Brave","Adamant","Naughty",
+			"Bold","Docile","Relaxed","Impish","Lax",
+			"Timid","Hasty","Serious","Jolly","Naive",
+			"Modest","Mild","Quiet","Bashful","Rash",
+			"Calm","Gentle","Sassy","Careful","Quirky"}
 
 
 data_tables = {
@@ -2581,8 +2656,8 @@ function increment_menu()
 end 
 
 function get_map_id_color(map_id)
-	if map_id > 558 then return map_id_list['Jubilife']['color'] end
-	return map_ids[map_id] or map_id_list['Normal']['color']
+	if map_id > 558 then return map_id_list['jubilife']['color'] end
+	return map_ids[map_id] or map_id_list['default']['color']
 end 
 
 
@@ -2731,7 +2806,7 @@ end
 
 function get_collision_color(collision)
 	if bit.rshift(collision,7) ~= 0 then return "#CCCCCC" end
-	return tile_id_list['Normal']['color']
+	return tile_id_list['Default']['color']
 end 
 
 chunk_scr_x = {0,128,0,128}
@@ -3217,6 +3292,9 @@ function memory_viewer()
 
 end 
 
+-- RNG data
+
+
 -- Change game screen
 
 function write_image_to_calculator()
@@ -3317,8 +3395,8 @@ function run_functions()
 end 
 
 function main_gui()
-	--base = memory.readdword(lang_data["base_addr"]) -- check base every loop in case of reset
-	base = memory.readdword(memory.readdword(0x2002848)-4)
+	base = memory.readdword(lang_data["base_addr"]) -- check base every loop in case of reset
+	--base = memory.readdword(memory.readdword(0x2002848)-4)
 	memory_state = get_memory_state() -- check for underground,battletower or overworld state (add: intro?)
 	memory_shift = data_table["memory_shift"][memory_state] -- get memory shift based on state
 
@@ -3331,7 +3409,6 @@ function main_gui()
 	show_boundary_lines()
 	show_menu(menu_id)
 
-	-- temporary gui before I implement gui screens
 	print_to_screen(5,15,"Base:"..fmt(base,8),'yellow')
 	show_player_data()
 
