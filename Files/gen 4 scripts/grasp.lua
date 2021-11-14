@@ -9,7 +9,7 @@
 
 -------------------------------------------------
 --  base pointer addresses provided by Ganix   --
---           void formulas by MKdasher         --
+--  void/rng func based on MKdasher's scripts  --
 -------------------------------------------------
 
 -- DATA TABLES
@@ -1053,6 +1053,218 @@ nature_list = {"Hardy","Lonely","Brave","Adamant","Naughty",
 			"Modest","Mild","Quiet","Bashful","Rash",
 			"Calm","Gentle","Sassy","Careful","Quirky"}
 
+sprite_id_dp = {
+	[0x00] = "LukasRun",
+	[0x01] = "MaleKid",
+	[0x02] = "FemaleKid",
+	[0x03] = "Nerd",
+	[0x04] = "Youngster",
+	[0x05] = "Bug Catcher",
+	[0x06] = "Fem Ace Trainer",
+	[0x07] = "Fem Jogger",
+	[0x08] = "Fem ?",
+	[0x09] = "Male ?",
+	[0x0A] = "Male ?",
+	[0x0B] = "Male Ace trainer",
+	[0x0C] = "Fem ?",
+	[0x0D] = "Fem ?",
+	[0x0E] = "Fem Ace Trainer",
+	[0x0F] = "Balding Old Man",
+	[0x10] = "Woman",
+	[0x11] = "Daycare man",
+	[0x12] = "Daycare Woman",
+	[0x13] = "Collector",
+	[0x14] = "Hiker",
+	[0x15] = "LukasBike",
+	[0x16] = "Fem Reporter",
+	[0x17] = "Male Reporter",
+	[0x18] = "Woman",
+	[0x19] = "Woman",
+	[0x1A] = "Nurse Joy",
+	[0x1B] = "Nurse",
+	[0x1C] = "Nurse",
+	[0x1D] = "Male Scientist",
+	[0x1E] = "Fem Scientist",
+	[0x1F] = "Rough guy",
+	[0x20] = "Male Skier",
+	[0x21] = "Fem Skier",
+	[0x22] = "Police",
+	[0x23] = "Contest Woman",
+	[0x24] = "Rich Man",
+	[0x25] = "Rich Woman",
+	[0x26] = "Male Cyclist",
+	[0x27] = "Fem Cyclist",
+	[0x28] = "UG worker",
+	[0x29] = "Farmer Parent",
+	[0x2A] = "Farmer Child",
+	[0x2B] = "Clown",
+	[0x2C] = "Artist",
+	[0x2D] = "Male Jogger",
+	[0x2E] = "Male Swimmer",
+	[0x2F] = "Fem Swimster",
+	[0x30] = "Fem Beach Kid",
+	[0x31] = "Male Beach Kid",
+	[0x32] = "Explorer",
+	[0x33] = "Red Belt",
+	[0x34] = "Camper Girl",
+	[0x35] = "Camper Girl",
+	[0x36] = "Fisherman",
+	[0x37] = "Woman", -- umbrella
+	[0x38] = "Sailor",
+	[0x39] = "MissingNo",
+	[0x3A] = "MissingNo",
+	[0x3B] = "Rich Boy",
+	[0x3C] = "Waitress",
+	[0x3D] = "MissingNo",
+	[0x3E] = "Rich Boy",
+	[0x3F] = "Rich Girl",
+	[0x40] = "Snow Guy",
+	[0x41] = "Snow Girl",
+	[0x42] = "MissingNo",
+	[0x43] = "MissingNo",
+	[0x44] = "Snow Woman",
+	[0x45] = "Snow Woman",
+	[0x46] = "Psychic",
+	[0x47] = "Poke Kid",
+	[0x48] = "Cleffa",
+	[0x49] = "Jigglypuf",
+	[0x4A] = "Psyduck",
+	[0x4B] = "MissingNo",
+	[0x4C] = "MissingNo",
+	[0x4D] = "MissingNo",
+	[0x4E] = "Torchic",
+	[0x4F] = "Skitty",
+	[0x50] = "MissingNo",
+	[0x51] = "Baby Stroll",
+	[0x52] = "Poketch Guy",
+	[0x53] = "Woman",
+	[0x54] = "Strength Boulder",
+	[0x55] = "Rock Smash Rock",
+	[0x56] = "Cut Sapling",
+	[0x57] = "Pokéball",
+	[0x58] = "Woman",
+	[0x59] = "Woman",
+	[0x5A] = "Woman",
+	[0x5B] = "Invalid",
+	[0x5C] = "Invalid",
+	[0x5D] = "Invalid",
+	[0x5E] = "Invalid",
+	[0x5F] = "Invalid",
+	[0x60] = "Lukas",
+	[0x61] = "Dawn",
+	[0x63]  = "Proff. Rowan",
+	[0x64] = "Invalid",
+	[0x65] = "Invalid",
+	[0x66] = "Invalid",
+	[0x67] = "Invalid",
+	[0x68] = "Invalid",
+	[0x69] = "Invalid",
+	[0x6A] = "Invalid",
+	[0x6B] = "Invalid",
+	[0x6C] = "Invalid",
+	[0x6D] = "Invalid",
+	[0x6E] = "Invalid",
+	[0x6F] = "Invalid",
+	[0x70] = "Invalid",
+	[0x71] = "Invalid",
+	[0x72] = "Invalid",
+	[0x73] = "Invalid",
+	[0x74] = "Invalid",
+	[0x75] = "Invalid",
+	[0x76] = "Invalid",
+	[0x77] = "Invalid",
+	[0x78] = "Cyrus",
+	[0x79] = "Mars",
+	[0x7A] = "Saturn",
+	[0x7B] = "Jupiter",
+	[0x7C] = "MaleGalactic",
+	[0x7D] = "FemaleGalactic",
+	[0x7E] = "Roark",
+	[0x7F] = "Gardenia",
+	[0x80] = "Crasher Wake",
+	[0x81] = "Maylene",
+	[0x82] = "Fantina",
+	[0x83] = "Candice",
+	[0x84] = "Byron",
+	[0x85] = "Volkner",
+	[0x86] = "Aaron",
+	[0x87] = "Bertha",
+	[0x88] = "Flint",
+	[0x89] = "Lucian",
+	[0x8A] = "Cynthia",
+	[0x8B] = "UnusedNPC",
+	[0x8C] = "Mother",
+	[0x8D] = "Cherryl",
+	[0x8E] = "Riley",
+	[0x8F] = "Marley",
+	[0x90] = "Buck",
+	[0x91] = "Mira",
+	[0x92] = "MissingNo.",
+	[0x93] = "MissingNo.",
+	[0x94] = "Rival",
+	[0x95] = "UnusedNPC",
+	[0x96] = "UnusedNPC",
+	[0x97] = "Uxie",
+	[0x98] = "Mesprit",
+	[0x99] = "Azelf",
+	[0x9A] = "Dialga",
+	[0x9B] = "Palkia",
+	[0x9C] = "Arceus",
+	[0x9D] = "Darkrai",
+	[0x9E] = "Shaymin",
+	[0x9F] = "Cresselia",
+	[0xA0] = "Giratina",
+	[0xA1] = "Heatran",
+	[0xA2] = "MissingNo.",
+	[0xA3] = "Reception",
+	[0xA4] = "Old Man",
+	[0xA5] = "Old Woman",
+	[0xA6] = "Proff Oak",
+	[0xA7] = "Hoenn girl", -- forgot name lol
+	[0xA8] = "Nerd",
+	[0xA9] = "Palmer",
+	[0xAA] = "UnusedNPC",
+	[0xAB] = "UnusedNPC",
+	[0xAC] = "UnusedNPC",
+	[0xAD] = "Starly",
+	[0xAE] = "BriefCase",
+	[0xAF] = "Waitress",
+	[0xB0] = "LukasFlyAnim",
+	[0xB1] = "DawnFlyAnim",
+	[0xB2] = "LukasSurfAnim",
+	[0xB3] = "DawnSurfAnim",
+	[0xB4] = "LukasSprayAnim",
+	[0xB5] = "DawnSprayAnim",
+	[0xB6] = "Vent",
+	[0xB7] = "Invalid",
+	[0xB8] = "Regigigas",
+	[0xB9] = "Drifloon",
+	[0xBA] = "LukasContest",
+	[0xBB] = "DawnContest",
+	[0xBC] = "LukasFishAnim",
+	[0xBD] = "DawnFishAnim",
+	[0xBE] = "MossRock",
+	[0xBF] = "IceRock",
+	[0xC0] = "MetalCoat?", -- no clue
+	[0xC1] = "DeliveryMan", -- mystery gift/wifi events
+	[0xC2] = "NintendoPlayer",
+	[0xC3] = "Magikarp",
+	[0xC4] = "LukasPoketchAnim",
+	[0xC5] = "DawnPoketchAnim",
+	[0xC6] = "LukasClearPoketchAnim",
+	[0xC7] = "DawnClearPoketchAnim",
+	[0xC8] = "LukasObtainItemAnim",
+	[0xC9] = "DawnObtainItemAnim",
+	[0xCA] = "Elevator",
+	[0xCB] = "LakeTrioWall",
+	[0xCC] = "Pachirisu",
+	[0xCD] = "Shroomish",
+	[0xCE] = "Buneary",
+	[0xCF] = "Happiny",
+	[0xD0] = "Machop",
+}
+--missing berries
+--signs
 
 data_tables = {
 	--1 DP and PD demo
@@ -1719,6 +1931,22 @@ function tap_touch_screen(x_,y_,frames)
 	stylus.set(stylus_)
 end
 
+calc_x_start = 33
+calc_y_start = 48
+
+calc_x_pos = {["0"]=50,["1"]=50,["2"]=80,["3"]=110,["4"]=50,["5"]=80,["6"]=110,["7"]=50,["8"]=80,["9"]=110,["+"]=140,["-"]=170,["x"]=140,["*"]=140,["/"]=170,["C"]=150,["."]=110,["="]=160,}
+calc_y_pos = {["0"]=160,["1"]=125,["2"]=125,["3"]=125,["4"]=90,["5"]=90,["6"]=90,["7"]=60,["8"]=60,["9"]=60,["+"]=90,["-"]=90,["x"]=125,["*"]=125,["/"]=125,["C"]=60,["."]=160,["="]=160,}
+
+function write_calc_input(input_str) -- input in str form
+	for i = 1,#input_str do 
+		-- gui.text(50,10,"test "..string.sub(input_str,i,i),"red")
+		tap_touch_screen(calc_x_pos[string.sub(input_str,i,i)],calc_y_pos[string.sub(input_str,i,i)],2)
+		wait_frames(2)
+	end 
+	use_menu(8)
+
+end 
+
 function press_button(btn,frames)
 	frames = frames or 2
 	current_frame = emu.framecount()
@@ -2287,7 +2515,7 @@ end
 function go_direction_wait_warp(direction,frames)
 	frames = frames or 200
 	wait_frames(20)
-	press_button(direction)
+	press_button(direction,8)
 	wait_frames(frames)
 end
 
@@ -2409,14 +2637,44 @@ function press_equal_sign()
 end 
 
 function auto_movement()
-	press_button("down",2)
-	wait_frames(20)
-	press_button("X",2)
-	mash_button("A",20)
-	-- print("Hello")
-	-- -- press_buttons({"up","down","left","right"},60)
-	-- tap_touch_screen(35,71,2)
-	-- tap_touch_screen(65,121,2)
+	down(9,0,0,"false")
+	left(1,0,0,"false")
+	down(19,0,0,"false")
+	left(15,0,0,"false")
+	up(2,0,0,"false")
+	left(17,0,0,"false")
+	down(1,0,0,"false")
+	right(1,0,0,"false")
+	left(1,0,0,"false")
+	right(9,0,0,"false")
+	up(1,0,0,"false")
+	right(10,0,0,"false")
+	down(1,0,0,"false")
+	right(5,0,0,"false")
+	down(6,0,0,"false")
+	right(19,0,0,"false")
+	up(7,0,0,"false")
+	left(15,0,0,"false")
+	graphic_reload()
+	go_direction_wait_warp("down")
+	down(1,0,0,"false")
+	right(28,0,0,"false")
+	wait_frames(8)
+	get_on_bike(1)
+	wait_frames(8)
+	right(34,0,0,"false")
+	down(260,0,0,"false")
+	left(11,0,0,"false")
+	save_reset()
+	go_direction_wait_warp("left")
+	up(6,0,0,"false")
+	press_button("left",8)
+	mash_button("A",200)
+
+end 
+
+function auto_calculate()
+
 end 
 
 map_editing =  false 
@@ -2532,6 +2790,8 @@ function show_player_data()
 	print_to_screen(10,70,"Stored Warp:","yellow")
 	print_to_screen(20,80,"X: "..x_stored_warp_16..","..fmt(x_stored_warp_16,4),"yellow")
 	print_to_screen(20,90,"Z: "..z_stored_warp_16..","..fmt(z_stored_warp_16,4),"yellow")
+	step_counter = memory.readword(base + live_struct["step_counter"])
+	print_to_screen(10,100,"Steps: "..step_counter,"yellow")
 	
 end
 
@@ -2648,7 +2908,7 @@ function show_bounding_boxes(memory_state)
 end 
 
 --
-menu_id = 2
+menu_id = 0
 menu_count = 2
 
 function increment_menu()
@@ -2656,7 +2916,7 @@ function increment_menu()
 end 
 
 function get_map_id_color(map_id)
-	if map_id > 558 then return map_id_list['jubilife']['color'] end
+	if map_id > 558 then return map_id_list['jubilife_city']['color'] end
 	return map_ids[map_id] or map_id_list['default']['color']
 end 
 
@@ -2806,7 +3066,7 @@ end
 
 function get_collision_color(collision)
 	if bit.rshift(collision,7) ~= 0 then return "#CCCCCC" end
-	return tile_id_list['Default']['color']
+	return tile_id_list['default']['color']
 end 
 
 chunk_scr_x = {0,128,0,128}
@@ -3076,13 +3336,10 @@ function show_script_start()
 
 	if show_script then 
 		print_to_screen(143,15,"Next Command:\n    0x"..fmt(next_opcode_addr,8),"#00f0f")
-		-- print_to_screen(143,35,"Id: 0x"..fmt(opcode,0),"#00f0f")
-		-- print_to_screen(143,45,script_command_names[opcode],"#00f0f") --only accurate if the last script command doesn't contain any parameters
-
-		print_to_screen(143,65,"Script Data:","#00f0f")
-		print_to_screen(153,75,"Array:  0x"..fmt(script_array_addr,0),"#00f0f")
-		print_to_screen(153,85,"Offset: 0x"..fmt(script_offs_4,0),"#00f0f")
-		print_to_screen(153,95,"Exec:   0x"..fmt(script_execution_start_addr,0),"#00f0f")
+		print_to_screen(143,35,"Script Data:","#00f0f")
+		print_to_screen(153,45,"Array:  0x"..fmt(script_array_addr,0),"#00f0f")
+		print_to_screen(153,55,"Offset: 0x"..fmt(script_offs_4,0),"#00f0f")
+		print_to_screen(153,65,"Exec:   0x"..fmt(script_execution_start_addr,0),"#00f0f")
 		show_script_memory()
 	else
 		print_to_screen(143,15,"No script loaded","#00f0f")
@@ -3218,7 +3475,7 @@ function show_script_memory()
 		end
 
 		if check_jump_validity(cur_sc_id,jump_id) then
-			print_to_screen(143,115+20*jumps_shown,"Jump"..(jumps_shown+1)..":\n    0x"..fmt(jump_value,0),"yellow")
+			print_to_screen(143,85+10*jumps_shown,"Jump"..(jumps_shown+1)..": 0x"..fmt(jump_value,0),"yellow")
 			index = (index - index%8) + 8
 			cur_sc_addr = cur_sc_addr + jump_value
 			print_to_screen(46+(index%8)*26,2+math.floor(index/8)*10,"Jump by 0x"..fmt(jump_value,0).." to 0x"..fmt(cur_sc_addr+2,8),"red",2)
@@ -3294,6 +3551,34 @@ end
 
 -- RNG data
 
+function mult32(a,b)
+	local c=rshift(a,16)
+	local d=a%0x10000
+	local e=rshift(b,16)
+	local f=b%0x10000
+	local g=(c*f+d*e)%0x10000
+	local h=d*f
+	local i=g*0x10000+h
+	return i
+end
+
+function advance_rng(rng)
+	return mult32(rng,0x41C64E6D) + 0x6073
+end
+
+function get_rng()
+
+end 
+
+function show_rng()
+	get_rng()
+	gui.text(0,83,"Curr RNG: "..bit.tohex(currentRNG), "#FFFF00A0")
+	gui.text(0,93,"Next RNG: "..bit.tohex(nextRNG), "#FFFF00A0")
+	gui.text(0,103,"Dist last: "..distlast, "#FFFF00A0")
+	gui.text(0,113,"Dist seed: " .. distanceseed, "#FFFF00A0")
+	gui.text(0,123, "Step Cnt (128): ".. stepcnt128, "#FFFF00A0")
+	gui.text(0,133, "Enc. Rate Cnt: ".. stepcounter .. "/".. maxstepcounter, "#FFFF00A0")
+end 
 
 -- Change game screen
 
@@ -3312,9 +3597,10 @@ end
 
 
 -- SHOW MENU DATA
+function empty() end
 
 menu_choices = {
-	OW = {show_void_pos,show_chunks_ow,debug_script_calling,memory_viewer},
+	OW = {show_void_pos,show_chunks_ow,debug_script_calling,memory_viewer,empty},
 	UG = {show_void_pos,show_chunks_ug,memory_viewer},
 	BT = {show_void_pos,show_chunks_bt,debug_script_calling,memory_viewer}
 	}
@@ -3328,12 +3614,22 @@ function show_menu(index)
 	menu_choices[memory_state][index+1]()
 end
 
+function auto_sprite_inc()
+	sprite = memory.readword(base + player_struct["sprite_id_32"])
+	memory.writeword(base + player_struct["sprite_id_32"],sprite+1)
+	use_menu(5)
+	wait_frames(60)
+	press_button("B",4)
+end 
+
 key_configuration = {
 	switch_wtw_state = {"W"},
 	toggle_map_editing = {"M"},
 	toggle_memory_addr_editing = {"shift","U"},
 	auto_movement = {"shift","M"},
 	increment_menu = {"shift","V"},
+	--auto_calculate = {"shift","C"},
+	--auto_sprite_inc = {"B"},
 	teleport_up = {"shift","up"},
 	teleport_left = {"shift","left"},
 	teleport_down = {"shift","down"},
