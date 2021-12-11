@@ -222,7 +222,11 @@ tile_id_list = {
     },
     bridge = {
         color = '#C79',
-        ids = {0x70,0x71,0x72,0x73,0x74,0x75}
+        ids = {0x71,0x72,0x73,0x74,0x75}
+	},
+	start_bridge = {
+		color= "#C7B", 
+		ids = {0x70}
 	},
     bike_bridge = {
         color = '#C7A55',
@@ -1944,6 +1948,7 @@ function write_calc_input(input_str) -- input in str form
 		wait_frames(2)
 	end 
 	use_menu(8)
+	wait_frames(2)
 
 end 
 
@@ -2532,9 +2537,9 @@ function turn_around(frames,until_encounter)
 	until_encounter = return_arg(until_encounter,true)
 	if until_encounter then
 		while not check_battle_state() do
-			press_button("right",4)
-			wait_frames(4)
 			press_button("left",4)
+			wait_frames(4)
+			press_button("right",4)
 			wait_frames(4)
 		end 
 		return
@@ -2627,54 +2632,212 @@ end
 
 show_steps = true 
 
-function auto_calc_input()
-	for i = 0,calc_input do
-	end 
-end 
+-- function auto_calc_input()
+-- 	for i = 0,calc_input do
+-- 	end 
+-- end 
 
 function press_equal_sign()
 
 end 
 
 function auto_movement()
-	down(9,0,0,"false")
+	wait_frames(20)
 	left(1,0,0,"false")
-	down(19,0,0,"false")
-	left(15,0,0,"false")
-	up(2,0,0,"false")
-	left(17,0,0,"false")
 	down(1,0,0,"false")
 	right(1,0,0,"false")
 	left(1,0,0,"false")
-	right(9,0,0,"false")
-	up(1,0,0,"false")
-	right(10,0,0,"false")
-	down(1,0,0,"false")
-	right(5,0,0,"false")
-	down(6,0,0,"false")
-	right(19,0,0,"false")
-	up(7,0,0,"false")
-	left(15,0,0,"false")
-	graphic_reload()
-	go_direction_wait_warp("down")
-	down(1,0,0,"false")
-	right(28,0,0,"false")
-	wait_frames(8)
-	get_on_bike(1)
-	wait_frames(8)
-	right(34,0,0,"false")
-	down(260,0,0,"false")
-	left(11,0,0,"false")
-	save_reset()
-	go_direction_wait_warp("left")
-	up(6,0,0,"false")
-	press_button("left",8)
-	mash_button("A",200)
+	up(1)
+	wait_frames(20)
+	left(1,0,0,"false")
+	up(14,0,0,"false")
+	left(15)
+	up(5)
+	right(193)
+	
+	down(26598)
+	right(14)
+	down(160)
+	right(32)
+	down(160)
+	right(32)
+	down(160)
+	right(32)
+	down(160)
+	right(32)
+
+	down(960)
+	right(32)
+	down(384)
+	left(1)
+
+	down(1152)
+	right(1)
+	down(160)
+	left(1)
+
+	down(1344)
+	right(1)
+	
+	down(12097)
+	right(28)
+	-- pal park cutscene
+	-- right(80)
+	-- 1 N
+
+
 
 end 
 
 function auto_calculate()
+	write_calc_input("8621850700x256=")
+	-- write_calc_input("2199023281152x1=")
+	-- for i=0,8 do 
+	-- 	use_menu(8)
+	-- 	wait_frames(2)
+	-- end 
+	
+end
 
+function manaphy_creation()
+	write_calc_input("2450564232073185024x1=")
+	write_calc_input("10160726794148251392x1=")
+	write_calc_input("2306449044030883584x1=")
+	write_calc_input("10160726794181805824x1=")
+	write_calc_input("606034850744064x1=")
+	write_calc_input("606034867521280x1=")
+	write_calc_input("12394512209407903488x1=")
+	write_calc_input("432951599128643328x1=")
+	write_calc_input("17942946950361908992x1=")
+	write_calc_input("15420931159051208448x1=")
+	write_calc_input("5476983181833930496x1=")
+	write_calc_input("9079862883747104512x1=")
+	write_calc_input("14123894466418837248x1=")
+	write_calc_input("3747600924973991680x1=")
+	write_calc_input("10665129952631850752x1=")
+	write_calc_input("16717967851834574592x1=")
+	write_calc_input("5765213558086305536x1=")
+	write_calc_input("11962166645364885248x1=")
+	write_calc_input("16645910257846978304x1=")
+	write_calc_input("7206365438895195904x1=")
+	write_calc_input("8359286943518820096x1=")
+	write_calc_input("6774019874701182720x1=")
+	write_calc_input("2882909796669851392x1=")
+	write_calc_input("5116695211862394624x1=")
+	write_calc_input("8071056567434217216x1=")
+	write_calc_input("7710768597261354752x1=")
+	write_calc_input("10088669200529753856x1=")
+	write_calc_input("13763606496480855808x1=")
+	write_calc_input("10088669200563308288x1=")
+	write_calc_input("16862083040145311488x1=")
+	write_calc_input("12970972962113980160x1=")
+	write_calc_input("9151920478120576768x1=")
+	write_calc_input("12250397021768255232x1=")
+	write_calc_input("15276815971378005760x1=")
+	write_calc_input("8935747696057124608x1=")
+	write_calc_input("7350480627239487232x1=")
+	write_calc_input("9872496418583742208x1=")
+	write_calc_input("4396119271717996288x1=")
+	write_calc_input("216778817534953216x1=")
+	write_calc_input("12034224239771911936x1=")
+	write_calc_input("3747600925426976512x1=")
+	write_calc_input("12250397021919250176x1=")
+	write_calc_input("3243197767195035392x1=")
+	write_calc_input("17942946950949111552x1=")
+	write_calc_input("16429737476169402112x1=")
+	write_calc_input("15060643189465548544x1=")
+	write_calc_input("2450564232844936960x1=")
+	write_calc_input("7422538221478741760x1=")
+	write_calc_input("10448957171088492288x1=")
+	write_calc_input("13115088150508603136x1=")
+	write_calc_input("12250397022070245120x1=")
+	write_calc_input("1153527540246120192x1=")
+	write_calc_input("16862083040531187456x1=")
+	write_calc_input("4684349648138143488x1=")
+	write_calc_input("11529821081758074624x1=")
+	write_calc_input("14268009655216113408x1=")
+	write_calc_input("6197559122984961792x1=")
+	write_calc_input("18375292515411560192x1=")
+	write_calc_input("15709161536025003776x1=")
+	write_calc_input("10376899577235113728x1=")
+	write_calc_input("6125501529014142720x1=")
+	write_calc_input("13403318526861641472x1=")
+	write_calc_input("4756407242327066368x1=")
+	write_calc_input("11169533111719429888x1=")
+	write_calc_input("7134307845612242688x1=")
+	write_calc_input("2810852203353343744x1=")
+	write_calc_input("13187145744831743744x1=")
+	write_calc_input("7782826192003925760x1=")
+	write_calc_input("9800438825082685184x1=")
+	write_calc_input("8791632508568471296x1=")
+	write_calc_input("11097475517798942464x1=")
+	write_calc_input("12970972962801846016x1=")
+	write_calc_input("17726774169321867008x1=")
+	write_calc_input("13619491309176751872x1=")
+	write_calc_input("72663630063077120x1=")
+	write_calc_input("3891716114090034944x1=")
+	write_calc_input("17222371011123480320x1=")
+	write_calc_input("7710768598133769984x1=")
+	write_calc_input("11529821082160727808x1=")
+	write_calc_input("6485789499522549504x1=")
+	write_calc_input("17438543793304372992x1=")
+	write_calc_input("10160726795490428672x1=")
+	write_calc_input("1369700322879997696x1=")
+	write_calc_input("12826857774927316736x1=")
+	write_calc_input("15420931160309499648x1=")
+	write_calc_input("4324061678485374720x1=")
+	write_calc_input("15637103942456837888x1=")
+	write_calc_input("3891716114291361536x1=")
+	write_calc_input("9944554013494085376x1=")
+	write_calc_input("16934140635189872384x1=")
+	write_calc_input("13835664091575748352x1=")
+	write_calc_input("10232784389696128768x1=")
+	write_calc_input("3171140173995968256x1=")
+	write_calc_input("17078255823332837120x1=")
+	write_calc_input("18303234921994389248x1=")
+	write_calc_input("15348873566456121088x1=")
+	write_calc_input("7206365440187041536x1=")
+	write_calc_input("577066788714448640x1=")
+	write_calc_input("8647517320979154688x1=")
+	write_calc_input("15853276724788725504x1=")
+	write_calc_input("11241590706378114816x1=")
+	write_calc_input("17582658981732550400x1=")
+	write_calc_input("12322454616980588288x1=")
+	write_calc_input("8143114162797545216x1=")
+	write_calc_input("15709161536796755712x1=")
+	write_calc_input("5188752807276054272x1=")
+	write_calc_input("12970972963389048576x1=")
+	write_calc_input("5332867995385464576x1=")
+	write_calc_input("15709161536863864576x1=")
+	write_calc_input("11457763488642893568x1=")
+	write_calc_input("18375292516300752640x1=")
+	write_calc_input("1225585135290681088x1=")
+	write_calc_input("11169533112541513472x1=")
+	write_calc_input("12034224241013425920x1=")
+	write_calc_input("1946161075720292096x1=")
+	write_calc_input("17798831764081215232x1=")
+	write_calc_input("3243197768436549376x1=")
+	write_calc_input("9728381231866840832x1=")
+	write_calc_input("8719574915352626944x1=")
+	write_calc_input("10016611608052107008x1=")
+	write_calc_input("9872496419993028352x1=")
+	write_calc_input("1369700323534309120x1=")
+	write_calc_input("8791632509457663744x1=")
+	write_calc_input("17870889358253360896x1=")
+	write_calc_input("4468176867215542016x1=")
+	write_calc_input("16429737477528356608x1=")
+	write_calc_input("10016611608169547520x1=")
+	write_calc_input("8647517321465693952x1=")
+	write_calc_input("12178339429340940032x1=")
+	write_calc_input("2666737016351229696x1=")
+	write_calc_input("4540234461354133248x1=")
+	write_calc_input("4324061679257126656x1=")
+	write_calc_input("1946161076022281984x1=")
+	write_calc_input("6701962282542302976x1=")
+	write_calc_input("4684349649497097984x1=")
+	write_calc_input("360894007238199040x1=")
+	write_calc_input("144115462953870336x1=")
+	print("done")
 end 
 
 map_editing =  false 
@@ -2734,6 +2897,29 @@ function change_memory_addr()
 
 end 
 
+teleport_editing =  false 
+
+function toggle_teleport_editing()
+	teleport_editing = not teleport_editing 
+	temp_teleport_amount = ""
+end
+
+function change_teleport_amount()
+	value = check_btn_ints()
+	if value ~= nil then 
+		temp_teleport_amount = temp_teleport_amount..value
+		tp_amount = tonumber(temp_teleport_amount)
+	end
+	if (#temp_teleport_amount > 4) or (key.enter) then
+		temp_teleport_amount = tonumber(temp_teleport_amount)
+		if temp_teleport_amount > 65535 then
+			temp_teleport_amount = 65535
+		end 
+		tp_amount = temp_teleport_amount
+		teleport_editing = false
+	end
+end 
+
 
 tp_amount = 31
 
@@ -2777,6 +2963,11 @@ function get_memory_state()
 	return "OW"
 end
 
+function get_edit_color(editing)
+	if editing then return "red" end
+	return "yellow"
+end 
+
 function show_player_data()
 	x_phys_32 = memory.readword(base + player_struct["x_phys_32"] + memory_shift)
 	z_phys_32 = memory.readword(base + player_struct["z_phys_32"] + memory_shift) 
@@ -2784,7 +2975,7 @@ function show_player_data()
 	print_to_screen(10,30,"Physical:","yellow")
 	print_to_screen(20,40,"X: "..x_phys_32..","..fmt(x_phys_32,4),"yellow")
 	print_to_screen(20,50,"Z: "..z_phys_32..","..fmt(z_phys_32,4),"yellow")
-	print_to_screen(20,60,"Map Id: "..map_id_phys_32..","..fmt(map_id_phys_32,4),"yellow")
+	print_to_screen(20,60,"Map Id: "..map_id_phys_32..","..fmt(map_id_phys_32,4),get_edit_color(map_editing))
 	x_stored_warp_16 = memory.readword(base + live_struct["x_stored_warp_16"])
 	z_stored_warp_16 = memory.readword(base + live_struct["z_stored_warp_16"])	
 	print_to_screen(10,70,"Stored Warp:","yellow")
@@ -2792,6 +2983,9 @@ function show_player_data()
 	print_to_screen(20,90,"Z: "..z_stored_warp_16..","..fmt(z_stored_warp_16,4),"yellow")
 	step_counter = memory.readword(base + live_struct["step_counter"])
 	print_to_screen(10,100,"Steps: "..step_counter,"yellow")
+	npc_count = memory.readbyte(base + general_npc_struct["npc_count"] + memory_shift) -1 
+	print_to_screen(10,110,"NPCs: "..npc_count,"yellow")
+	print_to_screen(10,120,"TP: "..tp_amount,get_edit_color(teleport_editing))
 	
 end
 
@@ -2920,33 +3114,38 @@ function get_map_id_color(map_id)
 	return map_ids[map_id] or map_id_list['default']['color']
 end 
 
+c_map_converted = {[1000]=">999"}
+
+function get_display_map(map_id)
+	return c_map_converted[map_id] or map_id
+end
 
 function show_void_pos()
 	matrix_width = memory.readbyte(base + matrix_struct["matrix_width_8"])
+	matrix_height = memory.readbyte(base + matrix_struct["matrix_height_8"])
 	matrix_center = base + matrix_struct["matrix_center_16"]
 
 	x_phys_32 = memory.readdwordsigned(base + player_struct["x_phys_32"] + memory_shift)
 	z_phys_32 = memory.readdwordsigned(base + player_struct["z_phys_32"] + memory_shift)
 
 	x_offs = math.modf(x_phys_32 / 32) *2
-	z_offs = math.modf(z_phys_32 / 32) *2 *matrix_width 
+	z_offs = math.modf(z_phys_32 / 32) *2 *matrix_height 
 
-	center = (5*2) + (data_table["matrix_size"]*2*9)
+	center = (5*2) + (matrix_height*2*9)
 	for row=0,9 do
 		for col=0,18 do 
-			c_map_offset = matrix_center+x_offs+z_offs + row*2 + col*2*data_table["matrix_size"]-center
-			c_map_id = memory.readword(c_map_offset)
-			if c_map_offset == matrix_center + x_offs+z_offs then
+			
+			c_map_offset = matrix_center + x_offs + z_offs + row*2 + col*2*matrix_height-center
+			c_map_id = math.min(memory.readword(c_map_offset),1000)
+
+			
+			if (c_map_offset == matrix_center + x_offs+z_offs) and (row==5) then
+				print_to_screen(90,10,fmt(c_map_offset,8).."\n"..data_table["matrix_size"])
 				clr = 'white'
 			else
 				clr = get_map_id_color(c_map_id)
 			end
-
-			if c_map_id > 999 then
-				c_map_id = ">999"
-			end 
-
-			print_to_screen(3 + row*25,3 + col*10,c_map_id,clr,2)
+			print_to_screen(3 + row*25,3 + col*10,get_display_map(c_map_id),clr,2)
 		end 
 	end 
 end
@@ -3160,65 +3359,30 @@ end
 
 function show_tiles_ow(additional_offset)
 	start_chunk_struct = memory.readdword(base+data_table["chunk_calculation_ptr"])
-	print_to_screen(153,140,"0x"..fmt(start_chunk_struct,8))
 	chunk_pointer_offs = chunk_struct["chunk_pointer_offs"]
 	chunk_pointers = {}
-	print_to_screen(153,150,"Chunk addresses:")
-	debug_tile_dump = ""
-
 	for i = 1,#chunk_pointer_offs do
 		chunk_pointer = memory.readdword(chunk_pointer_offs[i] + start_chunk_struct)
-		print_to_screen(153,150+i*10,"0x"..fmt(chunk_pointer,7))
 		for col = 0,31 do 
-			-- remove unless debug version
-			if col ~= 0 then 
-				debug_tile_dump = debug_tile_dump.."],"
-			end 
-			debug_tile_dump = debug_tile_dump.."["
-			--
 
 			for row = 0,31 do 
 				tile_data = memory.readword(chunk_pointer+row*2 + col*64+additional_offset)
 				tile_color = get_tile_color(tile_data)
 				draw_rectangle(chunk_scr_x[i]+row*4,chunk_scr_y[i] + col*3,5,4,tile_color,0,2)
-
-				-- remove unless debug version
-				if tile_color  == nil then
-					tile_color = "#000"
-				end 
-				debug_tile_dump = debug_tile_dump.."\""..tile_color.."\","
-				--
-
-								
-
 			end
 		end 
-		
-		-- remove unless debug version 
-		if debug_tile_print then
-			if i == 1 then  
-				debug_tile_dump = debug_tile_dump.."]"		
-				file = io.open("dump_test.txt","a")
-				io.output(file)
-				io.write("\nMap_"..map_id_phys_32.."=["..debug_tile_dump.."]")
-				io.close(file)
-				debug_tile_print = false 
-			end
-		end 
-		--
-
 	end 
 end
 
 function show_collision_ow(additional_offset)
 	start_chunk_struct = memory.readdword(base+data_table["chunk_calculation_ptr"])
-	print_to_screen(153,140,"0x"..fmt(start_chunk_struct,8))
+	--print_to_screen(153,140,"0x"..fmt(start_chunk_struct,8))
 	chunk_pointer_offs = chunk_struct["chunk_pointer_offs"]
 	chunk_pointers = {}
-	print_to_screen(153,150,"Chunk addresses:")
+	--print_to_screen(153,150,"Chunk addresses:")
 	for i = 1,#chunk_pointer_offs do
 		chunk_pointer = memory.readdword(chunk_pointer_offs[i] + start_chunk_struct)
-		print_to_screen(153,150+i*10,"0x"..fmt(chunk_pointer,7))
+		--print_to_screen(153,150+i*10,"0x"..fmt(chunk_pointer,7))
 		for row = 0,31 do 
 			for col = 0,31 do 
 				if (memory.readbyte(chunk_pointer+row*2 + col*64+additional_offset)) ~= 0xff then
@@ -3495,7 +3659,7 @@ function show_script_memory()
 end 
 
 scroll = 0
-temp_memory_addr = 0x22A044C
+temp_memory_addr = 0x22B5B91--0x22A044C
 temp_str_memory_addr = fmt(temp_memory_addr,0)
 
 memview_addr = temp_memory_addr - temp_memory_addr%16 
@@ -3513,14 +3677,54 @@ function reset_scroll()
 end 
 
 function get_value_color(cmd)
-	if script_commands[cmd] then 
-		return script_commands[cmd]['color']
-	end 
+	if cmd > 0x0 then return "#4AAAFF" end--"#00F0F" end
 	return script_commands['default']['color']
+	-- if script_commands[cmd] then 
+	-- 	return script_commands[cmd]['color']
+	-- end 
+	-- return script_commands['default']['color']
 end 
 
+small_endian = true 
 function memory_viewer()
-	draw_rectangle(0,0,256,200,"#000000AA","#000001888",2)
+	if small_endian then memory_viewer_8() return end
+	memory_viewer_16()
+end 
+
+function memory_viewer_8()
+	-- draw_rectangle(0,0,256,200,"#000000AA","#000001888",2)
+	draw_rectangle(0,0,256,200,"#000000CC","#000001888",2)
+	for y = 0,15 do
+		for x = 0,7 do
+			-- script_command = memory.readword(script_execution_start_addr+x*2+y*16)
+			current_addr = memview_addr+x*2+y*16 + scroll
+			value = bit.bor(shiftl(memory.readbyte(current_addr),8),memory.readbyte(current_addr+1))
+			color = get_value_color(value)
+			print_to_screen(48+x*26,20+y*10,fmt(value,4),color,2)
+		end
+		print_to_screen(2,20+y*10,fmt(memview_addr+y*16 + scroll,7),"#888888",2)
+	end  
+	for x = 0,15 do
+		print_to_screen(48+x*13,8,fmt(x,0),"#888888",2)
+		
+	end 
+	for x = 1,7 do
+		gui.drawline(46+(x*26),6,46+(x*26),179,"#444444")
+	end 
+
+	print_to_screen(2,8,temp_str_memory_addr,"yellow",2)
+	gui.drawline(45,6,45,179,"#888888")
+	gui.drawline(0,6,0,179,"#888888")
+	gui.drawline(255,6,255,179,"#888888")
+	gui.drawline(0,5,256,5,"#888888")
+	gui.drawline(0,17,256,17,"#888888")
+	gui.drawline(0,179,256,179,"#888888")
+
+end 
+
+function memory_viewer_16()
+	-- draw_rectangle(0,0,256,200,"#000000AA","#000001888",2)
+	draw_rectangle(0,0,256,200,"#000000CC","#000001888",2)
 	for y = 0,15 do
 		for x = 0,7 do
 			-- script_command = memory.readword(script_execution_start_addr+x*2+y*16)
@@ -3625,10 +3829,11 @@ end
 key_configuration = {
 	switch_wtw_state = {"W"},
 	toggle_map_editing = {"M"},
-	toggle_memory_addr_editing = {"shift","U"},
-	auto_movement = {"shift","M"},
+	toggle_teleport_editing = {"J"},
+	toggle_memory_addr_editing = {"shift","N"},
+	auto_movement = {"shift","control","M"},
 	increment_menu = {"shift","V"},
-	--auto_calculate = {"shift","C"},
+	auto_calculate = {"shift","control","C"},
 	--auto_sprite_inc = {"B"},
 	teleport_up = {"shift","up"},
 	teleport_left = {"shift","left"},
@@ -3688,6 +3893,7 @@ end
 function run_functions()
 	if map_editing then change_map_id() end 
 	if memory_editing then change_memory_addr() end 
+	if teleport_editing then change_teleport_amount() end 
 end 
 
 function main_gui()
