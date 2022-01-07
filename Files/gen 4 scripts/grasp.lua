@@ -1055,7 +1055,8 @@ nature_list = {"Hardy","Lonely","Brave","Adamant","Naughty",
 			"Bold","Docile","Relaxed","Impish","Lax",
 			"Timid","Hasty","Serious","Jolly","Naive",
 			"Modest","Mild","Quiet","Bashful","Rash",
-			"Calm","Gentle","Sassy","Careful","Quirky"}
+			"Calm","Gentle","Sassy","Careful","Quirky"
+}
 
 sprite_id_dp = {
 	[0x00] = "LukasRun",
@@ -1267,6 +1268,7 @@ sprite_id_dp = {
 	[0xCF] = "Happiny",
 	[0xD0] = "Machop",
 }
+
 --missing berries
 --signs
 
@@ -1353,7 +1355,72 @@ data_tables = {
 	},
 	--4 HGSS
 	{
+		item_struct_offs = 0x0,
+		step_counter_offs = 0x0,
 
+		-- start of structure offsets/structure data
+		player_live_struct_offs = 0x1238, --
+		signature_offs = 0x0,
+		signature_size = 0x600,
+	
+		mapdata_and_menu_struct_offs = 0x22964,
+		chunk_calculation_ptr = 0x24014,
+		matrix_struct_offs = 0x24110,
+		matrix_size = 30,
+
+		general_npc_struct_offs = 0x25C14, --
+		player_npc_struct_offs = 0x25D60, --
+
+		object_struct_offs = 0x25114, --
+		object_struct_size = 0x14,
+		warp_struct_size = 0xC,
+		trigger_struct_size = 0x10,
+
+		npc_struct_offs = 0x25FD8,
+		npc_struct_size = 0x12C,
+
+		memory_shift = {
+			UG=0x8104,
+			BT=0x8104,
+			OW=0x0
+		},
+		
+		memory_state_check_offs = 0x22A00, -- 0x22A00,0x22A04,0x22A20
+		opcode_pointer =  0x29500, -- affected by bt
+
+		memory_state_check_val = 0x2C9EC,
+	
+		menu_data = 0x29434,
+		current_pocket_index_offs = 0x2977C,
+		hall_of_fame_struct_offs = 0x2C298,
+		hall_of_fame_entry_size = 0x3C,
+
+
+		ug_revealing_circle_struct_offs = 0x115150,
+		ug_trap_struct_offs = 0x12B5B0,
+		ug_trap_struct_size = 0x6,
+		
+
+		ug_cur_gem_ptr = 0x12DBC0,
+		ug_gem_struct_offs = 0x12D5E0,
+		ug_gem_struct_size = 0x6,
+		ug_gem_count = 0xFA,
+
+		ug_excavation_minigame_offs = 0x12DD36,
+		ug_excavation_minigame_tile_count = 0x81, -- 13 col * 9 row of 1 byte each
+		ug_excavation_minigame_visual_offs = 0x534C4,
+
+		-- static addresses
+		bag_hovering_data_ptr = 0x2106FAC,
+		menu_addr = 0x21C45BC, -- also check for underground minigame
+
+		ug_trap_count_addr= 0x222CAD7,
+
+		ug_init_addr = 0x2250E86,
+		ug_init_val = 0x1F,
+
+		game_state = 0x21C45B8, -- 4 = wifiroom, 5 = underground, 6 = overworld, 0x10 = battle
+		battle_check = 0x221885E
 	},
 }
 
@@ -1557,7 +1624,7 @@ general_npc_struct = {
 
 start_npc_struct = data_table["npc_struct_offs"]
 
-generic_npc_struct = { -- -0x10 everything bitch
+generic_npc_struct = {
 	sprite_id_16 = start_npc_struct + 0x10,
 	obj_code_16 = start_npc_struct + 0x12,
 	move_code_16 = start_npc_struct + 0x14,
@@ -1977,9 +2044,10 @@ function press_buttons(btns,frames)
 		emu.frameadvance()
 		current_frame = emu.framecount()
 	end 
-	for btn = 1,#btns do
-		joy[btn] = false
+	for i = 1,#btns do
+		joy[btns[i]] = false
 	end 
+	joypad.set(joy)
 end 	
 
 -- menu selection 
@@ -2371,7 +2439,12 @@ end
 
 function set_stepcounter(steps)
 	step_addr = base+live_struct["step_counter"]
-	memory.writeword(step_addr,0)
+	memory.writeword(step_addr,steps)
+end 
+
+function add_to_stepcounter(steps)
+	step_addr = base+live_struct["step_counter"]
+	memory.writedword(step_addr,memory.readdword(step_addr)+steps)
 end 
 
 function clear_stepcounter()
@@ -2393,12 +2466,13 @@ function check_bike_state()
 	return bike_state
 end 
 
-function move_player(pos,target,pos_offs,j_up,j_down,j_left,j_right)
+function move_player(pos,target,pos_offs,joy_b,j_up,j_down,j_left,j_right)
 	while pos ~= target do
 		joy.up = j_up
 		joy.down = j_down
 		joy.left = j_left
 		joy.right = j_right
+		joy.B = joy_b
 		joypad.set(joy)
 		joy = {}
 		emu.frameadvance()
@@ -2433,7 +2507,12 @@ function up(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 		target = 4294967295 + target + 1
 	end
 	
-	move_player(pos,target,live_struct["z_pos_32_r"],true)
+	press_b = false
+	if (check_bike_state() == 0) or (check_bike_state() == 4) then
+		press_b = true
+	end 
+
+	move_player(pos,target,live_struct["z_pos_32_r"],press_b,true)
 	if reset_stepcounter then
 		wait_frames(delay_before_reset*30)
 		clear_stepcounter()
@@ -2457,11 +2536,16 @@ function left(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 		end
 	end 
 
+	press_b = false
+	if (check_bike_state() == 0) or (check_bike_state() == 4) then
+		press_b = true
+	end 
+
 	if target < 0 then
 		target = 4294967295 + target + 1
 	end 
 
-	move_player(pos,target,live_struct["x_pos_32_r"],false,false,true)
+	move_player(pos,target,live_struct["x_pos_32_r"],press_b,false,false,true)
 	
 	if reset_stepcounter then
 		wait_frames(delay_before_reset*30)
@@ -2485,7 +2569,13 @@ function down(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 			target = target - 2	
 		end 
 	end
-	move_player(pos,target,live_struct["z_pos_32_r"],false,true)
+
+	press_b = false
+	if (check_bike_state() == 0) or (check_bike_state() == 4) then
+		press_b = true
+	end 
+
+	move_player(pos,target,live_struct["z_pos_32_r"],press_b,false,true)
 	if reset_stepcounter then
 		wait_frames(delay_before_reset*30)
 		clear_stepcounter()
@@ -2509,7 +2599,12 @@ function right(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 		end 
 	end 
 
-	move_player(pos,target,live_struct["x_pos_32_r"],false,false,false,true)
+	press_b = false
+	if (check_bike_state() == 0) or (check_bike_state() == 4) then
+		press_b = true
+	end 
+
+	move_player(pos,target,live_struct["x_pos_32_r"],press_b,false,false,false,true)
 	if reset_stepcounter then
 		wait_frames(delay_before_reset*30)
 		clear_stepcounter()
@@ -2642,51 +2737,81 @@ function press_equal_sign()
 end 
 
 function auto_movement()
-	wait_frames(20)
+	up(1,0,0,"false")
+	right(1,0,0,"false")
+	down(1,0,0,"false")
+	up(1,0,0,"false")
+	left(1,0,0,"false")
+	right(1,0,0,"false")
+	down(1,0,0,"false")
+	left(1,0,0,"false")
+	right(1,0,0,"false")
+	left(1,0,0,"false")
+	up(1,0,0,"false")
+	right(1,0,0,"false")
+	down(1,0,0,"false")
+	up(1,0,0,"false")
 	left(1,0,0,"false")
 	down(1,0,0,"false")
 	right(1,0,0,"false")
 	left(1,0,0,"false")
-	up(1)
-	wait_frames(20)
-	left(1,0,0,"false")
-	up(14,0,0,"false")
-	left(15)
-	up(5)
-	right(193)
 	
-	down(26598)
-	right(14)
-	down(160)
-	right(32)
-	down(160)
-	right(32)
-	down(160)
-	right(32)
-	down(160)
-	right(32)
-
-	down(960)
-	right(32)
-	down(384)
-	left(1)
-
-	down(1152)
-	right(1)
-	down(160)
-	left(1)
-
-	down(1344)
-	right(1)
 	
-	down(12097)
-	right(28)
-	-- pal park cutscene
-	-- right(80)
-	-- 1 N
+	--press_buttons({"B","down"},8)
+	--press_buttons({"B","right"},8)
+	--press_buttons({"B","down"},8)
+	--press_buttons({"B","left"},8)
 
+	--press_buttons({"B","up"},8)
+	
+	
+	
+	
+	
+	
+	
+	
+	-- show_steps=false
+	-- wait_frames(20)
+	-- left(1,0,0,"false")
+	-- down(1,0,0,"false")
+	-- right(1,0,0,"false")
+	-- left(1,0,0,"false")
+	-- up(1)
+	-- left(1,0,0,"false")
+	-- up(14,0,0,"false")
+	-- left(15,0,0,"false")
+	-- wait_frames(8)
+	-- mash_button("A",60)
+	-- clear_stepcounter()
+	-- show_steps=true
+	-- wait_frames(8)
+	-- up(5)
+	-- right(161)
+	-- down(25441)
+	-- right(32)
 
-
+	-- down(1344)
+	-- left(1)
+	-- down(1248)
+	-- right(1)
+	-- down(385)
+	-- left(1)
+	-- down(1152)
+	-- right(1)
+	-- down(159)
+	-- left(1)
+	-- down(1344)
+	-- right(1)
+	
+	-- down(12033)
+	-- right(27)
+	-- down(96) -- pal park cutscene
+	-- print("pal park reached!")
+	-- wait_frames(1200)
+	-- right(80) -- or 81 for map 332
+	-- print("map 332 reached!")
+	-- up(1) -- map 332/333
 end 
 
 function auto_calculate()
@@ -2928,13 +3053,15 @@ function teleport_up()
 	memory.writedword(base + player_struct["z_phys_32"] + memory_shift,z_phys_32 - tp_amount) 
 	z_cam_16 = memory.readword(base + player_struct["z_cam_16"] + memory_shift)
 	memory.writeword(base + player_struct["z_cam_16"] + memory_shift,z_cam_16 - tp_amount) 
+	add_to_stepcounter(tp_amount)
 end
 
 function teleport_left()
 	x_phys_32 = memory.readdword(base + player_struct["x_phys_32"] + memory_shift)
 	memory.writedword(base + player_struct["x_phys_32"] + memory_shift,x_phys_32 - tp_amount) 
 	x_cam_16 = memory.readword(base + player_struct["x_cam_16"] + memory_shift)
-	memory.writeword(base + player_struct["x_cam_16"] + memory_shift,x_cam_16 - tp_amount) 
+	memory.writeword(base + player_struct["x_cam_16"] + memory_shift,x_cam_16 - tp_amount)
+	add_to_stepcounter(tp_amount) 
 end
 
 function teleport_right()
@@ -2942,6 +3069,7 @@ function teleport_right()
 	memory.writedword(base + player_struct["x_phys_32"] + memory_shift,x_phys_32 + tp_amount) 
 	x_cam_16 = memory.readword(base + player_struct["x_cam_16"] + memory_shift)
 	memory.writeword(base + player_struct["x_cam_16"] + memory_shift,x_cam_16 + tp_amount)
+	add_to_stepcounter(tp_amount)
 end
 
 function teleport_down()
@@ -2949,6 +3077,7 @@ function teleport_down()
 	memory.writedword(base + player_struct["z_phys_32"] + memory_shift,z_phys_32 + tp_amount) 
 	z_cam_16 = memory.readword(base + player_struct["z_cam_16"] + memory_shift)
 	memory.writeword(base + player_struct["z_cam_16"] + memory_shift,z_cam_16 + tp_amount) 
+	add_to_stepcounter(tp_amount)
 end
 
 -- GUI GAMEPLAY FUNCTIONS
@@ -3140,7 +3269,7 @@ function show_void_pos()
 
 			
 			if (c_map_offset == matrix_center + x_offs+z_offs) and (row==5) then
-				print_to_screen(90,10,fmt(c_map_offset,8).."\n"..data_table["matrix_size"])
+				-- print_to_screen(90,10,fmt(c_map_offset,8).."\n"..data_table["matrix_size"])
 				clr = 'white'
 			else
 				clr = get_map_id_color(c_map_id)
