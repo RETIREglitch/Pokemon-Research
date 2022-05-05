@@ -15,14 +15,6 @@
 -- DATA TABLES
 
 local map_id_list = {
-	goal = {
-		color = '#f7bbf3',
-		ids = {333,332}
-		},
-	chain = {
-		color = '#DfA',
-		ids = {469,406,385,40, 442, 450, 457, 499, 501,342, 406, 501, 502, 503}
-	},
 	mystery_zone = {
 		color = '#88888866',
 		ids = {0}
@@ -54,10 +46,19 @@ local map_id_list = {
 		color = '#66ffbbff',
 		ids = {3}
 	},
+	goal = {
+		color = '#f7bbf3',
+		ids = {333,332,251,392,393}
+		},
+	chain = {
+		color = '#DfA',
+		ids = {205,8,186,187,28}
+	},
+
 	default = {
 		color = '#00bb00ff',
 		ids = {}
-	}
+	},
 }
 
 map_ids = {}
@@ -69,11 +70,11 @@ for k,v in pairs(map_id_list) do
 end
 
 local tile_names = {
-			"nothing","nothing","Grass","Grass","4","Cave","Cave","7","Cave","9","10", "Haunted House","Cave wall","13","14","15",
+			"nothing","nothing","Grass","Grass","4","Cave","Cave","7","Ground enc","9","10", "Indoor enc","Cave wall","13","14","15",
 			"Pond","Water","Water","WaterF","Water","Water","Puddle","ShallW","24","Water","26","27","28","29","30","31",
 			"Ice","Sand","Water","35","Cave","Cave","38","39","40","41","Water","43","44","45","46","47",
-			"Onesided Wall","Onesided Wall","Onesided Wall","Onesided Wall","Doublesided Wall","Doublesided Wall","Doublesided Wall","Doublesided Wall","Ledge (R)","Ledge (L)","Ledge (U)","Ledge (D)","60","61","62","Ledge Corner",
-			"Spin (R)","Spin (L)","Spin (U)","Spin (D)","68","69","70","71","72","Stair","Stair","Rockclimb (V)","Rockclimb (H)","77","78","79",
+			"No R mov","No L mov","No U mov","No D mov","No R/U mov","No L/U mov","No R/D mov","No L/D mov","Ledge (R)","Ledge (L)","Ledge (U)","Ledge (D)","60","61","62","Ledge Corner",
+			"Spin (R)","Spin (L)","Spin (U)","Spin (D)","68","69","70","71","72","No U/D mov","No L/R mov","Rockclimb (V)","Rockclimb (H)","77","78","79",
 			"Water","Water","Water","Water","84","85","Raised Model","Raised Model","Raised Model","Raised Model","90","91","92","93","Warp","Warp",
 			"Warp","Warp","Doormat","Doormat","Doormat","Doormat","Warp","Warp","Warp","Warp","Warp","Warp","Warp","Warp","Warp","Warp",
 			"Start Bridge","Bridge","Bridge (C)","Bridge (W)","Bridge","Bridge (Sn)","Bike Bridge","Bike Bridge","Bike Bridge","Bike Bridge","Bike Bridge","Bike Bridge (G)","Bike Bridge (W)","Bike Bridge","126","127",
@@ -208,7 +209,7 @@ tile_id_list = {
         color = '#06b04',
        ids = {0xE4}
 	},
-    haunted_house = {
+    indoor_encounter = {
         color = '#A292BC',
         ids = {0xB}
     },
@@ -331,7 +332,7 @@ script_commands = {
 	[0x3a] = {color = '#5555FFF', script_command = 'BoardMsg', parameters = {'msg', 'wk', 'wk'}},
 	[0x3b] = {color = '#5555FFF', script_command = 'BoardEndWait', parameters = {'wk', 'wk'}},
 	[0x3c] = {color = '#5555FFF', script_command = 'MenuReq', parameters = {}},
-	[0x3d] = {color = '#5555FFF', script_command = 'BgScroll', parameters = {'r0', 't0', 'r1', 'r2', 't1', 'r3'}},
+	[0x3d] = {color = '#5555FFF', script_command = 'BgScroll_vertical', parameters = {'r0', 't0', 'r1', 'r2', 't1', 'r3'}},
 	[0x3e] = {color = '#5555FFF', script_command = 'YesNoWin', parameters = {'wkid', 'wkid'}},
 	[0x3f] = {color = '#5555FFF', script_command = 'GuinnessWin', parameters = {}},
 	[0x40] = {color = '#5555FFF', script_command = 'BmpMenuInit', parameters = {'xx', 'yy', 'cur', 'can', 'wkid', 'wkid'}},
@@ -1342,6 +1343,7 @@ data_tables = {
 		ug_init_val = 0x1F,
 
 		game_state = 0x21C45B8, -- 4 = wifiroom, 5 = underground, 6 = overworld, 0x10 = battle
+		graphical_x = 0x21CEF5A,
 		battle_check = 0x221885E
 	},
 
@@ -2965,6 +2967,12 @@ function manaphy_creation()
 	print("done")
 end 
 
+hex = false 
+
+function toggle_hexview()
+	hex = not hex
+end 
+
 map_editing =  false 
 
 function toggle_map_editing()
@@ -3011,7 +3019,7 @@ function change_memory_addr()
 	if key.enter then
 		memview_addr = temp_memory_addr - temp_memory_addr%16
 		memory_editing = false
-		scroll = 0
+		scroll_vertical = 0
 		return
 	end
 
@@ -3107,14 +3115,17 @@ function show_player_data()
 	print_to_screen(20,60,"Map Id: "..map_id_phys_32..","..fmt(map_id_phys_32,4),get_edit_color(map_editing))
 	x_stored_warp_16 = memory.readword(base + live_struct["x_stored_warp_16"])
 	z_stored_warp_16 = memory.readword(base + live_struct["z_stored_warp_16"])	
-	print_to_screen(10,70,"Stored Warp:","yellow")
-	print_to_screen(20,80,"X: "..x_stored_warp_16..","..fmt(x_stored_warp_16,4),"yellow")
-	print_to_screen(20,90,"Z: "..z_stored_warp_16..","..fmt(z_stored_warp_16,4),"yellow")
+	map_id_stored_warp_16 = memory.readword(base + live_struct["map_id_stored_warp_16"])
+	print_to_screen(10,80,"Stored Warp:","yellow")
+	print_to_screen(20,90,"X: "..x_stored_warp_16..","..fmt(x_stored_warp_16,4),"yellow")
+	print_to_screen(20,100,"Z: "..z_stored_warp_16..","..fmt(z_stored_warp_16,4),"yellow")
+	print_to_screen(20,110,"Map Id: "..map_id_stored_warp_16..","..fmt(map_id_stored_warp_16,4),"yellow")
+
 	step_counter = memory.readword(base + live_struct["step_counter"])
-	print_to_screen(10,100,"Steps: "..step_counter,"yellow")
+	print_to_screen(10,130,"Steps: "..step_counter,"yellow")
 	npc_count = memory.readbyte(base + general_npc_struct["npc_count"] + memory_shift) -1 
-	print_to_screen(10,110,"NPCs: "..npc_count,"yellow")
-	print_to_screen(10,120,"TP: "..tp_amount,get_edit_color(teleport_editing))
+	print_to_screen(10,140,"NPCs: "..npc_count,"yellow")
+	print_to_screen(10,150,"TP: "..tp_amount,get_edit_color(teleport_editing))
 	
 end
 
@@ -3249,9 +3260,19 @@ function get_display_map(map_id)
 	return c_map_converted[map_id] or map_id
 end
 
+set_matrix_height = none
+
+function toggle_matrix_mode()
+	if set_matrix_height == 30 then
+	 set_matrix_height = none
+	 return
+	end 
+	set_matrix_height = 30
+end 
+
 function show_void_pos()
 	matrix_width = memory.readbyte(base + matrix_struct["matrix_width_8"])
-	matrix_height = memory.readbyte(base + matrix_struct["matrix_height_8"])
+	matrix_height = set_matrix_height or memory.readbyte(base + matrix_struct["matrix_height_8"])
 	matrix_center = base + matrix_struct["matrix_center_16"]
 
 	x_phys_32 = memory.readdwordsigned(base + player_struct["x_phys_32"] + memory_shift)
@@ -3261,23 +3282,53 @@ function show_void_pos()
 	z_offs = math.modf(z_phys_32 / 32) *2 *matrix_height 
 
 	center = (5*2) + (matrix_height*2*9)
+
+	print_to_screen(130,15,"Void pos: 0x" .. fmt(matrix_center+x_offs+z_offs,8),"yellow")
+
+	if hex then hex_show_pos() return end
+	int_show_pos()
+end
+
+function hex_show_pos()
+	initial_addr =  matrix_center + x_offs + z_offs
+	start_addr = initial_addr + scroll_vertical*2*matrix_height + scroll_horizontal*2
 	for row=0,9 do
 		for col=0,18 do 
-			
-			c_map_offset = matrix_center + x_offs + z_offs + row*2 + col*2*matrix_height-center
-			c_map_id = math.min(memory.readword(c_map_offset),1000)
+			c_map_offset = start_addr + row*2 + col*2*matrix_height-center
+			c_map_id = memory.readword(c_map_offset)
 
-			
-			if (c_map_offset == matrix_center + x_offs+z_offs) and (row==5) then
-				-- print_to_screen(90,10,fmt(c_map_offset,8).."\n"..data_table["matrix_size"])
+			if (c_map_offset == initial_addr) then
 				clr = 'white'
 			else
 				clr = get_map_id_color(c_map_id)
 			end
-			print_to_screen(3 + row*25,3 + col*10,get_display_map(c_map_id),clr,2)
+			print_to_screen(3 + row*25,3 + col*10,fmt(c_map_id,4),clr,2)
+		end 
+	end
+
+end
+
+
+function int_show_pos()
+	initial_addr =  matrix_center + x_offs + z_offs
+	start_addr = initial_addr + scroll_vertical*2*matrix_height + scroll_horizontal*2
+	
+	for row=0,9 do
+		for col=0,18 do 
+			c_map_offset = start_addr + row*2 + col*2*matrix_height-center
+			c_map_id = math.min(memory.readword(c_map_offset),1000)
+
+			
+			if (c_map_offset == initial_addr) then
+				clr = 'white'
+			else
+				clr = get_map_id_color(c_map_id)
+			end
+ 
+				print_to_screen(3 + row*25,3 + col*10,get_display_map(c_map_id),clr,2)
 		end 
 	end 
-end
+end 
 
 function split_word_into_bytes(word)
 	h_byte = bit.rshift(word,8)
@@ -3468,6 +3519,8 @@ function show_tile_data()
 	else 
 		print_to_screen(198,35,"false",'red')
 	end
+
+	print_to_screen(143,45,"Vis X: ".. memory.readword(data_table['graphical_x']).."," .. fmt(memory.readword(data_table['graphical_x']),1),"yellow")
 	
 	if show_load_calculations then 
 		x_target_16 = memory.readword(start_chunk_struct + chunk_struct["x_target_16"])
@@ -3488,12 +3541,14 @@ end
 
 function show_tiles_ow(additional_offset)
 	start_chunk_struct = memory.readdword(base+data_table["chunk_calculation_ptr"])
+	print_to_screen(153,140,"0x"..fmt(start_chunk_struct,8))
 	chunk_pointer_offs = chunk_struct["chunk_pointer_offs"]
 	chunk_pointers = {}
+	print_to_screen(153,150,"Chunk addresses:")
 	for i = 1,#chunk_pointer_offs do
 		chunk_pointer = memory.readdword(chunk_pointer_offs[i] + start_chunk_struct)
+		print_to_screen(153,150+i*10,"0x"..fmt(chunk_pointer,7))
 		for col = 0,31 do 
-
 			for row = 0,31 do 
 				tile_data = memory.readword(chunk_pointer+row*2 + col*64+additional_offset)
 				tile_color = get_tile_color(tile_data)
@@ -3505,13 +3560,13 @@ end
 
 function show_collision_ow(additional_offset)
 	start_chunk_struct = memory.readdword(base+data_table["chunk_calculation_ptr"])
-	--print_to_screen(153,140,"0x"..fmt(start_chunk_struct,8))
+	print_to_screen(153,140,"0x"..fmt(start_chunk_struct,8))
 	chunk_pointer_offs = chunk_struct["chunk_pointer_offs"]
 	chunk_pointers = {}
-	--print_to_screen(153,150,"Chunk addresses:")
+	print_to_screen(153,150,"Chunk addresses:")
 	for i = 1,#chunk_pointer_offs do
 		chunk_pointer = memory.readdword(chunk_pointer_offs[i] + start_chunk_struct)
-		--print_to_screen(153,150+i*10,"0x"..fmt(chunk_pointer,7))
+		print_to_screen(153,150+i*10,"0x"..fmt(chunk_pointer,7))
 		for row = 0,31 do 
 			for col = 0,31 do 
 				if (memory.readbyte(chunk_pointer+row*2 + col*64+additional_offset)) ~= 0xff then
@@ -3691,9 +3746,8 @@ param_color = "#80A09" --"#AACC44"
 addr_color = "#888888"
 
 function show_script_memory()
-	-- draw_rectangle(0,0,256,200,"#000000AA","#000001888",2)
 	draw_rectangle(0,0,256,200,"#000000ff","#000001888",2)
-	cur_sc_addr = script_execution_start_addr + scroll
+	cur_sc_addr = script_execution_start_addr + scroll_vertical*0x10
 	cur_sc_id = bit.bor(shiftl(memory.readbyte(cur_sc_addr+1),8),memory.readbyte(cur_sc_addr))
 	cur_sc_addr = cur_sc_addr - 2
 	cur_sc = script_commands[cur_sc_id]
@@ -3787,22 +3841,32 @@ function show_script_memory()
 	end 
 end 
 
-scroll = 0
-temp_memory_addr = 0x22B5B91--0x22A044C
+scroll_vertical = 0
+scroll_horizontal = 0
+temp_memory_addr = 0x22A0434--0x229BE50--0x22B5B91 --0x22A044C
 temp_str_memory_addr = fmt(temp_memory_addr,0)
 
 memview_addr = temp_memory_addr - temp_memory_addr%16 
 
-function increment_scroll()
-	scroll = scroll - 16
+function increment_scroll_vertical()
+	scroll_vertical = scroll_vertical - 1
 end 
 
-function decrement_scroll()
-	scroll = scroll + 16
+function decrement_scroll_vertical()
+	scroll_vertical = scroll_vertical + 1
+end 
+
+function increment_scroll_horizontal()
+	scroll_horizontal = scroll_horizontal + 1
+end 
+
+function decrement_scroll_horizontal()
+	scroll_horizontal = scroll_horizontal - 1
 end 
 
 function reset_scroll()
-	scroll = 0
+	scroll_vertical = 0
+	scroll_horizontal = 0
 end 
 
 function get_value_color(cmd)
@@ -3826,12 +3890,12 @@ function memory_viewer_8()
 	for y = 0,15 do
 		for x = 0,7 do
 			-- script_command = memory.readword(script_execution_start_addr+x*2+y*16)
-			current_addr = memview_addr+x*2+y*16 + scroll
+			current_addr = memview_addr+x*2+y*16 + scroll_vertical*0x10
 			value = bit.bor(shiftl(memory.readbyte(current_addr),8),memory.readbyte(current_addr+1))
 			color = get_value_color(value)
 			print_to_screen(48+x*26,20+y*10,fmt(value,4),color,2)
 		end
-		print_to_screen(2,20+y*10,fmt(memview_addr+y*16 + scroll,7),"#888888",2)
+		print_to_screen(2,20+y*10,fmt(memview_addr+y*16 + scroll_vertical*0x10,7),"#888888",2)
 	end  
 	for x = 0,15 do
 		print_to_screen(48+x*13,8,fmt(x,0),"#888888",2)
@@ -3857,12 +3921,12 @@ function memory_viewer_16()
 	for y = 0,15 do
 		for x = 0,7 do
 			-- script_command = memory.readword(script_execution_start_addr+x*2+y*16)
-			current_addr = memview_addr+x*2+y*16 + scroll
+			current_addr = memview_addr+x*2+y*16 + scroll_vertical*0x10
 			value = memory.readword(current_addr)
 			color = get_value_color(value)
 			print_to_screen(48+x*26,20+y*10,fmt(value,4),color,2)
 		end
-		print_to_screen(2,20+y*10,fmt(memview_addr+y*16 + scroll,7),"#888888",2)
+		print_to_screen(2,20+y*10,fmt(memview_addr+y*16 + scroll_vertical*0x10,7),"#888888",2)
 	end  
 	for x = 0,15 do
 		print_to_screen(48+x*13,8,fmt(x,0),"#888888",2)
@@ -3935,7 +3999,7 @@ function empty() end
 menu_choices = {
 	OW = {show_void_pos,show_chunks_ow,debug_script_calling,memory_viewer,empty},
 	UG = {show_void_pos,show_chunks_ug,memory_viewer},
-	BT = {show_void_pos,show_chunks_bt,debug_script_calling,memory_viewer}
+	BT = {show_void_pos,show_chunks_bt,debug_script_calling,memory_viewer,empty}
 	}
 
 function show_menu_choices()
@@ -3959,7 +4023,9 @@ key_configuration = {
 	switch_wtw_state = {"W"},
 	toggle_map_editing = {"M"},
 	toggle_teleport_editing = {"J"},
+	toggle_hexview = {"control","H"},
 	toggle_memory_addr_editing = {"shift","N"},
+	toggle_matrix_mode = {"control","V"},
 	auto_movement = {"shift","control","M"},
 	increment_menu = {"shift","V"},
 	auto_calculate = {"shift","control","C"},
@@ -3978,12 +4044,15 @@ key_configuration = {
 	toggle_load_calculations = {"L","C"},
 	toggle_debug_tile_print = {"T","C"},
 	write_image_to_calculator = {"S","C"},
-	reset_scroll = {"shift","space"}
+	reset_scroll = {"shift","space"},
 }
 
 key_configuration_cont = {
-	increment_scroll = {"shift","U"},
-	decrement_scroll = {"shift","J"}
+	increment_scroll_vertical = {"control","up"},
+	decrement_scroll_vertical = {"control","down"},
+	increment_scroll_horizontal = {"control","right"},
+	decrement_scroll_horizontal = {"control","left"},
+
 }
 
 function run_functions_on_keypress()
@@ -4025,6 +4094,20 @@ function run_functions()
 	if teleport_editing then change_teleport_amount() end 
 end 
 
+function reset_for_base(base_end) 
+	if base%0x100 ~= base_end then
+		if	base ~= 0 then 
+			joy.L = true
+			joy.R = true 
+			joy.select = true
+			joy.start = true
+			joypad.set(joy)
+			joy = {}
+		end 
+			else print("Base value found!")
+	end 
+end 
+
 function main_gui()
 	base = memory.readdword(lang_data["base_addr"]) -- check base every loop in case of reset
 	--base = memory.readdword(memory.readdword(0x2002848)-4)
@@ -4056,6 +4139,9 @@ function main_gui()
 	run_functions_on_keypress()
 	run_continuous_function_on_keypress()
 	run_functions()
+
+	-- reset game to specific base if necessary
+	-- reset_for_base(0xC0)
 end
 
 

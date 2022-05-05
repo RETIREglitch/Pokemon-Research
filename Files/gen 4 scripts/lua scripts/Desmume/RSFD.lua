@@ -37,7 +37,7 @@ tilename = {"nothing","nothing","Grass","Grass","4","Cave","Cave/Tree","7","Cave
 local mapId = {
 	Highlight = {
 		color = '#f7bbf3',
-		number = {383,385, 386, 387, 406,217, 384,342, 501, 502, 503,86,263,411,418,469,219,344,347,288,40,442}
+		number = {203,261,321,332,333}
 		},
 	Highlight2= {
 		color = '#DfA',
@@ -2450,7 +2450,7 @@ function fn()
 
 	if key.comma then 
 	-- if base ~= 0x22719E4 and base ~= 0x2271A10 then 
-	if base ~= 0x227195C then
+	if base ~= 0x227e1B8 then
 	if	base ~= 0 then 
 		joy.L = true
 		joy.R = true 
