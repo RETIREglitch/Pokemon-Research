@@ -4,6 +4,10 @@ from os import stat
 import pathlib
 # from typing import Type
 from functools import lru_cache
+from colorama import Fore
+
+movement_colors = {"Yes":Fore.GREEN,"No ":Fore.RED}
+chunk_colors = {"2":Fore.GREEN,"4":Fore.LIGHTBLUE_EX}
 
 path = str(pathlib.Path(__file__).parent.resolve())
 
@@ -97,9 +101,9 @@ class ChunkSimulator():
     
     def search_for_current_base(self,search_dict,bases):
         for base in bases:
-            print(f"Results for base: {hex(base)}")
+            print(f"{Fore.WHITE}Results for base: {hex(base)}")
             for tile_id in self.tile_search_list:
-                print(f"  Tile Id: {hex(tile_id)}:")
+                print(f"{Fore.WHITE}  Tile Id: {hex(tile_id)}:")
                 for searched_data in search_dict:
                     for chunk_id,chunk in searched_data["chunks"].items():
                         for ptr,ptr_data_list in chunk.items():
@@ -107,14 +111,11 @@ class ChunkSimulator():
                                 if int(ptr_data["base"],16) == base:
                                     map_ids = searched_data["map_ids"]
                                     if int(ptr_data["tile"],16) == tile_id:
-                                        wall= "F" if int(ptr_data["collision"],16) < 0x80 else "T"
-                                        text = f"   {chunk_id} {ptr} Wall: {wall} Map Ids: {map_ids[:16]}"
-                                        if len(map_ids) > 16:
-                                            text += f" ... + {len(map_ids)-16} results"
+                                        free = "Yes" if int(ptr_data["collision"],16) < 0x80 else "No "
+                                        text = f"{chunk_colors[chunk_id[-1:]]}   {chunk_id} {ptr} {movement_colors[free]} Free: {free} {Fore.LIGHTBLACK_EX}Map Ids: {map_ids[:14]}"
+                                        if len(map_ids) > 14:
+                                            text += f"{Fore.LIGHTBLACK_EX} ... + {len(map_ids)-14}"
                                         print(text)
-
-
-                        
             print("")
                     
     @lru_cache
@@ -156,4 +157,4 @@ class ChunkSimulator():
 
 
 if __name__ == '__main__':
-    chunksim = ChunkSimulator(tile_search_list=[0xD8])
+    chunksim = ChunkSimulator(tile_search_list=[0xD8],base_search_list=[0x226D340])
