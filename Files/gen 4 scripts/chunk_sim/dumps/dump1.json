@@ -1,0 +1,2695 @@
+[
+ {
+  "map_ids": [
+   0,
+   1
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d2b4",
+      "tile": "0xd8",
+      "collision": "0xbd",
+      "ptr": "0x231bdd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d288",
+      "tile": "0xd8",
+      "collision": "0xd7",
+      "ptr": "0x231d7d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d35c",
+      "tile": "0xd8",
+      "collision": "0xf2",
+      "ptr": "0x231f2d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d330",
+      "tile": "0xd8",
+      "collision": "0xc",
+      "ptr": "0x2320cd8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   2
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d2a4",
+      "tile": "0xd8",
+      "collision": "0x72",
+      "ptr": "0x23272d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d278",
+      "tile": "0xd8",
+      "collision": "0x8c",
+      "ptr": "0x2328cd8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d34c",
+      "tile": "0xd8",
+      "collision": "0xa7",
+      "ptr": "0x232a7d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d320",
+      "tile": "0xd8",
+      "collision": "0xc1",
+      "ptr": "0x232c1d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   332,
+   333,
+   410,
+   466
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d284",
+      "tile": "0xd8",
+      "collision": "0xf7",
+      "ptr": "0x230f7d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d358",
+      "tile": "0xd8",
+      "collision": "0x12",
+      "ptr": "0x23112d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d32c",
+      "tile": "0xd8",
+      "collision": "0x2c",
+      "ptr": "0x2312cd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d300",
+      "tile": "0xd8",
+      "collision": "0x46",
+      "ptr": "0x23146d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   3,
+   206,
+   334,
+   342,
+   343,
+   344,
+   345,
+   391,
+   392,
+   411,
+   418,
+   467
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d35c",
+      "tile": "0xd8",
+      "collision": "0xc6",
+      "ptr": "0x231c6d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d330",
+      "tile": "0xd8",
+      "collision": "0xe0",
+      "ptr": "0x231e0d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d304",
+      "tile": "0xd8",
+      "collision": "0xfa",
+      "ptr": "0x231fad8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2d8",
+      "tile": "0xd8",
+      "collision": "0x14",
+      "ptr": "0x23214d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   45,
+   350,
+   353
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d26c",
+      "tile": "0xd8",
+      "collision": "0x49",
+      "ptr": "0x23049d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d340",
+      "tile": "0xd8",
+      "collision": "0x64",
+      "ptr": "0x23064d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d314",
+      "tile": "0xd8",
+      "collision": "0x7e",
+      "ptr": "0x2307ed8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2e8",
+      "tile": "0xd8",
+      "collision": "0x98",
+      "ptr": "0x23098d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   65,
+   200,
+   202,
+   204,
+   256,
+   346,
+   347,
+   349,
+   365,
+   426
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d344",
+      "tile": "0xd8",
+      "collision": "0xe7",
+      "ptr": "0x230e7d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d318",
+      "tile": "0xd8",
+      "collision": "0x1",
+      "ptr": "0x23101d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d2ec",
+      "tile": "0xd8",
+      "collision": "0x1b",
+      "ptr": "0x2311bd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2c0",
+      "tile": "0xd8",
+      "collision": "0x35",
+      "ptr": "0x23135d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   86,
+   252,
+   354
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d290",
+      "tile": "0xd8",
+      "collision": "0x2",
+      "ptr": "0x23002d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d264",
+      "tile": "0xd8",
+      "collision": "0x1c",
+      "ptr": "0x2301cd8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d338",
+      "tile": "0xd8",
+      "collision": "0x37",
+      "ptr": "0x23037d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d30c",
+      "tile": "0xd8",
+      "collision": "0x51",
+      "ptr": "0x23051d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   224,
+   356,
+   362,
+   363,
+   366,
+   382,
+   433,
+   442
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d290",
+      "tile": "0xd8",
+      "collision": "0xfb",
+      "ptr": "0x22ffbd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d264",
+      "tile": "0xd8",
+      "collision": "0x15",
+      "ptr": "0x23015d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d338",
+      "tile": "0xd8",
+      "collision": "0x30",
+      "ptr": "0x23030d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d30c",
+      "tile": "0xd8",
+      "collision": "0x4a",
+      "ptr": "0x2304ad8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   132,
+   276,
+   277
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d2b4",
+      "tile": "0xd8",
+      "collision": "0x2c",
+      "ptr": "0x2302cd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d288",
+      "tile": "0xd8",
+      "collision": "0x46",
+      "ptr": "0x23046d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d35c",
+      "tile": "0xd8",
+      "collision": "0x61",
+      "ptr": "0x23061d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d330",
+      "tile": "0xd8",
+      "collision": "0x7b",
+      "ptr": "0x2307bd8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   287
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d290",
+      "tile": "0xd8",
+      "collision": "0xc9",
+      "ptr": "0x22fc9d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d264",
+      "tile": "0xd8",
+      "collision": "0xe3",
+      "ptr": "0x22fe3d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d338",
+      "tile": "0xd8",
+      "collision": "0xfe",
+      "ptr": "0x22ffed8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d30c",
+      "tile": "0xd8",
+      "collision": "0x18",
+      "ptr": "0x23018d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   472
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d260",
+      "tile": "0xd8",
+      "collision": "0xb",
+      "ptr": "0x2300bd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d334",
+      "tile": "0xd8",
+      "collision": "0x26",
+      "ptr": "0x23026d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d308",
+      "tile": "0xd8",
+      "collision": "0x40",
+      "ptr": "0x23040d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2dc",
+      "tile": "0xd8",
+      "collision": "0x5a",
+      "ptr": "0x2305ad8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   317,
+   318
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d27c",
+      "tile": "0xd8",
+      "collision": "0xc7",
+      "ptr": "0x22fc7d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d350",
+      "tile": "0xd8",
+      "collision": "0xe2",
+      "ptr": "0x22fe2d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d324",
+      "tile": "0xd8",
+      "collision": "0xfc",
+      "ptr": "0x22ffcd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2f8",
+      "tile": "0xd8",
+      "collision": "0x16",
+      "ptr": "0x23016d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   260,
+   288
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d354",
+      "tile": "0xd8",
+      "collision": "0xcd",
+      "ptr": "0x22fcdd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d328",
+      "tile": "0xd8",
+      "collision": "0xe7",
+      "ptr": "0x22fe7d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d2fc",
+      "tile": "0xd8",
+      "collision": "0x1",
+      "ptr": "0x23001d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2d0",
+      "tile": "0xd8",
+      "collision": "0x1b",
+      "ptr": "0x2301bd8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   262
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d284",
+      "tile": "0xd8",
+      "collision": "0x24",
+      "ptr": "0x22f24d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d358",
+      "tile": "0xd8",
+      "collision": "0x3f",
+      "ptr": "0x22f3fd8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d32c",
+      "tile": "0xd8",
+      "collision": "0x59",
+      "ptr": "0x22f59d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d300",
+      "tile": "0xd8",
+      "collision": "0x73",
+      "ptr": "0x22f73d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   266,
+   336,
+   341,
+   373,
+   380,
+   395
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d268",
+      "tile": "0xd8",
+      "collision": "0xc3",
+      "ptr": "0x22fc3d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d33c",
+      "tile": "0xd8",
+      "collision": "0xde",
+      "ptr": "0x22fded8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d310",
+      "tile": "0xd8",
+      "collision": "0xf8",
+      "ptr": "0x22ff8d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2e4",
+      "tile": "0xd8",
+      "collision": "0x12",
+      "ptr": "0x23012d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   188,
+   406,
+   407,
+   408,
+   409,
+   457,
+   470,
+   471,
+   473
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d2e8",
+      "tile": "0xd8",
+      "collision": "0xaa",
+      "ptr": "0x22faad8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2bc",
+      "tile": "0xd8",
+      "collision": "0xc4",
+      "ptr": "0x22fc4d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d290",
+      "tile": "0xd8",
+      "collision": "0xde",
+      "ptr": "0x22fded8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d264",
+      "tile": "0xd8",
+      "collision": "0xf8",
+      "ptr": "0x22ff8d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   5,
+   23,
+   31,
+   32,
+   85,
+   335
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d2e0",
+      "tile": "0xd8",
+      "collision": "0x86",
+      "ptr": "0x23086d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2b4",
+      "tile": "0xd8",
+      "collision": "0xa0",
+      "ptr": "0x230a0d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d288",
+      "tile": "0xd8",
+      "collision": "0xba",
+      "ptr": "0x230bad8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d35c",
+      "tile": "0xd8",
+      "collision": "0xd5",
+      "ptr": "0x230d5d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   6,
+   7,
+   18,
+   36,
+   37,
+   48,
+   49,
+   69,
+   70,
+   101,
+   102,
+   105,
+   114,
+   123,
+   124,
+   134,
+   135,
+   142,
+   151,
+   152,
+   168,
+   169,
+   173,
+   174,
+   175,
+   189,
+   190,
+   327,
+   420,
+   421,
+   428,
+   429,
+   435,
+   436,
+   443,
+   444,
+   452,
+   453,
+   459,
+   460,
+   463,
+   474,
+   475,
+   476,
+   477,
+   478,
+   479,
+   480,
+   481,
+   482,
+   483,
+   484,
+   485,
+   486,
+   487,
+   488,
+   489,
+   490,
+   495,
+   496,
+   516
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d338",
+      "tile": "0xd8",
+      "collision": "0xaa",
+      "ptr": "0x22faad8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d30c",
+      "tile": "0xd8",
+      "collision": "0xc4",
+      "ptr": "0x22fc4d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d2e0",
+      "tile": "0xd8",
+      "collision": "0xde",
+      "ptr": "0x22fded8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2b4",
+      "tile": "0xd8",
+      "collision": "0xf8",
+      "ptr": "0x22ff8d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   4,
+   34,
+   46,
+   66,
+   71,
+   87,
+   121,
+   136,
+   137,
+   138,
+   139,
+   140,
+   141,
+   144,
+   153,
+   166,
+   191,
+   419,
+   427,
+   430,
+   434,
+   437,
+   451,
+   458
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d27c",
+      "tile": "0xd8",
+      "collision": "0x1e",
+      "ptr": "0x2301ed8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d350",
+      "tile": "0xd8",
+      "collision": "0x39",
+      "ptr": "0x23039d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d324",
+      "tile": "0xd8",
+      "collision": "0x53",
+      "ptr": "0x23053d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2f8",
+      "tile": "0xd8",
+      "collision": "0x6d",
+      "ptr": "0x2306dd8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   122
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d2c0",
+      "tile": "0xd8",
+      "collision": "0x51",
+      "ptr": "0x22e51d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d294",
+      "tile": "0xd8",
+      "collision": "0x6b",
+      "ptr": "0x22e6bd8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d268",
+      "tile": "0xd8",
+      "collision": "0x85",
+      "ptr": "0x22e85d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d33c",
+      "tile": "0xd8",
+      "collision": "0xa0",
+      "ptr": "0x22ea0d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   35
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d2c4",
+      "tile": "0xd8",
+      "collision": "0xa4",
+      "ptr": "0x22ea4d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d298",
+      "tile": "0xd8",
+      "collision": "0xbe",
+      "ptr": "0x22ebed8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d26c",
+      "tile": "0xd8",
+      "collision": "0xd8",
+      "ptr": "0x22ed8d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d340",
+      "tile": "0xd8",
+      "collision": "0xf3",
+      "ptr": "0x22ef3d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   47
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d300",
+      "tile": "0xd8",
+      "collision": "0x24",
+      "ptr": "0x22e24d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2d4",
+      "tile": "0xd8",
+      "collision": "0x3e",
+      "ptr": "0x22e3ed8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d2a8",
+      "tile": "0xd8",
+      "collision": "0x58",
+      "ptr": "0x22e58d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d27c",
+      "tile": "0xd8",
+      "collision": "0x72",
+      "ptr": "0x22e72d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   67,
+   68
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d308",
+      "tile": "0xd8",
+      "collision": "0x26",
+      "ptr": "0x22e26d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2dc",
+      "tile": "0xd8",
+      "collision": "0x40",
+      "ptr": "0x22e40d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d2b0",
+      "tile": "0xd8",
+      "collision": "0x5a",
+      "ptr": "0x22e5ad8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d284",
+      "tile": "0xd8",
+      "collision": "0x74",
+      "ptr": "0x22e74d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   88,
+   89,
+   90,
+   91,
+   92,
+   93,
+   94,
+   95,
+   96,
+   97,
+   98,
+   99,
+   100
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d27c",
+      "tile": "0xd8",
+      "collision": "0x41",
+      "ptr": "0x22e41d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d350",
+      "tile": "0xd8",
+      "collision": "0x5c",
+      "ptr": "0x22e5cd8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d324",
+      "tile": "0xd8",
+      "collision": "0x76",
+      "ptr": "0x22e76d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2f8",
+      "tile": "0xd8",
+      "collision": "0x90",
+      "ptr": "0x22e90d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   167
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d318",
+      "tile": "0xd8",
+      "collision": "0x32",
+      "ptr": "0x22e32d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2ec",
+      "tile": "0xd8",
+      "collision": "0x4c",
+      "ptr": "0x22e4cd8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d2c0",
+      "tile": "0xd8",
+      "collision": "0x66",
+      "ptr": "0x22e66d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d294",
+      "tile": "0xd8",
+      "collision": "0x80",
+      "ptr": "0x22e80d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   133
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d2c0",
+      "tile": "0xd8",
+      "collision": "0x52",
+      "ptr": "0x22e52d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d294",
+      "tile": "0xd8",
+      "collision": "0x6c",
+      "ptr": "0x22e6cd8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d268",
+      "tile": "0xd8",
+      "collision": "0x86",
+      "ptr": "0x22e86d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d33c",
+      "tile": "0xd8",
+      "collision": "0xa1",
+      "ptr": "0x22ea1d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   154,
+   155,
+   156
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d358",
+      "tile": "0xd8",
+      "collision": "0x40",
+      "ptr": "0x22f40d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d32c",
+      "tile": "0xd8",
+      "collision": "0x5a",
+      "ptr": "0x22f5ad8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d300",
+      "tile": "0xd8",
+      "collision": "0x74",
+      "ptr": "0x22f74d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2d4",
+      "tile": "0xd8",
+      "collision": "0x8e",
+      "ptr": "0x22f8ed8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   304,
+   352
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d2ec",
+      "tile": "0xd8",
+      "collision": "0xff",
+      "ptr": "0x230ffd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2c0",
+      "tile": "0xd8",
+      "collision": "0x19",
+      "ptr": "0x23119d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d294",
+      "tile": "0xd8",
+      "collision": "0x33",
+      "ptr": "0x23133d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d268",
+      "tile": "0xd8",
+      "collision": "0x4d",
+      "ptr": "0x2314dd8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   117,
+   118,
+   558
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d28c",
+      "tile": "0xd8",
+      "collision": "0x87",
+      "ptr": "0x23187d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d260",
+      "tile": "0xd8",
+      "collision": "0xa1",
+      "ptr": "0x231a1d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d334",
+      "tile": "0xd8",
+      "collision": "0xbc",
+      "ptr": "0x231bcd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d308",
+      "tile": "0xd8",
+      "collision": "0xd6",
+      "ptr": "0x231d6d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   324,
+   325,
+   326,
+   328,
+   329,
+   330,
+   331,
+   493
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d33c",
+      "tile": "0xd8",
+      "collision": "0x93",
+      "ptr": "0x23193d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d310",
+      "tile": "0xd8",
+      "collision": "0xad",
+      "ptr": "0x231add8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d2e4",
+      "tile": "0xd8",
+      "collision": "0xc7",
+      "ptr": "0x231c7d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2b8",
+      "tile": "0xd8",
+      "collision": "0xe1",
+      "ptr": "0x231e1d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d2b0",
+      "tile": "0xd8",
+      "collision": "0xa8",
+      "ptr": "0x231a8d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d284",
+      "tile": "0xd8",
+      "collision": "0xc2",
+      "ptr": "0x231c2d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d358",
+      "tile": "0xd8",
+      "collision": "0xdd",
+      "ptr": "0x231ddd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d32c",
+      "tile": "0xd8",
+      "collision": "0xf7",
+      "ptr": "0x231f7d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   119,
+   337,
+   338,
+   339,
+   368,
+   369,
+   370,
+   376,
+   377,
+   378,
+   379,
+   492
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d2b8",
+      "tile": "0xd8",
+      "collision": "0x88",
+      "ptr": "0x23188d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d28c",
+      "tile": "0xd8",
+      "collision": "0xa2",
+      "ptr": "0x231a2d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d260",
+      "tile": "0xd8",
+      "collision": "0xbc",
+      "ptr": "0x231bcd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d334",
+      "tile": "0xd8",
+      "collision": "0xd7",
+      "ptr": "0x231d7d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   176,
+   177,
+   178,
+   179,
+   180,
+   181,
+   182,
+   183,
+   184,
+   185,
+   186,
+   187
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d350",
+      "tile": "0xd8",
+      "collision": "0xd3",
+      "ptr": "0x22ed3d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d324",
+      "tile": "0xd8",
+      "collision": "0xed",
+      "ptr": "0x22eedd8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d2f8",
+      "tile": "0xd8",
+      "collision": "0x7",
+      "ptr": "0x22f07d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2cc",
+      "tile": "0xd8",
+      "collision": "0x21",
+      "ptr": "0x22f21d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   116
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d318",
+      "tile": "0xd8",
+      "collision": "0x89",
+      "ptr": "0x23189d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2ec",
+      "tile": "0xd8",
+      "collision": "0xa3",
+      "ptr": "0x231a3d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d2c0",
+      "tile": "0xd8",
+      "collision": "0xbd",
+      "ptr": "0x231bdd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d294",
+      "tile": "0xd8",
+      "collision": "0xd7",
+      "ptr": "0x231d7d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   157,
+   461,
+   462
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d338",
+      "tile": "0xd8",
+      "collision": "0x90",
+      "ptr": "0x23190d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d30c",
+      "tile": "0xd8",
+      "collision": "0xaa",
+      "ptr": "0x231aad8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d2e0",
+      "tile": "0xd8",
+      "collision": "0xc4",
+      "ptr": "0x231c4d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2b4",
+      "tile": "0xd8",
+      "collision": "0xde",
+      "ptr": "0x231ded8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   125,
+   126,
+   164,
+   393
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d2a4",
+      "tile": "0xd8",
+      "collision": "0xa8",
+      "ptr": "0x231a8d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d278",
+      "tile": "0xd8",
+      "collision": "0xc2",
+      "ptr": "0x231c2d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d34c",
+      "tile": "0xd8",
+      "collision": "0xdd",
+      "ptr": "0x231ddd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d320",
+      "tile": "0xd8",
+      "collision": "0xf7",
+      "ptr": "0x231f7d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   28
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d318",
+      "tile": "0xd8",
+      "collision": "0x96",
+      "ptr": "0x22e96d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2ec",
+      "tile": "0xd8",
+      "collision": "0xb0",
+      "ptr": "0x22eb0d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d2c0",
+      "tile": "0xd8",
+      "collision": "0xca",
+      "ptr": "0x22ecad8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d294",
+      "tile": "0xd8",
+      "collision": "0xe4",
+      "ptr": "0x22ee4d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   323
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d330",
+      "tile": "0xd8",
+      "collision": "0x80",
+      "ptr": "0x23180d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d304",
+      "tile": "0xd8",
+      "collision": "0x9a",
+      "ptr": "0x2319ad8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d2d8",
+      "tile": "0xd8",
+      "collision": "0xb4",
+      "ptr": "0x231b4d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2ac",
+      "tile": "0xd8",
+      "collision": "0xce",
+      "ptr": "0x231ced8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   357,
+   358,
+   359,
+   360,
+   361
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d340",
+      "tile": "0xd8",
+      "collision": "0x8e",
+      "ptr": "0x2318ed8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d314",
+      "tile": "0xd8",
+      "collision": "0xa8",
+      "ptr": "0x231a8d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d2e8",
+      "tile": "0xd8",
+      "collision": "0xc2",
+      "ptr": "0x231c2d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2bc",
+      "tile": "0xd8",
+      "collision": "0xdc",
+      "ptr": "0x231dcd8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   207,
+   208,
+   209,
+   212,
+   213,
+   214,
+   215,
+   216,
+   217,
+   218,
+   219,
+   244,
+   245,
+   246,
+   247,
+   248,
+   249,
+   254,
+   258,
+   259,
+   284,
+   285,
+   286,
+   313,
+   316,
+   319,
+   512,
+   513
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d268",
+      "tile": "0xd8",
+      "collision": "0x3c",
+      "ptr": "0x22e3cd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d33c",
+      "tile": "0xd8",
+      "collision": "0x57",
+      "ptr": "0x22e57d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d310",
+      "tile": "0xd8",
+      "collision": "0x71",
+      "ptr": "0x22e71d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2e4",
+      "tile": "0xd8",
+      "collision": "0x8b",
+      "ptr": "0x22e8bd8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   255
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d294",
+      "tile": "0xd8",
+      "collision": "0xc",
+      "ptr": "0x22c0cd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d268",
+      "tile": "0xd8",
+      "collision": "0x26",
+      "ptr": "0x22c26d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d2ec",
+      "tile": "0xd8",
+      "collision": "0x87",
+      "ptr": "0x22e87d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2c0",
+      "tile": "0xd8",
+      "collision": "0xa1",
+      "ptr": "0x22ea1d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   197
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d31c",
+      "tile": "0xd8",
+      "collision": "0x80",
+      "ptr": "0x22e80d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2f0",
+      "tile": "0xd8",
+      "collision": "0x9a",
+      "ptr": "0x22e9ad8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d2c4",
+      "tile": "0xd8",
+      "collision": "0xb4",
+      "ptr": "0x22eb4d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d298",
+      "tile": "0xd8",
+      "collision": "0xce",
+      "ptr": "0x22eced8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   225,
+   226,
+   227,
+   228,
+   229,
+   230,
+   231,
+   232,
+   233,
+   234,
+   235,
+   236,
+   237,
+   238,
+   239,
+   240,
+   241,
+   242,
+   268,
+   269,
+   270,
+   271,
+   272,
+   273,
+   449,
+   515,
+   518,
+   519,
+   520,
+   521,
+   522,
+   523,
+   524,
+   525,
+   526,
+   527,
+   528,
+   529,
+   530,
+   531,
+   532,
+   533,
+   534,
+   535,
+   536,
+   537,
+   538,
+   539,
+   540,
+   541,
+   542,
+   543,
+   544,
+   545,
+   546,
+   547,
+   548,
+   549,
+   550,
+   551,
+   552,
+   553,
+   554,
+   555,
+   556,
+   557
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d2c4",
+      "tile": "0xd8",
+      "collision": "0x93",
+      "ptr": "0x22e93d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d298",
+      "tile": "0xd8",
+      "collision": "0xad",
+      "ptr": "0x22eadd8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d26c",
+      "tile": "0xd8",
+      "collision": "0xc7",
+      "ptr": "0x22ec7d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d340",
+      "tile": "0xd8",
+      "collision": "0xe2",
+      "ptr": "0x22ee2d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   263,
+   264,
+   265
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d2b8",
+      "tile": "0xd8",
+      "collision": "0x1d",
+      "ptr": "0x22e1dd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d28c",
+      "tile": "0xd8",
+      "collision": "0x37",
+      "ptr": "0x22e37d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d260",
+      "tile": "0xd8",
+      "collision": "0x51",
+      "ptr": "0x22e51d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d334",
+      "tile": "0xd8",
+      "collision": "0x6c",
+      "ptr": "0x22e6cd8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   305,
+   306,
+   307,
+   308,
+   309,
+   310
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d330",
+      "tile": "0xd8",
+      "collision": "0x31",
+      "ptr": "0x23231d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d304",
+      "tile": "0xd8",
+      "collision": "0x4b",
+      "ptr": "0x2324bd8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d2d8",
+      "tile": "0xd8",
+      "collision": "0x65",
+      "ptr": "0x23265d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2ac",
+      "tile": "0xd8",
+      "collision": "0x7f",
+      "ptr": "0x2327fd8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   253
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d268",
+      "tile": "0xd8",
+      "collision": "0xc4",
+      "ptr": "0x22ec4d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d33c",
+      "tile": "0xd8",
+      "collision": "0xdf",
+      "ptr": "0x22edfd8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d310",
+      "tile": "0xd8",
+      "collision": "0xf9",
+      "ptr": "0x22ef9d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2e4",
+      "tile": "0xd8",
+      "collision": "0x13",
+      "ptr": "0x22f13d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   220,
+   221,
+   510,
+   511
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d298",
+      "tile": "0xd8",
+      "collision": "0x17",
+      "ptr": "0x22f17d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d26c",
+      "tile": "0xd8",
+      "collision": "0x31",
+      "ptr": "0x22f31d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d340",
+      "tile": "0xd8",
+      "collision": "0x4c",
+      "ptr": "0x22f4cd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d314",
+      "tile": "0xd8",
+      "collision": "0x66",
+      "ptr": "0x22f66d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   251
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d34c",
+      "tile": "0xd8",
+      "collision": "0xf4",
+      "ptr": "0x22bf4d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d320",
+      "tile": "0xd8",
+      "collision": "0xe",
+      "ptr": "0x22c0ed8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d300",
+      "tile": "0xd8",
+      "collision": "0x71",
+      "ptr": "0x22e71d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2d4",
+      "tile": "0xd8",
+      "collision": "0x8b",
+      "ptr": "0x22e8bd8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   267,
+   311,
+   312,
+   314,
+   315
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d32c",
+      "tile": "0xd8",
+      "collision": "0xf9",
+      "ptr": "0x22bf9d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d300",
+      "tile": "0xd8",
+      "collision": "0x13",
+      "ptr": "0x22c13d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d274",
+      "tile": "0xd8",
+      "collision": "0x1b",
+      "ptr": "0x22c1bd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d348",
+      "tile": "0xd8",
+      "collision": "0x36",
+      "ptr": "0x22c36d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   223,
+   504,
+   505,
+   506,
+   507,
+   508,
+   509
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d348",
+      "tile": "0xd8",
+      "collision": "0x2c",
+      "ptr": "0x22c2cd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d31c",
+      "tile": "0xd8",
+      "collision": "0x46",
+      "ptr": "0x22c46d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d274",
+      "tile": "0xd8",
+      "collision": "0xa3",
+      "ptr": "0x22ea3d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d348",
+      "tile": "0xd8",
+      "collision": "0xbe",
+      "ptr": "0x22ebed8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   322
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d2d4",
+      "tile": "0xd8",
+      "collision": "0xcf",
+      "ptr": "0x22ecfd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2a8",
+      "tile": "0xd8",
+      "collision": "0xe9",
+      "ptr": "0x22ee9d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d27c",
+      "tile": "0xd8",
+      "collision": "0x3",
+      "ptr": "0x22f03d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d350",
+      "tile": "0xd8",
+      "collision": "0x1e",
+      "ptr": "0x22f1ed8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   278,
+   279,
+   280,
+   281,
+   282,
+   283
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d2b4",
+      "tile": "0xd8",
+      "collision": "0x73",
+      "ptr": "0x22e73d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d288",
+      "tile": "0xd8",
+      "collision": "0x8d",
+      "ptr": "0x22e8dd8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d35c",
+      "tile": "0xd8",
+      "collision": "0xa8",
+      "ptr": "0x22ea8d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d330",
+      "tile": "0xd8",
+      "collision": "0xc2",
+      "ptr": "0x22ec2d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   295,
+   296,
+   297,
+   298,
+   299,
+   300,
+   301,
+   302,
+   303
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d29c",
+      "tile": "0xd8",
+      "collision": "0xd0",
+      "ptr": "0x231d0d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d270",
+      "tile": "0xd8",
+      "collision": "0xea",
+      "ptr": "0x231ead8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d344",
+      "tile": "0xd8",
+      "collision": "0x5",
+      "ptr": "0x23205d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d318",
+      "tile": "0xd8",
+      "collision": "0x1f",
+      "ptr": "0x2321fd8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   205
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d324",
+      "tile": "0xd8",
+      "collision": "0x67",
+      "ptr": "0x22e67d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2f8",
+      "tile": "0xd8",
+      "collision": "0x81",
+      "ptr": "0x22e81d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d2cc",
+      "tile": "0xd8",
+      "collision": "0x9b",
+      "ptr": "0x22e9bd8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d2a0",
+      "tile": "0xd8",
+      "collision": "0xb5",
+      "ptr": "0x22eb5d8"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "map_ids": [
+   494,
+   497
+  ],
+  "chunks": {
+   "Chunk 2": {
+    "ptr 1": [
+     {
+      "base": "0x226d2c8",
+      "tile": "0xd8",
+      "collision": "0x2e",
+      "ptr": "0x2322ed8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d29c",
+      "tile": "0xd8",
+      "collision": "0x48",
+      "ptr": "0x23248d8"
+     }
+    ]
+   },
+   "Chunk 4": {
+    "ptr 1": [
+     {
+      "base": "0x226d270",
+      "tile": "0xd8",
+      "collision": "0x62",
+      "ptr": "0x23262d8"
+     }
+    ],
+    "ptr 2": [
+     {
+      "base": "0x226d344",
+      "tile": "0xd8",
+      "collision": "0x7d",
+      "ptr": "0x2327dd8"
+     }
+    ]
+   }
+  }
+ }
+]

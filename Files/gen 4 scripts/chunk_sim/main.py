@@ -8,65 +8,115 @@ from functools import lru_cache
 path = str(pathlib.Path(__file__).parent.resolve())
 
 class ChunkSimulator():
-    def __init__(self,game_type=0,base_ptr=0x0226D2ac):
+    def __init__(self,game_type=0,tile_search_list = [0xD8],min_base=0x226D260,base_search_list=[0x226D2AC,0x226D2F8]):
         self.game_type = game_type
-        self.base_ptr = base_ptr
         self.texture_memory_offset = 0
 
-
         self.game = ["dp","pt","hgss"][self.game_type]
+        self.tile_search_list = tile_search_list
+        self.min_base = min_base
 
-        self.path_chunk_data = path + "/chunk_data.json"
-        self.json_chunk_data = self.load_json(self.path_chunk_data)
+        self.json_chunk_data = self.load_json(path + "/data/chunk_data.json")
 
-        self.game_data = self.json_chunk_data.get(self.game)
-        self.all_pointer_values = [] # remove final build
-        
-        self.simulated_memory = self.simulate_memory()
+        self.game_data = self.json_chunk_data.get(self.game,{})
+        self.chunk_pointer_differences = [
+            [-0x13C,0x86C],
+            [-0x11C0,0x86C],
+            [-0x11C0,0x86C],
+            [-0x11C0,0x86C]
+        ]       
 
-        print(hex(min(self.all_pointer_values))) # remove final build
-        print(hex(max(self.all_pointer_values))) # remove final build
-        
-        self.id_list = [0xD8,0xD7]
-        self.check_for_tiles()
+        output = self.search_texture_sets()
+        self.write_json(path + "/dumps/dump1.json",output)
+        self.search_for_current_base(output,base_search_list)
 
-    def simulate_memory(self):
-        simulated_memory = []
-        for c_id in self.game_data:
-            c_data = self.game_data[c_id]
+    def search_texture_sets(self):
+        output = []
+        for texture_data in self.game_data:
+            primary_texture_set = texture_data["primary_texture_set"]
+            secondary_texture_sets = texture_data["secondary_texture_sets"]
+            chunk_offsets = texture_data["chunk_offsets"]
+
+            #print(f"\nPrimary texture set: {primary_texture_set}\nSecondary Texture sets:")
+            for set in secondary_texture_sets: 
+                id = set["id"]
+                map_ids = set["map_ids"]
+                #print(f" {id}: map ids:{map_ids}")
+
+            searched_data = {"map_ids":map_ids,"chunks":{}}
+            for i,offs in enumerate(chunk_offsets):
+                if i%2 == 1:
+                    searched_data["chunks"][f"Chunk {i+1}"] = (self.check_for_tiles(offs,i))
+
+            output.append(searched_data)
+        return output
+
+    @lru_cache              
+    def check_for_tiles(self,offs,chunk_id):
+        chunk_data = {}
+        chunk_ptr = offs+self.min_base
+        ptrs = [chunk_ptr + self.chunk_pointer_differences[chunk_id][i] for i in range(0,2)]
+        #print(f"    Chunk {chunk_id+1}")
+
+        for i,ptr in enumerate(ptrs):
+            chunk_data[f"ptr {i+1}"] = []
+            tile_lower = ptr>>16
+            tile_id,tile_collision = ptr & 0xFF,(ptr>>8)&0xFF
             
-            c_ptrs = c_data["chunk_pointers"]
-            print(f"Primary texture set {c_id}\nSecondary texture sets:")
-            map_ids = c_data["map_ids"]
-            for t_set in map_ids:
-                print(f"{t_set}: {map_ids[t_set]}")
-               
-            initial_memory = c_data["texture_data"]
-            simulated_memory.append(self.simulate_memory_instance(initial_memory,self.base_ptr,c_ptrs))
-        return simulated_memory
+            for searched_tile in self.tile_search_list:
+                if searched_tile%4 != 0:
+                    continue
+                diff = searched_tile - tile_id
+                if diff < 0:
+                    tile_collision += 1
+                required_base = self.fix_base(self.min_base + diff)
 
+                #print(f"\tRequired base: {hex(required_base)}")
+                collision_type = "walkable" if tile_collision < 0x80 else "wall"
+                full_ptr = (tile_lower<<16)|(tile_collision<<8)|searched_tile
+                #print(f"\t  Tile: {hex(searched_tile)} {collision_type} \t({hex(full_ptr)})")
+                chunk_data[f"ptr {i+1}"].append({"base":hex(required_base),"tile":hex(searched_tile),"collision":hex(tile_collision),"ptr":hex(full_ptr)})
 
-    def simulate_memory_instance(self,initial_mem,base_ptr,c_ptrs):
-        for ptr_i in range(len(c_ptrs)):
-                ptr = c_ptrs[ptr_i]
-                print(f"\t{ptr_i+1}. {hex(ptr+base_ptr)}")
-                split_ptr = ChunkSimulator.split_dword_into_bytes(ptr+base_ptr)
-                self.all_pointer_values.append(ptr) # remove final build
-                # for i in split_ptr:
-                #     print(f"\t{hex(i)}")
-        
-    @lru_cache    
-    def check_for_tiles(self):
-        #use self.id_list
-        return None
+        return chunk_data
+                
+    @lru_cache
+    def split_into_tiles(self,ptr):
+        split_ptr = []
+        for word in ChunkSimulator.split_dword_into_words(ptr):
+            bytes = ChunkSimulator.split_word_into_bytes(word)
+            split_ptr.append({"tile_id":bytes[1],"collision":bytes[0]})
+        return split_ptr
 
-    def load_chunks(self,id,d1,d2):
-        chunk_data,chunk_ptrs_offs = self.multi_get_data(d1,d2,chunk_dat=True,chunk_ptrs=True)
-        chunk_ptr_indexes = ChunkSimulator.multi_offset_to_array_index(chunk_ptrs_offs,self.base_ptr)
+    @lru_cache
+    def fix_base(self,base):
+        if base < self.min_base:
+            return base + 0x100
+        if base > self.min_base + 0x100:
+            return base - 0x100
+        return base
     
-    def offset_to_array_index():
-        return None
+    def search_for_current_base(self,search_dict,bases):
+        for base in bases:
+            print(f"Results for base: {hex(base)}")
+            for tile_id in self.tile_search_list:
+                print(f"  Tile Id: {hex(tile_id)}:")
+                for searched_data in search_dict:
+                    for chunk_id,chunk in searched_data["chunks"].items():
+                        for ptr,ptr_data_list in chunk.items():
+                            for ptr_data in ptr_data_list:
+                                if int(ptr_data["base"],16) == base:
+                                    map_ids = searched_data["map_ids"]
+                                    if int(ptr_data["tile"],16) == tile_id:
+                                        wall= "F" if int(ptr_data["collision"],16) < 0x80 else "T"
+                                        text = f"   {chunk_id} {ptr} Wall: {wall} Map Ids: {map_ids[:16]}"
+                                        if len(map_ids) > 16:
+                                            text += f" ... + {len(map_ids)-16} results"
+                                        print(text)
 
+
+                        
+            print("")
+                    
     @lru_cache
     def multi_offset_to_array_index(offset_list,base_ptr):
         return [ChunkSimulator.offset_to_array_index(offset,base_ptr) for offset in offset_list]
@@ -99,7 +149,11 @@ class ChunkSimulator():
             json_obj = json.load(file_)
         return json_obj
 
+    @staticmethod
+    def write_json(file,json_obj):
+        with open(file,"w") as file_:
+            json.dump(json_obj,file_,indent=1)
 
 
 if __name__ == '__main__':
-    chunksim = ChunkSimulator()
+    chunksim = ChunkSimulator(tile_search_list=[0xD8])
