@@ -3055,6 +3055,9 @@ function teleport_up()
 	z_cam_16 = memory.read_u16_le(base + player_struct["z_cam_16"] + memory_shift)
 	memory.write_u16_le(base + player_struct["z_cam_16"] + memory_shift,z_cam_16 - tp_amount) 
 	add_to_stepcounter(tp_amount)
+
+	print(base + player_struct["z_phys_32"] + memory_shift)
+	print(base + player_struct["z_cam_16"] + memory_shift)
 end
 
 function teleport_left()
@@ -3255,8 +3258,8 @@ function show_void_pos()
 	matrix_height = memory.read_u8(base + matrix_struct["matrix_height_8"])
 	matrix_center = base + matrix_struct["matrix_center_16"]
 
-	x_phys_32 = memory.read_u32_le(base + player_struct["x_phys_32"] + memory_shift) --actually should be signed
-	z_phys_32 = memory.read_u32_le(base + player_struct["z_phys_32"] + memory_shift)
+	x_phys_32 = memory.read_s32_le(base + player_struct["x_phys_32"] + memory_shift) --actually should be signed
+	z_phys_32 = memory.read_s32_le(base + player_struct["z_phys_32"] + memory_shift)
 
 	x_offs = math.modf(x_phys_32 / 32) *2
 	z_offs = math.modf(z_phys_32 / 32) *2 *matrix_height 
@@ -3929,31 +3932,31 @@ key_configuration = {
 	switch_wtw_state = {"W"},
 	toggle_map_editing = {"M"},
 	toggle_teleport_editing = {"J"},
-	toggle_memory_addr_editing = {"Shift","N"},
-	auto_movement = {"Shift","control","M"},
-	increment_menu = {"Shift","V"},
-	auto_calculate = {"Shift","control","C"},
+	toggle_memory_addr_editing = {"LeftShift","N"},
+	auto_movement = {"LeftShift","control","M"},
+	increment_menu = {"LeftShift","V"},
+	auto_calculate = {"LeftShift","control","C"},
 	--auto_sprite_inc = {"B"},
-	teleport_up = {"Shift","Up"},
-	teleport_left = {"Shift","Left"},
-	teleport_down = {"Shift","Down"},
-	teleport_right = {"Shift","Right"},
-	toggle_tile_view = {"Shift","T"},
-	toggle_player_pos = {"Shift","P"},
-	toggle_bounding_view = {"Shift","I"},
-	toggle_grid = {"Shift","G"},
-	toggle_loadlines = {"Shift","L"},
-	toggle_maplines = {"Shift","K"},
-	toggle_mapmodellines = {"Shift","H"},
+	teleport_up = {"LeftShift","Up"},
+	teleport_left = {"LeftShift","Left"},
+	teleport_down = {"LeftShift","Down"},
+	teleport_right = {"LeftShift","Right"},
+	toggle_tile_view = {"LeftShift","T"},
+	toggle_player_pos = {"LeftShift","P"},
+	toggle_bounding_view = {"LeftShift","I"},
+	toggle_grid = {"LeftShift","G"},
+	toggle_loadlines = {"LeftShift","L"},
+	toggle_maplines = {"LeftShift","K"},
+	toggle_mapmodellines = {"LeftShift","H"},
 	toggle_load_calculations = {"L","C"},
 	toggle_debug_tile_print = {"T","C"},
 	write_image_to_calculator = {"S","C"},
-	reset_scroll = {"Shift","space"}
+	reset_scroll = {"LeftShift","space"}
 }
 
 key_configuration_cont = {
-	increment_scroll = {"Shift","U"},
-	decrement_scroll = {"Shift","J"}
+	increment_scroll = {"LeftShift","U"},
+	decrement_scroll = {"LeftShift","J"}
 }
 
 function run_functions_on_keypress()
