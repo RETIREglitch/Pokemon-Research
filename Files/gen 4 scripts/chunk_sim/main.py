@@ -12,12 +12,11 @@ chunk_colors = {"2":Fore.GREEN,"4":Fore.LIGHTBLUE_EX}
 path = str(pathlib.Path(__file__).parent.resolve())
 
 class ChunkSimulator():
-    def __init__(self,game_type=0,tile_search_list = [0xD8],min_base=0x226D260,base_search_list=[0x226D2AC,0x226D2F8]):
+    def __init__(self,game_type=0,min_base=0x226D260):
         self.game_type = game_type
         self.texture_memory_offset = 0
 
         self.game = ["dp","pt","hgss"][self.game_type]
-        self.tile_search_list = tile_search_list
         self.min_base = min_base
 
         self.json_chunk_data = self.load_json(path + "/data/chunk_data.json")
@@ -30,9 +29,32 @@ class ChunkSimulator():
             [-0x11C0,0x86C]
         ]       
 
-        output = self.search_texture_sets()
-        self.write_json(path + "/dumps/dump1.json",output)
-        self.search_for_current_base(output,base_search_list)
+        write_option = ""
+        while write_option.upper() not in ["Y","N"]:
+            write_option = input("Write data to json? y/n > ")
+
+        while True:
+            tile_search_list = input("Insert tiles to search, comma seperated > ")
+            bases = input("Insert bases to search, comma seperated > ")
+            print()
+
+            try:
+                self.tile_search_list = [int(tile,16) for tile in tile_search_list.split(",")]
+                base_search_list = [int(base,16) for base in bases.split(",")]
+            except Exception:
+                print("Error, using defaults")
+                self.tile_search_list = [0xD8]
+                base_search_list = [0x226D2CA,0x226D2C0]
+
+            output = self.search_texture_sets()
+            if write_option == "Y":
+                count = 0
+                for f in pathlib.Path(path + "/dumps").iterdir():
+                    if f.is_file():
+                        count += 1
+                self.write_json(path + f"/dumps/dump{count+1}.json",output)
+            self.search_for_current_base(output,base_search_list)
+            input()
 
     def search_texture_sets(self):
         output = []
@@ -41,11 +63,10 @@ class ChunkSimulator():
             secondary_texture_sets = texture_data["secondary_texture_sets"]
             chunk_offsets = texture_data["chunk_offsets"]
 
-            #print(f"\nPrimary texture set: {primary_texture_set}\nSecondary Texture sets:")
+            map_ids = []
             for set in secondary_texture_sets: 
                 id = set["id"]
-                map_ids = set["map_ids"]
-                #print(f" {id}: map ids:{map_ids}")
+                map_ids.extend(set["map_ids"])
 
             searched_data = {"map_ids":map_ids,"chunks":{}}
             for i,offs in enumerate(chunk_offsets):
@@ -157,4 +178,5 @@ class ChunkSimulator():
 
 
 if __name__ == '__main__':
-    chunksim = ChunkSimulator(tile_search_list=[0xD8],base_search_list=[0x226D340])
+    # tile_search_list=[0xD8],base_search_list=[0x226D340]
+    chunksim = ChunkSimulator()
