@@ -12,6 +12,10 @@
 --  void/rng func based on MKdasher's scripts  --
 -------------------------------------------------
 
+-- simpler codes
+readbyte,readword,readdword,readdwordsigned,writebyte,writeword,writedword = memory.readbyte,memory.readword,memory.readdword,memory.readdwordsigned,memory.writebyte,memory.writeword,memory.writedword
+bor,band,lshift,rshift = bit.bor,bit.band,bit.lshift,bit.rshift
+
 -- DATA TABLES
 
 local map_id_list = {
@@ -35,8 +39,12 @@ local map_id_list = {
 	},
 	bsod_model = {
 		color = 'red',
-		ids = {35, 88, 93, 95, 122,133, 150 ,154, 155, 156, 176, 178, 180, 182,
-				184, 185, 188, 291, 293, 295, 504, 505, 506, 507, 508, 509}
+		ids = {35, 88, 93, 95, 122,133,154, 155, 156, 176, 178, 180, 182,
+				184, 185, 188, 291, 293, 504, 505, 506, 507, 508, 509}
+	},
+	soft_lock = {
+		color = 'red',
+		ids = {150}
 	},
 	wrong_warp = {
 		color = '#666fd',
@@ -48,7 +56,7 @@ local map_id_list = {
 	},
 	goal = {
 		color = '#f7bbf3',
-		ids = {333,332,251,392,393}
+		ids = {333,332,251,392,393,86}
 		},
 	chain = {
 		color = '#DfA',
@@ -347,7 +355,7 @@ script_commands = {
 	[0x49] = {color = '#5555FFF', script_command = 'SePlay', parameters = {'snd', 'snd'}},
 	[0x4a] = {color = '#5555FFF', script_command = 'SeStop', parameters = {'snd', 'snd'}},
 	[0x4b] = {color = '#5555FFF', script_command = 'SeWait', parameters = {'snd', 'snd'}},
-	[0x4c] = {color = '#5555FFF', script_command = 'VoicePlay', parameters = {'sp', 'sp'}},
+	[0x4c] = {color = '#5555FFF', script_command = 'VoicePlay', parameters = {'sp', 'sp','vol','vol'}},
 	[0x4d] = {color = '#5555FFF', script_command = 'VoicePlayWait', parameters = {}},
 	[0x4e] = {color = '#5555FFF', script_command = 'MePlay', parameters = {'snd', 'snd'}},
 	[0x4f] = {color = '#5555FFF', script_command = 'MeWait', parameters = {}},
@@ -1477,15 +1485,15 @@ game_specific_data = {
 
 }
 
-ver = memory.readdword(0x023FFE0C)
+ver = readdword(0x023FFE0C)
 if ver == 0 then
-	ver = memory.readdword(0x027FFE0C)
+	ver = readdword(0x027FFE0C)
 end
 
-id = bit.band(ver, 0xFF)
+id = band(ver, 0xFF)
 game_id = string.char(id)
 
-lang_ascii = bit.band(bit.rshift(ver, 24), 0xFF)
+lang_ascii = band(rshift(ver, 24), 0xFF)
 lang = string.char(lang_ascii)
 
 game_data = game_specific_data[game_id]
@@ -1524,7 +1532,8 @@ live_struct = {
 	z_pos_last_warp_32_2  = start_live_struct + 0x40,
 	y_pos_last_warp_32_2  = start_live_struct + 0x44,
 
-	map_id_stored_warp_16 = start_live_struct + 0x4C,
+	map_id_stored_warp_16 = start_live_struct + 0x48,
+	warp_id_stored_warp_32 = start_live_struct + 0x4C,
 	x_stored_warp_16 = start_live_struct + 0x50,
 	z_stored_warp_16 = start_live_struct + 0x54,
 	y_stored_warp_16 = start_live_struct + 0x58,
@@ -1837,7 +1846,7 @@ hall_of_fame_struct = {
 -- MATH, INPUT, FORMATTING, NON-GAMEPLAY RELATED FUNCTIONS
 
 function fmt(arg,len)
-    return string.format("%0"..len.."X", bit.band(4294967295, arg))
+    return string.format("%0"..len.."X", band(4294967295, arg))
 end
 
 function print_to_screen(x,y,txt,clr,screen)
@@ -2056,11 +2065,11 @@ end
 
 function use_menu(menu_index)
 
-	if memory.readword(base + mapdata_and_menu_struct["side_menu_state"]) == 0 then	
+	if readword(base + mapdata_and_menu_struct["side_menu_state"]) == 0 then	
 		press_button("X")
 	end 
 	
-	current_menu_index = memory.readbyte(base + mapdata_and_menu_struct["menu_index"])
+	current_menu_index = readbyte(base + mapdata_and_menu_struct["menu_index"])
 
 	if menu_index == current_menu_index then 
 		wait_frames(4)
@@ -2074,7 +2083,7 @@ function use_menu(menu_index)
 	while menu_index ~= current_menu_index do
 		press_button(btn)
 		wait_frames(2)
-		current_menu_index = memory.readbyte(base + mapdata_and_menu_struct["menu_index"])
+		current_menu_index = readbyte(base + mapdata_and_menu_struct["menu_index"])
 	end 
 	press_button("A")
 end
@@ -2083,9 +2092,9 @@ function find_item_address_from_pocket(item_id,pocket_id,item_id2)
 	item_id2 = item_id2 or item_id
 	current_addr = base + item_pocket_struct[pocket_id+1][2]
 	end_addr = base + item_pocket_struct[pocket_id+1][3]
-	current_item_id = memory.readword(current_addr)
+	current_item_id = readword(current_addr)
 	while (current_addr < end_addr) and (current_item_id ~= 0) do
-		current_item_id = memory.readword(current_addr)
+		current_item_id = readword(current_addr)
 		if (current_item_id == item_id) or (current_item_id == item_id2)  then
 			-- debug_print("item found with id "..fmt(item_id,4).." or id "..fmt(item_id2,4).." at addr "..fmt(current_addr,8).." in "..item_pocket_struct[pocket_id+1][1])
 			return  current_addr
@@ -2099,9 +2108,9 @@ function find_item_address(item_id)
 	for pocket_id = 0,#item_pocket_struct-1 do
 		current_addr = base + item_pocket_struct[pocket_id+1][2]
 		end_addr = base + item_pocket_struct[pocket_id+1][3]
-		current_item_id = memory.readword(current_addr)
+		current_item_id = readword(current_addr)
 		while (current_addr < end_addr) and (current_item_id ~= 0) do
-			current_item_id = memory.readword(current_addr)
+			current_item_id = readword(current_addr)
 			-- debug_print("item with id "..fmt(current_item_id,4)..item_pocket_struct[pocket_id+1][1])
 			if current_item_id == item_id then
 				data = {current_addr,pocket_id}
@@ -2126,7 +2135,7 @@ function switch_to_item(item_id)
 		return
 	end
 	
-	current_pocket_id = memory.readbyte(base + data_table["current_pocket_index_offs"])
+	current_pocket_id = readbyte(base + data_table["current_pocket_index_offs"])
 	count_button_presses = math.abs(pocket_id - current_pocket_id)
 
 	if pocket_id > current_pocket_id then
@@ -2140,13 +2149,13 @@ function switch_to_item(item_id)
 		wait_frames(4)
 	end 
 	wait_frames(40)
-	current_pocket_id = memory.readbyte(base + data_table["current_pocket_index_offs"])	
-	hovering_item_id_offs = memory.readdword(data_table["bag_hovering_data_ptr"])
+	current_pocket_id = readbyte(base + data_table["current_pocket_index_offs"])	
+	hovering_item_id_offs = readdword(data_table["bag_hovering_data_ptr"])
 
-	if memory.readword(hovering_item_id_offs + hovering_item_struct["cursor_offset_16"]) == 0x5A then -- hovering over "none"
+	if readword(hovering_item_id_offs + hovering_item_struct["cursor_offset_16"]) == 0x5A then -- hovering over "none"
 		direction = "up"
 	else	
-		hovering_item_id = memory.readbyte(hovering_item_id_offs + hovering_item_struct["hovering_item_id"])
+		hovering_item_id = readbyte(hovering_item_id_offs + hovering_item_struct["hovering_item_id"])
 		hovering_item_address = find_item_address_from_pocket(hovering_item_id,current_pocket_id,hovering_item_id+0x100)
 
 		if hovering_item_address == nil then -- failed to find item in current pocket
@@ -2175,7 +2184,7 @@ function switch_to_item(item_id)
 	while item_id%0x100 ~= hovering_item_id do
 		press_button(direction)
 		wait_frames(2)
-		hovering_item_id = memory.readbyte(hovering_item_id_offs + 0x360)
+		hovering_item_id = readbyte(hovering_item_id_offs + 0x360)
 		-- debug_print(fmt(item_id,4),fmt(hovering_item_id,4))
 		
 		-- if hovering_item_id == 0xF8 then
@@ -2435,18 +2444,18 @@ collision_states = {
 }
 
 function switch_wtw_state()
-	current_collision_state = memory.readword(lang_data["collision_check_addr"])
-	memory.writeword(lang_data["collision_check_addr"],collision_states[current_collision_state])
+	current_collision_state = readword(lang_data["collision_check_addr"])
+	writeword(lang_data["collision_check_addr"],collision_states[current_collision_state])
 end
 
 function set_stepcounter(steps)
 	step_addr = base+live_struct["step_counter"]
-	memory.writeword(step_addr,steps)
+	writeword(step_addr,steps)
 end 
 
 function add_to_stepcounter(steps)
 	step_addr = base+live_struct["step_counter"]
-	memory.writedword(step_addr,memory.readdword(step_addr)+steps)
+	writedword(step_addr,readdword(step_addr)+steps)
 end 
 
 function clear_stepcounter()
@@ -2455,13 +2464,13 @@ end
 
 function check_bike_state()
 	bike_state = 0
-	if memory.readword(base+live_struct["movement_mode_32"]) == 1 then -- on bike
+	if readword(base+live_struct["movement_mode_32"]) == 1 then -- on bike
 		bike_state = bike_state + 1
-		if memory.readword(base+live_struct["bike_gear_16"]) == 1 then -- fast gear
+		if readword(base+live_struct["bike_gear_16"]) == 1 then -- fast gear
 			bike_state = 2
 		end
 	else 
-		if memory.readword(base+live_struct["bike_gear_16"]) == 1 then -- fast gear, but walking
+		if readword(base+live_struct["bike_gear_16"]) == 1 then -- fast gear, but walking
 			bike_state = 4
 		end	
 	end 	
@@ -2478,7 +2487,7 @@ function move_player(pos,target,pos_offs,joy_b,j_up,j_down,j_left,j_right)
 		joypad.set(joy)
 		joy = {}
 		emu.frameadvance()
-		pos = memory.readdword(base + pos_offs)
+		pos = readdword(base + pos_offs)
 	end
 end 
 
@@ -2495,7 +2504,7 @@ function up(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 	delay_after_reset = delay_after_reset or 4
 	reset_stepcounter = return_arg(reset_stepcounter,true)
 
-	player_pos_y = memory.readdword(base + live_struct["z_pos_32_r"])
+	player_pos_y = readdword(base + live_struct["z_pos_32_r"])
 	target = player_pos_y - steps
 
 	-- account for bike momentum
@@ -2528,7 +2537,7 @@ function left(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 	delay_after_reset = delay_after_reset or 4
 	reset_stepcounter = return_arg(reset_stepcounter,true)
 
-	player_pos_x = memory.readdword(base + live_struct["x_pos_32_r"])
+	player_pos_x = readdword(base + live_struct["x_pos_32_r"])
 	target = player_pos_x - steps
 
 	-- account for bike momentum
@@ -2562,7 +2571,7 @@ function down(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 	delay_after_reset = delay_after_reset or 4
 	reset_stepcounter = return_arg(reset_stepcounter,true)
 
-	player_pos_y = memory.readdword(base + live_struct["z_pos_32_r"])
+	player_pos_y = readdword(base + live_struct["z_pos_32_r"])
 	target = (player_pos_y + steps)%4294967296
 
 	-- account for bike momentum
@@ -2591,7 +2600,7 @@ function right(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 	delay_after_reset = delay_after_reset or 4
 	reset_stepcounter = return_arg(reset_stepcounter,true)
 
-	player_pos_x = memory.readdword(base + live_struct["x_pos_32_r"])
+	player_pos_x = readdword(base + live_struct["x_pos_32_r"])
 	target = (player_pos_x + steps)%4294967296
 
 	-- account for bike momentum
@@ -2622,7 +2631,7 @@ function go_direction_wait_warp(direction,frames)
 end
 
 function check_battle_state()
-	if memory.readword(data_table["battle_check"]) ~= 0 then
+	if readword(data_table["battle_check"]) ~= 0 then
 		return true
 	end
 	return false 
@@ -2697,8 +2706,8 @@ end
 
 
 function nib(byte)
-	l_nib = bit.rshift(byte,4)
-	h_nib = bit.band(byte,0xF)
+	l_nib = rshift(byte,4)
+	h_nib = band(byte,0xF)
 	return {l_nib,h_nib}
 
 end 
@@ -2985,14 +2994,14 @@ function change_map_id()
 	value = check_btn_ints()
 	if value ~= nil then 
 		temp_map_id = temp_map_id..value
-		memory.writeword(base + live_struct["map_id_32"],tonumber(temp_map_id))
+		writeword(base + live_struct["map_id_32"],tonumber(temp_map_id))
 	end
 	if (#temp_map_id > 4) or (key.enter) then
 		temp_map_id = tonumber(temp_map_id)
 		if temp_map_id > 65535 then
 			temp_map_id = 65535
 		end 
-		memory.writeword(base + live_struct["map_id_32"],temp_map_id)
+		writeword(base + live_struct["map_id_32"],temp_map_id)
 		map_editing = false
 	end
 end 
@@ -3010,7 +3019,7 @@ function change_memory_addr()
 	value = check_btn_hex()
 	if value ~= nil then 
 		if #temp_str_memory_addr < 7 then 
-			temp_memory_addr = bit.lshift(temp_memory_addr,4) + value 
+			temp_memory_addr = lshift(temp_memory_addr,4) + value 
 			temp_str_memory_addr = fmt(temp_memory_addr,0)
 			return
 		end 
@@ -3024,7 +3033,7 @@ function change_memory_addr()
 	end
 
 	if check_key("backspace") then 
-		temp_memory_addr = bit.rshift(temp_memory_addr,4)
+		temp_memory_addr = rshift(temp_memory_addr,4)
 		temp_str_memory_addr = fmt(temp_memory_addr,0)
 	end
 
@@ -3057,42 +3066,42 @@ end
 tp_amount = 31
 
 function teleport_up()
-	z_phys_32 = memory.readdword(base + player_struct["z_phys_32"] + memory_shift)
-	memory.writedword(base + player_struct["z_phys_32"] + memory_shift,z_phys_32 - tp_amount) 
-	z_cam_16 = memory.readword(base + player_struct["z_cam_16"] + memory_shift)
-	memory.writeword(base + player_struct["z_cam_16"] + memory_shift,z_cam_16 - tp_amount) 
+	z_phys_32 = readdword(base + player_struct["z_phys_32"] + memory_shift)
+	writedword(base + player_struct["z_phys_32"] + memory_shift,z_phys_32 - tp_amount) 
+	z_cam_16 = readword(base + player_struct["z_cam_16"] + memory_shift)
+	writeword(base + player_struct["z_cam_16"] + memory_shift,z_cam_16 - tp_amount) 
 	add_to_stepcounter(tp_amount)
 end
 
 function teleport_left()
-	x_phys_32 = memory.readdword(base + player_struct["x_phys_32"] + memory_shift)
-	memory.writedword(base + player_struct["x_phys_32"] + memory_shift,x_phys_32 - tp_amount) 
-	x_cam_16 = memory.readword(base + player_struct["x_cam_16"] + memory_shift)
-	memory.writeword(base + player_struct["x_cam_16"] + memory_shift,x_cam_16 - tp_amount)
+	x_phys_32 = readdword(base + player_struct["x_phys_32"] + memory_shift)
+	writedword(base + player_struct["x_phys_32"] + memory_shift,x_phys_32 - tp_amount) 
+	x_cam_16 = readword(base + player_struct["x_cam_16"] + memory_shift)
+	writeword(base + player_struct["x_cam_16"] + memory_shift,x_cam_16 - tp_amount)
 	add_to_stepcounter(tp_amount) 
 end
 
 function teleport_right()
-	x_phys_32 = memory.readdword(base + player_struct["x_phys_32"] + memory_shift)
-	memory.writedword(base + player_struct["x_phys_32"] + memory_shift,x_phys_32 + tp_amount) 
-	x_cam_16 = memory.readword(base + player_struct["x_cam_16"] + memory_shift)
-	memory.writeword(base + player_struct["x_cam_16"] + memory_shift,x_cam_16 + tp_amount)
+	x_phys_32 = readdword(base + player_struct["x_phys_32"] + memory_shift)
+	writedword(base + player_struct["x_phys_32"] + memory_shift,x_phys_32 + tp_amount) 
+	x_cam_16 = readword(base + player_struct["x_cam_16"] + memory_shift)
+	writeword(base + player_struct["x_cam_16"] + memory_shift,x_cam_16 + tp_amount)
 	add_to_stepcounter(tp_amount)
 end
 
 function teleport_down()
-	z_phys_32 = memory.readdword(base + player_struct["z_phys_32"] + memory_shift)
-	memory.writedword(base + player_struct["z_phys_32"] + memory_shift,z_phys_32 + tp_amount) 
-	z_cam_16 = memory.readword(base + player_struct["z_cam_16"] + memory_shift)
-	memory.writeword(base + player_struct["z_cam_16"] + memory_shift,z_cam_16 + tp_amount) 
+	z_phys_32 = readdword(base + player_struct["z_phys_32"] + memory_shift)
+	writedword(base + player_struct["z_phys_32"] + memory_shift,z_phys_32 + tp_amount) 
+	z_cam_16 = readword(base + player_struct["z_cam_16"] + memory_shift)
+	writeword(base + player_struct["z_cam_16"] + memory_shift,z_cam_16 + tp_amount) 
 	add_to_stepcounter(tp_amount)
 end
 
 -- GUI GAMEPLAY FUNCTIONS
 
 function get_memory_state()
-	if memory.readdword(base+data_table["memory_state_check_offs"]) == (base + data_table["memory_state_check_val"]) then -- check for ug/bt ptr
-		if memory.readbyte(data_table["ug_init_addr"]) == data_table["ug_init_val"] then -- if 0x1f, is UG
+	if readdword(base+data_table["memory_state_check_offs"]) == (base + data_table["memory_state_check_val"]) then -- check for ug/bt ptr
+		if readbyte(data_table["ug_init_addr"]) == data_table["ug_init_val"] then -- if 0x1f, is UG
 			return "UG"
 		end
 		return "BT" 
@@ -3106,32 +3115,35 @@ function get_edit_color(editing)
 end 
 
 function show_player_data()
-	x_phys_32 = memory.readword(base + player_struct["x_phys_32"] + memory_shift)
-	z_phys_32 = memory.readword(base + player_struct["z_phys_32"] + memory_shift) 
-	map_id_phys_32 =  memory.readword(base + live_struct["map_id_32"])
+	x_phys_32 = readword(base + player_struct["x_phys_32"] + memory_shift)
+	z_phys_32 = readword(base + player_struct["z_phys_32"] + memory_shift) 
+	map_id_phys_32 =  readword(base + live_struct["map_id_32"])
 	print_to_screen(10,30,"Physical:","yellow")
 	print_to_screen(20,40,"X: "..x_phys_32..","..fmt(x_phys_32,4),"yellow")
 	print_to_screen(20,50,"Z: "..z_phys_32..","..fmt(z_phys_32,4),"yellow")
 	print_to_screen(20,60,"Map Id: "..map_id_phys_32..","..fmt(map_id_phys_32,4),get_edit_color(map_editing))
-	x_stored_warp_16 = memory.readword(base + live_struct["x_stored_warp_16"])
-	z_stored_warp_16 = memory.readword(base + live_struct["z_stored_warp_16"])	
-	map_id_stored_warp_16 = memory.readword(base + live_struct["map_id_stored_warp_16"])
+	x_stored_warp_16 = readword(base + live_struct["x_stored_warp_16"])
+	z_stored_warp_16 = readword(base + live_struct["z_stored_warp_16"])	
+	map_id_stored_warp_16 = readword(base + live_struct["map_id_stored_warp_16"])
+	warp_id_stored_warp_32 = readword(base + live_struct["warp_id_stored_warp_32"])
 	print_to_screen(10,80,"Stored Warp:","yellow")
 	print_to_screen(20,90,"X: "..x_stored_warp_16..","..fmt(x_stored_warp_16,4),"yellow")
 	print_to_screen(20,100,"Z: "..z_stored_warp_16..","..fmt(z_stored_warp_16,4),"yellow")
 	print_to_screen(20,110,"Map Id: "..map_id_stored_warp_16..","..fmt(map_id_stored_warp_16,4),"yellow")
+	print_to_screen(20,120,"Warp Id: "..warp_id_stored_warp_32..","..fmt(warp_id_stored_warp_32,4),"yellow")
+	--print_to_screen(20,120,fmt(base + live_struct["warp_id_stored_warp_32"],4),"yellow")
 
-	step_counter = memory.readword(base + live_struct["step_counter"])
-	print_to_screen(10,130,"Steps: "..step_counter,"yellow")
-	npc_count = memory.readbyte(base + general_npc_struct["npc_count"] + memory_shift) -1 
-	print_to_screen(10,140,"NPCs: "..npc_count,"yellow")
-	print_to_screen(10,150,"TP: "..tp_amount,get_edit_color(teleport_editing))
+	step_counter = readword(base + live_struct["step_counter"])
+	print_to_screen(10,140,"Steps: "..step_counter,"yellow")
+	npc_count = readbyte(base + general_npc_struct["npc_count"] + memory_shift) -1 
+	print_to_screen(10,150,"NPCs: "..npc_count,"yellow")
+	print_to_screen(10,160,"TP: "..tp_amount,get_edit_color(teleport_editing))
 	
 end
 
 function win_ug_minigame()
 	for i = 0,data_table["ug_excavation_minigame_tile_count"] do
-		memory.writebyte(base+ug_excavation_minigame_struct["tiles_start"]+i,0)		
+		writebyte(base+ug_excavation_minigame_struct["tiles_start"]+i,0)		
 	end 
 end
 
@@ -3150,23 +3162,23 @@ function show_ug_gems()
 end 
 
 function show_ug_traps()
-	ug_trap_count = memory.readbyte(data_table["ug_trap_count_addr"])
+	ug_trap_count = readbyte(data_table["ug_trap_count_addr"])
 	draw_bounding_boxes(ug_trap_count,base + ug_trap_struct["x_phys_16"], base + ug_trap_struct["z_phys_16"],data_table["ug_trap_struct_size"],0x0,"#FFFFFF8","white")
 end 
 
 function show_objects()
-	object_count = memory.readword(base+object_struct["object_count"])
+	object_count = readword(base+object_struct["object_count"])
 	draw_bounding_boxes(object_count,base + object_struct["x_phys_32"], base + object_struct["z_phys_32"],data_table["object_struct_size"],0x0,"#9793FF8","purple")
 end 
 
 function show_triggers()
-	start_trigger_struct = memory.readdword(base+object_struct["trigger_ptr_offs"])
-	trigger_count = memory.readword(start_trigger_struct+trigger_struct["trigger_count"])
+	start_trigger_struct = readdword(base+object_struct["trigger_ptr_offs"])
+	trigger_count = readword(start_trigger_struct+trigger_struct["trigger_count"])
 	for i = 0,trigger_count-1 do 
-		x_phys_16 = memory.readword(start_trigger_struct + trigger_struct["x_phys_16"] + i*data_table["trigger_struct_size"])
-		z_phys_16 = memory.readword(start_trigger_struct + trigger_struct["z_phys_16"] + i*data_table["trigger_struct_size"])
-		vert_count_16 = memory.readword(start_trigger_struct+trigger_struct["vert_count_16"] + i*data_table["trigger_struct_size"])
-		hor_count_16 = memory.readword(start_trigger_struct+trigger_struct["hor_count_16"] + i*data_table["trigger_struct_size"])
+		x_phys_16 = readword(start_trigger_struct + trigger_struct["x_phys_16"] + i*data_table["trigger_struct_size"])
+		z_phys_16 = readword(start_trigger_struct + trigger_struct["z_phys_16"] + i*data_table["trigger_struct_size"])
+		vert_count_16 = readword(start_trigger_struct+trigger_struct["vert_count_16"] + i*data_table["trigger_struct_size"])
+		hor_count_16 = readword(start_trigger_struct+trigger_struct["hor_count_16"] + i*data_table["trigger_struct_size"])
 		for vert_offs = 0, vert_count_16-1 do
 			x_trigger_inst = x_phys_16 + vert_offs
 			for hor_offs = 0, hor_count_16-1 do
@@ -3178,20 +3190,20 @@ function show_triggers()
 end
 
 function show_warps()
-	start_warp_struct = memory.readdword(base+object_struct["warp_ptr_offs"])
-	warp_count = memory.readword(start_warp_struct+warp_struct["warp_count"])
+	start_warp_struct = readdword(base+object_struct["warp_ptr_offs"])
+	warp_count = readword(start_warp_struct+warp_struct["warp_count"])
 	draw_bounding_boxes(warp_count,start_warp_struct+warp_struct["x_phys_16"],start_warp_struct+warp_struct["z_phys_16"],data_table["warp_struct_size"],0x0,"#600038", "#C00058")
 end 
 
 function show_npcs()
-	npc_count = memory.readbyte(base + general_npc_struct["npc_count"] + memory_shift) -1 -- subtracting player's npc from count
+	npc_count = readbyte(base + general_npc_struct["npc_count"] + memory_shift) -1 -- subtracting player's npc from count
 	if npc_count > 0 then -- prevent negative npc count when not initialized
 		draw_bounding_boxes(npc_count,base + generic_npc_struct["x_phys_32"],base + generic_npc_struct["z_phys_32"],data_table["npc_struct_size"],memory_shift,"#88FFFFA0","#0FB58")
 	end
 end
 
 function show_trainer_range()
-	npc_count = memory.readbyte(base + general_npc_struct["npc_count"] + memory_shift) -1 -- subtracting player's npc from count
+	npc_count = readbyte(base + general_npc_struct["npc_count"] + memory_shift) -1 -- subtracting player's npc from count
 	if npc_count > 0 then -- prevent negative npc count when not initialized
 		
 	end
@@ -3199,15 +3211,15 @@ end
 
 function draw_bounding_boxes(count,x_start,z_start,struct_size,extra_offs,fill,border)
 	for i = 0,count-1 do 
-		x_phys_32 = memory.readword(x_start + i*struct_size + extra_offs)
-		z_phys_32 = memory.readword(z_start + i*struct_size + extra_offs)
+		x_phys_32 = readword(x_start + i*struct_size + extra_offs)
+		z_phys_32 = readword(z_start + i*struct_size + extra_offs)
 		draw_bounding_box(x_phys_32,z_phys_32,fill,border)
 	end
 end 
 
 function draw_bounding_box(x,z,fill_clr,border_clr)
-	x_v = (memory.readword(base + live_struct["x_pos_32_r"]) - x) *16
-	y_v = (memory.readword(base + live_struct["z_pos_32_r"]) - z)
+	x_v = (readword(base + live_struct["x_pos_32_r"]) - x) *16
+	y_v = (readword(base + live_struct["z_pos_32_r"]) - z)
 	if y_v > 0 then 
 		y_v = y_v*13
 	else
@@ -3227,7 +3239,7 @@ function show_bounding_boxes(memory_state)
 
 	-- data that should only be shown when in UG (check is for excavation game)
 	if memory_state == "UG" then
-		-- if memory.readbyte(base+data_table["menu_addr"]) == 0 then 
+		-- if readbyte(base+data_table["menu_addr"]) == 0 then 
 		show_ug_gems()
 		show_ug_traps()
 		-- 	return 
@@ -3271,12 +3283,12 @@ function toggle_matrix_mode()
 end 
 
 function show_void_pos()
-	matrix_width = memory.readbyte(base + matrix_struct["matrix_width_8"])
-	matrix_height = set_matrix_height or memory.readbyte(base + matrix_struct["matrix_height_8"])
+	matrix_width = readbyte(base + matrix_struct["matrix_width_8"])
+	matrix_height = set_matrix_height or readbyte(base + matrix_struct["matrix_height_8"])
 	matrix_center = base + matrix_struct["matrix_center_16"]
 
-	x_phys_32 = memory.readdwordsigned(base + player_struct["x_phys_32"] + memory_shift)
-	z_phys_32 = memory.readdwordsigned(base + player_struct["z_phys_32"] + memory_shift)
+	x_phys_32 = readdwordsigned(base + player_struct["x_phys_32"] + memory_shift)
+	z_phys_32 = readdwordsigned(base + player_struct["z_phys_32"] + memory_shift)
 
 	x_offs = math.modf(x_phys_32 / 32) *2
 	z_offs = math.modf(z_phys_32 / 32) *2 *matrix_height 
@@ -3295,7 +3307,7 @@ function hex_show_pos()
 	for row=0,9 do
 		for col=0,18 do 
 			c_map_offset = start_addr + row*2 + col*2*matrix_height-center
-			c_map_id = memory.readword(c_map_offset)
+			c_map_id = readword(c_map_offset)
 
 			if (c_map_offset == initial_addr) then
 				clr = 'white'
@@ -3316,7 +3328,7 @@ function int_show_pos()
 	for row=0,9 do
 		for col=0,18 do 
 			c_map_offset = start_addr + row*2 + col*2*matrix_height-center
-			c_map_id = math.min(memory.readword(c_map_offset),1000)
+			c_map_id = math.min(readword(c_map_offset),1000)
 
 			
 			if (c_map_offset == initial_addr) then
@@ -3331,8 +3343,8 @@ function int_show_pos()
 end 
 
 function split_word_into_bytes(word)
-	h_byte = bit.rshift(word,8)
-	l_byte = bit.band(word,0xFF)
+	h_byte = rshift(word,8)
+	l_byte = band(word,0xFF)
 	return {l_byte,h_byte}
 end 
 
@@ -3373,8 +3385,8 @@ function show_gridlines()
 end 
 
 function show_loadlines()
-	x_cam_16 = memory.readword(base + player_struct["x_cam_16"] + memory_shift)
-	z_cam_16 = memory.readword(base + player_struct["z_cam_16"] + memory_shift)
+	x_cam_16 = readword(base + player_struct["x_cam_16"] + memory_shift)
+	z_cam_16 = readword(base + player_struct["z_cam_16"] + memory_shift)
 
 	add_x = 0
 	add_y = 0
@@ -3395,8 +3407,8 @@ function show_loadlines()
 end
 
 function show_maplines()
-	x_phys_32 = memory.readdword(base + player_struct["x_phys_32"] + memory_shift)
-	z_phys_32 = memory.readdword(base + player_struct["z_phys_32"] + memory_shift)
+	x_phys_32 = readdword(base + player_struct["x_phys_32"] + memory_shift)
+	z_phys_32 = readdword(base + player_struct["z_phys_32"] + memory_shift)
 
 	add_x = 0
 	add_y = 0
@@ -3418,8 +3430,8 @@ function show_maplines()
 end  
 
 function show_mapmodellines()
-	x_cam_16 = memory.readword(base + player_struct["x_cam_16"] + memory_shift)
-	z_cam_16 = memory.readword(base + player_struct["z_cam_16"] + memory_shift)
+	x_cam_16 = readword(base + player_struct["x_cam_16"] + memory_shift)
+	z_cam_16 = readword(base + player_struct["z_cam_16"] + memory_shift)
 	x_line = (-x_cam_16+7)%32
 	z_line = (-z_cam_16+7)%32
 	draw_line(x_line*16+7,0,0,200, "orange")
@@ -3431,8 +3443,8 @@ function show_mapmodellines()
 end 
 
 function get_tile_color(tile_data)
-	tile_id = bit.band(tile_data,0xff)
-	collision = bit.rshift(tile_data,8)
+	tile_id = band(tile_data,0xff)
+	collision = rshift(tile_data,8)
 
 	if tile_id == 0x00 then 
 		if collision > 0x7F then return "#CCCCCC" end
@@ -3444,7 +3456,7 @@ function get_tile_color(tile_data)
 end 
 
 function get_collision_color(collision)
-	if bit.rshift(collision,7) ~= 0 then return "#CCCCCC" end
+	if rshift(collision,7) ~= 0 then return "#CCCCCC" end
 	return tile_id_list['default']['color']
 end 
 
@@ -3469,8 +3481,8 @@ function show_chunks_ow()
 	draw_rectangle(0,0,256,200,"#000001fff","#000001fff",2)
 	
 	additional_offset = 0
-	x_phys_32 = memory.readdword(base + player_struct["x_phys_32"] + memory_shift)
-	z_phys_32 = memory.readdword(base + player_struct["z_phys_32"] + memory_shift)
+	x_phys_32 = readdword(base + player_struct["x_phys_32"] + memory_shift)
+	z_phys_32 = readdword(base + player_struct["z_phys_32"] + memory_shift)
 
 	if x_phys_32 > 0x7FFFFFF then 
 		additional_offset = additional_offset -64
@@ -3505,14 +3517,14 @@ function toggle_debug_tile_print()
 end 
 
 function show_tile_data()
-	tile_id = memory.readbyte(base + player_struct["tile_type_16_1"] + memory_shift)
-	-- current_tile_2 = memory.readbyte(base + player_struct["tile_type_16_2"] + memory_shift) -- slower
+	tile_id = readbyte(base + player_struct["tile_type_16_1"] + memory_shift)
+	-- current_tile_2 = readbyte(base + player_struct["tile_type_16_2"] + memory_shift) -- slower
 	print_to_screen(143,15,"Tile: "..tile_id..","..fmt(tile_id,2),'yellow')
 	print_to_screen(143,25,tile_names[tile_id+1],'yellow')
 
-	start_chunk_struct = memory.readdword(base+data_table["chunk_calculation_ptr"])
+	start_chunk_struct = readdword(base+data_table["chunk_calculation_ptr"])
 	print_to_screen(143,35,"Loading:",'yellow')
-	load_state = memory.readbyte(start_chunk_struct + chunk_struct["load_state"])
+	load_state = readbyte(start_chunk_struct + chunk_struct["load_state"])
 	if load_state == 0 then
 		print_to_screen(198,35,"true",'green')
 		
@@ -3520,17 +3532,17 @@ function show_tile_data()
 		print_to_screen(198,35,"false",'red')
 	end
 
-	print_to_screen(143,45,"Vis X: ".. memory.readword(data_table['graphical_x']).."," .. fmt(memory.readword(data_table['graphical_x']),1),"yellow")
+	--print_to_screen(143,45,"Vis X: ".. readword(data_table['graphical_x']).."," .. fmt(readword(data_table['graphical_x']),1),"yellow")
 	
 	if show_load_calculations then 
-		x_target_16 = memory.readword(start_chunk_struct + chunk_struct["x_target_16"])
-		z_target_16 = memory.readword(start_chunk_struct + chunk_struct["z_target_16"])
+		x_target_16 = readword(start_chunk_struct + chunk_struct["x_target_16"])
+		z_target_16 = readword(start_chunk_struct + chunk_struct["z_target_16"])
 		print_to_screen(143,45,"Target:",'yellow')
 		print_to_screen(143,55,"    X: "..x_target_16..","..fmt(x_target_16,4),'yellow')
 		print_to_screen(143,65,"    Z: "..z_target_16..","..fmt(z_target_16,4),'yellow')
 
-		x_cam_16 = memory.readword(base + player_struct["x_cam_16"] + memory_shift)
-		z_cam_16 = memory.readword(base + player_struct["z_cam_16"] + memory_shift) 
+		x_cam_16 = readword(base + player_struct["x_cam_16"] + memory_shift)
+		z_cam_16 = readword(base + player_struct["z_cam_16"] + memory_shift) 
 
 		print_to_screen(143,75,"Graphical:",'yellow')
 		print_to_screen(143,85,"    X: "..x_cam_16..","..fmt(x_cam_16,4),'yellow')
@@ -3540,17 +3552,17 @@ function show_tile_data()
 end 
 
 function show_tiles_ow(additional_offset)
-	start_chunk_struct = memory.readdword(base+data_table["chunk_calculation_ptr"])
+	start_chunk_struct = readdword(base+data_table["chunk_calculation_ptr"])
 	print_to_screen(153,140,"0x"..fmt(start_chunk_struct,8))
 	chunk_pointer_offs = chunk_struct["chunk_pointer_offs"]
 	chunk_pointers = {}
 	print_to_screen(153,150,"Chunk addresses:")
 	for i = 1,#chunk_pointer_offs do
-		chunk_pointer = memory.readdword(chunk_pointer_offs[i] + start_chunk_struct)
+		chunk_pointer = readdword(chunk_pointer_offs[i] + start_chunk_struct)
 		print_to_screen(153,150+i*10,"0x"..fmt(chunk_pointer,7))
 		for col = 0,31 do 
 			for row = 0,31 do 
-				tile_data = memory.readword(chunk_pointer+row*2 + col*64+additional_offset)
+				tile_data = readword(chunk_pointer+row*2 + col*64+additional_offset)
 				tile_color = get_tile_color(tile_data)
 				draw_rectangle(chunk_scr_x[i]+row*4,chunk_scr_y[i] + col*3,5,4,tile_color,0,2)
 			end
@@ -3559,18 +3571,18 @@ function show_tiles_ow(additional_offset)
 end
 
 function show_collision_ow(additional_offset)
-	start_chunk_struct = memory.readdword(base+data_table["chunk_calculation_ptr"])
+	start_chunk_struct = readdword(base+data_table["chunk_calculation_ptr"])
 	print_to_screen(153,140,"0x"..fmt(start_chunk_struct,8))
 	chunk_pointer_offs = chunk_struct["chunk_pointer_offs"]
 	chunk_pointers = {}
 	print_to_screen(153,150,"Chunk addresses:")
 	for i = 1,#chunk_pointer_offs do
-		chunk_pointer = memory.readdword(chunk_pointer_offs[i] + start_chunk_struct)
+		chunk_pointer = readdword(chunk_pointer_offs[i] + start_chunk_struct)
 		print_to_screen(153,150+i*10,"0x"..fmt(chunk_pointer,7))
 		for row = 0,31 do 
 			for col = 0,31 do 
-				if (memory.readbyte(chunk_pointer+row*2 + col*64+additional_offset)) ~= 0xff then
-					collision  = memory.readbyte(chunk_pointer+row*2 + col*64+1+additional_offset)
+				if (readbyte(chunk_pointer+row*2 + col*64+additional_offset)) ~= 0xff then
+					collision  = readbyte(chunk_pointer+row*2 + col*64+1+additional_offset)
 					collision_color = get_collision_color(collision)
 				end 
 				draw_rectangle(chunk_scr_x[i]+row*4,chunk_scr_y[i] + col*3,5,4,collision_color,0,2)
@@ -3581,11 +3593,11 @@ function show_collision_ow(additional_offset)
 end
 
 function show_chunk_position()
-	start_chunk_struct = memory.readdword(base+data_table["chunk_calculation_ptr"])
-	c_chunk = memory.readbyte(chunk_struct["current_chunk_8"] + start_chunk_struct)
+	start_chunk_struct = readdword(base+data_table["chunk_calculation_ptr"])
+	c_chunk = readbyte(chunk_struct["current_chunk_8"] + start_chunk_struct)
 	if c_chunk < 4 then 
-		x_phys_32 = memory.readdword(base + player_struct["x_phys_32"] + memory_shift)
-		z_phys_32 = memory.readdword(base + player_struct["z_phys_32"] + memory_shift)
+		x_phys_32 = readdword(base + player_struct["x_phys_32"] + memory_shift)
+		z_phys_32 = readdword(base + player_struct["z_phys_32"] + memory_shift)
 		if x_phys_32 > 0x7FFFFFF then 
 			c_chunk = 1
 		end 
@@ -3621,13 +3633,13 @@ param_count = 0
 
 function swap_endian(num)
 
-	return bit.bor(bit.lshift(num%256,8),bit.rshift(num,8));
+	return bor(lshift(num%256,8),rshift(num,8));
 end
 
 halting_commands = {
 	[0x02]=0,[0x1B]=0,[0xB0]=0
 }
-function get_script_command_color(cmd)
+function scr_cmd_color(cmd)
 	if script_commands[cmd] then 
 		return script_commands[cmd]['color']
 	end 
@@ -3645,13 +3657,13 @@ end
 
 function show_script_start()
 	last_script_map = script_map 
-	script_map = memory.readword(base + live_struct["map_id_32"])
+	script_map = readword(base + live_struct["map_id_32"])
 
 	script_array_pointer = base + 0x29574 + memory_shift-- this only accounts for normal RETIRE 
-	script_array_addr = memory.readdword(script_array_pointer)
+	script_array_addr = readdword(script_array_pointer)
 
 	temp_script_offs_4_addr = script_array_addr + 4*3 -- 4th index, 4 bytes each (indexing from 0 instead of 1)
-	temp_script_execution_start_addr = temp_script_offs_4_addr + memory.readdword(temp_script_offs_4_addr) + 0x4-- add the offset to its own address, add 4 bcs jump starts after the address
+	temp_script_execution_start_addr = temp_script_offs_4_addr + readdword(temp_script_offs_4_addr) + 0x4-- add the offset to its own address, add 4 bcs jump starts after the address
 
 	if script_array_addr == 0 then 
 		script_executed = false
@@ -3676,7 +3688,7 @@ function show_script_start()
 
 	if (script_executed and update_variables) then
 		script_offs_4_addr = temp_script_offs_4_addr
-		script_offs_4 = memory.readdword(script_offs_4_addr)
+		script_offs_4 = readdword(script_offs_4_addr)
 		script_execution_start_addr = temp_script_execution_start_addr
 		show_script = true
 		update_variables = false 
@@ -3697,12 +3709,12 @@ end
 
 function get_internal_pointer()
 	opcode_pointer = base + script_execution_struct["opcode_pointer"] + memory_shift
-	next_opcode_addr = memory.readdword(opcode_pointer)
-	-- opcode = memory.readword(next_opcode_addr-2)
+	next_opcode_addr = readdword(opcode_pointer)
+	-- opcode = readword(next_opcode_addr-2)
 	-- if next_opcode_addr%2 == 1 then 
-	-- 	higher_byte = bit.band(memory.readword(next_opcode_addr),0xFF)
-	-- 	lower_byte = bit.rshift(memory.readword(next_opcode_addr-2),8)
-	-- 	opcode = bit.bor(bit.lshift(higher_byte,8),lower_byte)
+	-- 	higher_byte = band(readword(next_opcode_addr),0xFF)
+	-- 	lower_byte = rshift(readword(next_opcode_addr-2),8)
+	-- 	opcode = bor(lshift(higher_byte,8),lower_byte)
 	-- end 
 	--print_to_screen(143,185,"Pointer addr:\n    "..fmt(opcode_pointer,8),"yellow")
 end
@@ -3711,7 +3723,7 @@ function shiftl(value,count)
 	if value == 0 then
 		return 0
 	end 
-	return bit.lshift(value,count)
+	return lshift(value,count)
 
 end 
 
@@ -3719,7 +3731,7 @@ function shiftr(value,count)
 	if value == 0 then
 		return 0
 	end 
-	return bit.rshift(value,count)
+	return rshift(value,count)
 
 end 
 
@@ -3734,7 +3746,7 @@ function check_jump_validity(scr_cmd,par)
 		return
 	end 
 	if (scr_cmd == 0x19) then 
-		player_facing_direction = memory.readbyte(base + player_struct["facing_dir_32"] + memory_shift)
+		player_facing_direction = readbyte(base + player_struct["facing_dir_32"] + memory_shift)
 		if (par == player_facing_direction) then
 			return true
 		end 
@@ -3745,73 +3757,82 @@ end
 param_color = "#80A09" --"#AACC44"
 addr_color = "#888888"
 
+function readbyte_little_endian(addr) 
+	return bor(shiftl(readbyte(addr+1),8),readbyte(addr))
+end 
+
+function print_to_grid(data,color,index) 
+	print_to_screen(46+(index%8)*26,2+math.floor(index/8)*10,data,color,2)
+end 
+
+function print_addr(addr)
+	print_to_screen(1,2+math.floor(index/8)*10,fmt(addr,7),addr_color,2)
+end
+
+function increment_index(index,count)
+	index = index + count
+	if index%8 == 0 then print_addr(cur_sc_addr) end 
+	return index
+end 
+
 function show_script_memory()
 	draw_rectangle(0,0,256,200,"#000000ff","#000001888",2)
 	cur_sc_addr = script_execution_start_addr + scroll_vertical*0x10
-	cur_sc_id = bit.bor(shiftl(memory.readbyte(cur_sc_addr+1),8),memory.readbyte(cur_sc_addr))
+	cur_sc_id = bor(shiftl(readbyte(cur_sc_addr+1),8),readbyte(cur_sc_addr))
 	cur_sc_addr = cur_sc_addr - 2
 	cur_sc = script_commands[cur_sc_id]
 	param_length = 0
 	index = 0
 	jumps_shown = 0
 
+
 	while cur_sc do
 		cur_sc_addr = cur_sc_addr + 2 + param_length
-		cur_sc_id = bit.bor(shiftl(memory.readbyte(cur_sc_addr+1),8),memory.readbyte(cur_sc_addr))
-		print_to_screen(46+(index%8)*26,2+math.floor(index/8)*10,fmt(cur_sc_id,4),get_script_command_color(cur_sc_id),2)
+		cur_sc_id = readbyte_little_endian(cur_sc_addr)
+		print_to_grid(fmt(cur_sc_id,4),scr_cmd_color(cur_sc_id),index)
 		cur_sc = script_commands[cur_sc_id]
-
 		if cur_sc then 
-			if index%8 == 0 then 
-				print_to_screen(1,2+math.floor(index/8)*10,fmt(cur_sc_addr,7),addr_color,2)
-			end 
+			index = increment_index(index,0)
+
 			if halting_commands[cur_sc_id] then 
-				index = (index - index%8) + 8
-				print_to_screen(46+(index%8)*26,2+math.floor(index/8)*10,"EXECUTION HALTED: "..cur_sc['script_command'],"red",2)
+				index = (index - index%8) + 8 -- new line
+				print_to_grid("EXECUTION HALTED: "..cur_sc['script_command'],"red",index)
 				break
 			end 
+			
 			param_count = #cur_sc['parameters']
 			if param_count > 0 then
-				cur_param_addr = cur_sc_addr
 				jump_value = 0
 				jump_id = 0xFF
+				
 				if param_count%2 == 0 then
 					for i = 0, param_count-1,2 do 
-						cur_param_addr = cur_param_addr + 2
-						cur_param_id = bit.bor(shiftl(memory.readbyte(cur_param_addr+1),8),memory.readbyte(cur_param_addr))
-						jump_value = bit.bor(jump_value,shiftl(cur_param_id,8*i))
-						index = index + 1
-						print_to_screen(46+(index%8)*26,2+math.floor(index/8)*10,fmt(cur_param_id,4),param_color,2)
-						if index%8 == 0 then 
-							print_to_screen(1,2+math.floor(index/8)*10,fmt(cur_sc_addr,7),addr_color,2)
-						end 
+						cur_param_addr = cur_sc_addr + (2+i)
+						cur_param_id = readbyte_little_endian(cur_param_addr)
+						jump_value = bor(jump_value,shiftl(cur_param_id,8*i))
+						index = increment_index(index,1)
+						print_to_grid(fmt(cur_param_id,4),param_color,index)
 					end 
 					cur_sc_addr = cur_param_addr
 				else
 					for i = 0, param_count-2,2 do 
-						cur_param_addr = cur_param_addr + 2
-						cur_param_id = bit.bor(shiftl(memory.readbyte(cur_param_addr+1),8),memory.readbyte(cur_param_addr))
+						cur_param_addr = cur_sc_addr + (2+i)
+						cur_param_id = readbyte_little_endian(cur_param_addr)
 						if i ~= 0 then 
-							jump_value = bit.bor(jump_value,shiftl(cur_param_id,8*(i-1)))
+							jump_value = bor(jump_value,shiftl(cur_param_id,8*(i-1)))
 						else
-							jump_value = memory.readbyte(cur_param_addr+1)
-							jump_id = memory.readbyte(cur_param_addr)
+							jump_value = readbyte(cur_param_addr+1)
+							jump_id = readbyte(cur_param_addr)
 						end 
-						index = index + 1
-						print_to_screen(46+(index%8)*26,2+math.floor(index/8)*10,fmt(cur_param_id,4),param_color,2)
-						if index%8 == 0 then 
-							print_to_screen(1,2+math.floor(index/8)*10,fmt(cur_sc_addr,7),addr_color,2)
-						end 
+						index = increment_index(index,1)
+						print_to_grid(fmt(cur_param_id,4),param_color,index)
 					end 
 					cur_param_addr = cur_param_addr + 2
-					cur_param_id = memory.readbyte(cur_param_addr)
-					jump_value = bit.bor(jump_value,shiftl(cur_param_id,8*(param_count+2)))
-					index = index + 1
+					cur_param_id = readbyte(cur_param_addr)
+					jump_value = bor(jump_value,shiftl(cur_param_id,8*(param_count+2)))
+					index = increment_index(index,1)
 					print_to_screen(46+(index%8)*26,2+math.floor(index/8)*10,fmt(cur_param_id,2),param_color,2)
 					cur_sc_addr = cur_param_addr - 1
-					if index%8 == 0 then 
-						print_to_screen(1,2+math.floor(index/8)*10,fmt(cur_sc_addr,7),addr_color,2)
-					end 
 				end	
 			end
 
@@ -3889,9 +3910,9 @@ function memory_viewer_8()
 	draw_rectangle(0,0,256,200,"#000000CC","#000001888",2)
 	for y = 0,15 do
 		for x = 0,7 do
-			-- script_command = memory.readword(script_execution_start_addr+x*2+y*16)
+			-- script_command = readword(script_execution_start_addr+x*2+y*16)
 			current_addr = memview_addr+x*2+y*16 + scroll_vertical*0x10
-			value = bit.bor(shiftl(memory.readbyte(current_addr),8),memory.readbyte(current_addr+1))
+			value = bor(shiftl(readbyte(current_addr),8),readbyte(current_addr+1))
 			color = get_value_color(value)
 			print_to_screen(48+x*26,20+y*10,fmt(value,4),color,2)
 		end
@@ -3920,9 +3941,9 @@ function memory_viewer_16()
 	draw_rectangle(0,0,256,200,"#000000CC","#000001888",2)
 	for y = 0,15 do
 		for x = 0,7 do
-			-- script_command = memory.readword(script_execution_start_addr+x*2+y*16)
+			-- script_command = readword(script_execution_start_addr+x*2+y*16)
 			current_addr = memview_addr+x*2+y*16 + scroll_vertical*0x10
-			value = memory.readword(current_addr)
+			value = readword(current_addr)
 			color = get_value_color(value)
 			print_to_screen(48+x*26,20+y*10,fmt(value,4),color,2)
 		end
@@ -3946,60 +3967,10 @@ function memory_viewer_16()
 
 end 
 
--- RNG data
-
-function mult32(a,b)
-	local c=rshift(a,16)
-	local d=a%0x10000
-	local e=rshift(b,16)
-	local f=b%0x10000
-	local g=(c*f+d*e)%0x10000
-	local h=d*f
-	local i=g*0x10000+h
-	return i
-end
-
-function advance_rng(rng)
-	return mult32(rng,0x41C64E6D) + 0x6073
-end
-
-function get_rng()
-
-end 
-
-function show_rng()
-	get_rng()
-	gui.text(0,83,"Curr RNG: "..bit.tohex(currentRNG), "#FFFF00A0")
-	gui.text(0,93,"Next RNG: "..bit.tohex(nextRNG), "#FFFF00A0")
-	gui.text(0,103,"Dist last: "..distlast, "#FFFF00A0")
-	gui.text(0,113,"Dist seed: " .. distanceseed, "#FFFF00A0")
-	gui.text(0,123, "Step Cnt (128): ".. stepcnt128, "#FFFF00A0")
-	gui.text(0,133, "Enc. Rate Cnt: ".. stepcounter .. "/".. maxstepcounter, "#FFFF00A0")
-end 
-
--- Change game screen
-
-function write_image_to_calculator()
-	print("Changing calculator background")
-	start_a = 0x23409C0
-	block_length = 0xF
-	for i = 0,23 do 
-		for j = 0,23 do 
-		memory.writeword(start_a+block_length*i+j*2+(0xF*3*i),0xA1)
-		end 
-	end 
-
-end
-
-
-
--- SHOW MENU DATA
-function empty() end
-
 menu_choices = {
 	OW = {show_void_pos,show_chunks_ow,debug_script_calling,memory_viewer,empty},
 	UG = {show_void_pos,show_chunks_ug,memory_viewer},
-	BT = {show_void_pos,show_chunks_bt,debug_script_calling,memory_viewer,empty}
+	BT = {show_void_pos,show_chunks_battle_tower,debug_script_calling,memory_viewer,empty}
 	}
 
 function show_menu_choices()
@@ -4012,12 +3983,22 @@ function show_menu(index)
 end
 
 function auto_sprite_inc()
-	sprite = memory.readword(base + player_struct["sprite_id_32"])
-	memory.writeword(base + player_struct["sprite_id_32"],sprite+1)
+	sprite = readword(base + player_struct["sprite_id_32"])
+	writeword(base + player_struct["sprite_id_32"],sprite+1)
 	use_menu(5)
 	wait_frames(60)
 	press_button("B",4)
 end 
+
+function spam_items() 
+	for i = base+0x838,base+0x838+2000,4 do
+		writedword(i,0x00010002)
+	end 
+end
+
+function debug_set_map()
+	writeword(base + 0x22ADA,187)
+end
 
 key_configuration = {
 	switch_wtw_state = {"W"},
@@ -4045,6 +4026,8 @@ key_configuration = {
 	toggle_debug_tile_print = {"T","C"},
 	write_image_to_calculator = {"S","C"},
 	reset_scroll = {"shift","space"},
+	--spam_items = {"control","I"}
+	debug_set_map = {"control","G"}
 }
 
 key_configuration_cont = {
@@ -4109,8 +4092,8 @@ function reset_for_base(base_end)
 end 
 
 function main_gui()
-	base = memory.readdword(lang_data["base_addr"]) -- check base every loop in case of reset
-	--base = memory.readdword(memory.readdword(0x2002848)-4)
+	base = readdword(lang_data["base_addr"]) -- check base every loop in case of reset
+	--base = readdword(readdword(0x2002848)-4)
 	memory_state = get_memory_state() -- check for underground,battletower or overworld state (add: intro?)
 	memory_shift = data_table["memory_shift"][memory_state] -- get memory shift based on state
 
@@ -4141,7 +4124,7 @@ function main_gui()
 	run_functions()
 
 	-- reset game to specific base if necessary
-	-- reset_for_base(0xC0)
+	--reset_for_base(0x60)
 end
 
 
