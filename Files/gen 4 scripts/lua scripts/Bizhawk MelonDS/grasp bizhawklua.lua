@@ -3842,16 +3842,16 @@ function memory_viewer_8()
 		
 	end 
 	for x = 1,7 do
-		gui.drawline(46+(x*26),6,46+(x*26),179,"#444444")
+		draw_line(46+(x*26),6,46+(x*26),179,"#444444")
 	end 
 
 	text(2,8,temp_str_memory_addr,"yellow",2)
-	gui.drawline(45,6,45,179,"#888888")
-	gui.drawline(0,6,0,179,"#888888")
-	gui.drawline(255,6,255,179,"#888888")
-	gui.drawline(0,5,256,5,"#888888")
-	gui.drawline(0,17,256,17,"#888888")
-	gui.drawline(0,179,256,179,"#888888")
+	draw_line(45,6,45,179,"#888888")
+	draw_line(0,6,0,179,"#888888")
+	draw_line(255,6,255,179,"#888888")
+	draw_line(0,5,256,5,"#888888")
+	draw_line(0,17,256,17,"#888888")
+	draw_line(0,179,256,179,"#888888")
 
 end 
 
@@ -3873,16 +3873,16 @@ function memory_viewer_16()
 		
 	end 
 	for x = 1,7 do
-		gui.drawline(46+(x*26),6,46+(x*26),179,"#444444")
+		draw_line(46+(x*26),6,46+(x*26),179,"#444444")
 	end 
 
 	text(2,8,temp_str_memory_addr,"yellow",2)
-	gui.drawline(45,6,45,179,"#888888")
-	gui.drawline(0,6,0,179,"#888888")
-	gui.drawline(255,6,255,179,"#888888")
-	gui.drawline(0,5,256,5,"#888888")
-	gui.drawline(0,17,256,17,"#888888")
-	gui.drawline(0,179,256,179,"#888888")
+	draw_line(45,6,45,179,"#888888")
+	draw_line(0,6,0,179,"#888888")
+	draw_line(255,6,255,179,"#888888")
+	draw_line(0,5,256,5,"#888888")
+	draw_line(0,17,256,17,"#888888")
+	draw_line(0,179,256,179,"#888888")
 
 end 
 
@@ -4023,5 +4023,8 @@ function main()
 	run_continuous_function_on_keypress()
 	run_functions()
 end
+
+client.SetGameExtraPadding(260,0,260, 0)
+client.setwindowsize(2)
 
 while true do main() end
