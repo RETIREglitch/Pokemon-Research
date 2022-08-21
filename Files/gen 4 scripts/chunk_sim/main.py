@@ -156,13 +156,14 @@ class ChunkSimulator(UtilityClass):
                         for ptr,ptr_data_list in chunk.items():
                             for ptr_data in ptr_data_list:
                                 if int(ptr_data["base"],16) == base:
-                                    map_ids = searched_data["map_ids"]
+                                    map_ids = sorted(searched_data["map_ids"])
                                     if int(ptr_data["tile"],16) == tile_id:
                                         free = "Yes" if int(ptr_data["collision"],16) < 0x80 else "No "
                                         sorted_data[hex(base)][hex(tile_id)].append({"chunk":int(chunk_id[-1:]),"ptr":int(ptr[-1:]),"free":free.replace(" ",""),"map_ids":map_ids})
                                         text = f"{chunk_colors[chunk_id[-1:]]}   {chunk_id} {ptr} {movement_colors[free]} Free: {free} {Fore.LIGHTBLACK_EX}Map Ids: {map_ids[:14]}"
                                         if len(map_ids) > 14:
-                                            text += f"{Fore.LIGHTBLACK_EX} ... + {len(map_ids)-14}"
+                                            for i in range(round(len(map_ids[14:])/14)):
+                                                text += "\n" + " "*37 + f"{map_ids[14:][i*14:i*14+14]}"
                                         print(text)
             print("")
         return sorted_data
@@ -186,12 +187,15 @@ class ChunkSimulator(UtilityClass):
         return filtered_tiles
 
 class BaseFinder(ChunkSimulator):
-    def __init__(self,write_option="Y"):
+    def __init__(self,write_option="Y",specified_tiles=[]):
         super().__init__()
-        self.init()
+        self.init(specified_tiles)
 
 
-    def init(self):
+    def init(self,specified_tiles):
+        if len(specified_tiles):
+            self.tile_search_list = specified_tiles
+            return
         aslr_tile_list = self.get_all_aslr_tiles()
         manipable_tile_list = self.filter_tiles(aslr_tile_list)
         self.tile_search_list = [int(tile["id"],16) for tile in manipable_tile_list]
@@ -217,16 +221,13 @@ class BaseFinder(ChunkSimulator):
                     count += 1
             self.write_json(path + f"/dumps/sorted/dump{count+1}.json",sorted_dump)
         return
-        
-
-
 
 if __name__ == '__main__':
     # tile_search_list=[0xD8],base_search_list=[0x226D340]
-    chunksim = BaseFinder()
-    
+    chunksim = BaseFinder(specified_tiles=[0xD8]) #specified_tiles=[0xD8]
     # dump to determine any ASLR layout:
     #base_search_list = [base for base in range (chunksim.min_base,chunksim.min_base+0x100,4)]
-    base_search_list = [0x226D340]
+    base_search_list = [0x226d2d4]
+    #base_search_list =[ i + 0x20 for i in [0x226d33c,0x226d278,0x226d30c,0x226d310,0x226d294,0x226d2d0,0x226d264,0x226d268]] #[0x226d268 + 0x20,0x226d2a4 +0x20,0x226d338 + 0x20,0x226d33c + 0x20]#[0x226D2C0]
     chunksim.dump_required_pointers(base_search_list,"N")
     input()
