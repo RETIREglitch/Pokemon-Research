@@ -231,7 +231,7 @@
     {"id":"0xe5","name":"misc objects","interaction":0,"encounter":0,"particles":0,"checkable":{"normal":0,"pal_park":0},"distinguishable":0},
     {"id":"0xe6","name":"230","interaction":0,"encounter":0,"particles":0,"checkable":{"normal":0,"pal_park":0},"distinguishable":0},
     {"id":"0xe7","name":"231","interaction":0,"encounter":0,"particles":0,"checkable":{"normal":0,"pal_park":0},"distinguishable":0},
-    {"id":"0xe8","name":"232","interaction":0,"encounter":0,"particles":0,"checkable":{"normal":0,"pal_park":0},"distinguishable":0},
+    {"id":"0xe8","name":"shelves","interaction":1,"encounter":0,"particles":0,"checkable":{"normal":1,"pal_park":1},"distinguishable":1},
     {"id":"0xe9","name":"233","interaction":0,"encounter":0,"particles":0,"checkable":{"normal":0,"pal_park":0},"distinguishable":0},
     {"id":"0xea","name":"234","interaction":0,"encounter":0,"particles":0,"checkable":{"normal":0,"pal_park":0},"distinguishable":0},
     {"id":"0xeb","name":"235","interaction":0,"encounter":0,"particles":0,"checkable":{"normal":0,"pal_park":0},"distinguishable":0},
