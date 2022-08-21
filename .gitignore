@@ -13,3 +13,6 @@ Files/gen 4 scripts/lua scripts/Desmume/earlypoketch.dsm
 Files/gen 4 scripts/lua scripts/Desmume/test_aslr.dsm
 Files/gen 4 scripts/lua scripts/Desmume/ultimateRNG_ex (1).lua
 Files/gen 4 scripts/ASE/condition_data_converter.py
+Files/gen 4 scripts/ASE/necessary_pokemon.txt
+Files/gen 4 scripts/chunk_sim/dumps/dump2.json
+Files/gen 4 scripts/chunk_sim/dumps/sorted/dump2.json
