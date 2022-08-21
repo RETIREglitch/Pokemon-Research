@@ -1,0 +1,2 @@
+function Game:main()
+end
