@@ -1,8 +1,6 @@
 import json
 from os import stat
-# from os import stat
 import pathlib
-# from typing import Type
 from functools import lru_cache
 from colorama import Fore
 
@@ -41,9 +39,10 @@ class UtilityClass():
             json.dump(json_obj,file_,indent=1)
 
 class ChunkSimulator(UtilityClass):
-    def __init__(self,game_type=0,min_base=0x226D260):
+    def __init__(self,game_type=0,min_bases={"EN":0x226D260,"JP":0x2271940,"DE":0x226D4A0,"FR":0x226d5E0,"IT":0x226D440,"ES":0x226D600,"KO":0x2274B00},language="EN"):
         self.game = ["dp","pt","hgss"][game_type]
-        self.min_base = min_base
+        self.min_base = min_bases[language]
+        self.language = language
         self.json_chunk_data = self.load_json(path + "/data/chunk_data.json")
         self.game_data = self.json_chunk_data.get(self.game,{})
 
@@ -52,39 +51,7 @@ class ChunkSimulator(UtilityClass):
             [-0x11C0,0x86C],
             [-0x11C0,0x86C],
             [-0x11C0,0x86C]
-        ]       
-
-        # output = self.search_texture_sets()
-        # if write_option == "Y":
-        #     count = 0
-        #     for f in pathlib.Path(path + "/dumps").iterdir():
-        #         if f.is_file():
-        #             count += 1
-        #     self.write_json(path + f"/dumps/dump{count+1}.json",output)
-        # self.sort_by_base(output,base_search_list)
-
-        # while True:
-            # tile_search_list = input("Insert tiles to search, comma seperated > ")
-            # bases = input("Insert bases to search, comma seperated > ")
-            # print()
-            
-            # try:
-            #     self.tile_search_list = [int(tile,16) for tile in tile_search_list.split(",")]
-            #     base_search_list = [int(base,16) for base in bases.split(",")]
-            # except Exception:
-            #     self.tile_search_list = [0xD8,0x10]
-            #     base_search_list = [0x226D2CA,0x226D2C0]
-
-
-            # output = self.search_texture_sets()
-            # if write_option == "Y":
-            #     count = 0
-            #     for f in pathlib.Path(path + "/dumps").iterdir():
-            #         if f.is_file():
-            #             count += 1
-            #     self.write_json(path + f"/dumps/dump{count+1}.json",output)
-            # self.sort_by_base(output,base_search_list)
-            # input()
+        ]
 
     def search_texture_sets(self):
         output = []
@@ -187,10 +154,9 @@ class ChunkSimulator(UtilityClass):
         return filtered_tiles
 
 class BaseFinder(ChunkSimulator):
-    def __init__(self,write_option="Y",specified_tiles=[]):
-        super().__init__()
+    def __init__(self,specified_tiles=[],language="EN"):
+        super().__init__(language=language)
         self.init(specified_tiles)
-
 
     def init(self,specified_tiles):
         if len(specified_tiles):
@@ -209,25 +175,26 @@ class BaseFinder(ChunkSimulator):
     def dump_required_pointers(self,base_search_list,write_option="Y"):
         output = self.search_texture_sets()
         sorted_dump = self.sort_by_base(output,base_search_list)
+        dir = f"/dumps/{self.language}/"
         if write_option == "Y":
             count = 0
-            for f in pathlib.Path(path + "/dumps").iterdir():
+            for f in pathlib.Path(path + f"{dir}unsorted").iterdir():
                 if f.is_file():
                     count += 1
-            self.write_json(path + f"/dumps/dump{count+1}.json",output)
+            self.write_json(path + f"{dir}unsorted/dump{count+1}.json",output)
             count = 0
-            for f in pathlib.Path(path + "/dumps/sorted").iterdir():
+            for f in pathlib.Path(path + f"{dir}sorted").iterdir():
                 if f.is_file():
                     count += 1
-            self.write_json(path + f"/dumps/sorted/dump{count+1}.json",sorted_dump)
+            self.write_json(path + f"{dir}sorted/dump{count+1}.json",sorted_dump)
         return
 
 if __name__ == '__main__':
     # tile_search_list=[0xD8],base_search_list=[0x226D340]
-    chunksim = BaseFinder(specified_tiles=[0xD8]) #specified_tiles=[0xD8]
+    chunksim = BaseFinder(language="IT") #specified_tiles=[0xD8]
     # dump to determine any ASLR layout:
-    #base_search_list = [base for base in range (chunksim.min_base,chunksim.min_base+0x100,4)]
-    base_search_list = [0x226d2d4]
+    base_search_list = [base for base in range (chunksim.min_base,chunksim.min_base+0x100,4)]
+    #base_search_list = [0x226d2d4]
     #base_search_list =[ i + 0x20 for i in [0x226d33c,0x226d278,0x226d30c,0x226d310,0x226d294,0x226d2d0,0x226d264,0x226d268]] #[0x226d268 + 0x20,0x226d2a4 +0x20,0x226d338 + 0x20,0x226d33c + 0x20]#[0x226D2C0]
-    chunksim.dump_required_pointers(base_search_list,"N")
+    chunksim.dump_required_pointers(base_search_list,"Y")
     input()
