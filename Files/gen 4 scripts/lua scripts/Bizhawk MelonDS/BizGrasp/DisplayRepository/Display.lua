@@ -5,8 +5,12 @@ Display = {
     right = 260;
     screenX = 260,
     topScreenY = 0,
-    bottomScreenY = 382
-    screenY = {self.topScreenY,self.bottomScreenY}
+    bottomScreenY = 191,
+    centerX = 388,
+    centerY = 191,
+    width = 256,
+    height = 191,
+    rightScreen = 260+256
 }
 
 function Display:new (o)
@@ -22,16 +26,34 @@ function Display:setGameExtraPadding()
     gui.defaultTextBackground(0)
 end
 
-function Display:drawLine(x,y,width,height,clr,screenY,screenX)
-	screenY = screenY or 1
-    screenX = screenX or 0
-	gui.drawLine(x+screenX*self.screenX,self.screenY[screen]+y,x+screenX*self.screenX+width,self.screenY[screen]+y+height,clr)
+function Display:drawLine(x,y,width,height,clr,screenX,screenY)
+	screenY = screenY or 0
+    screenX = screenX or 1
+    x = x + screenX * self.screenX
+    y = y + screenY * self.bottomScreenY
+	gui.drawLine(x,y,x+width,y+height,clr)
 end 
 
+function Display:drawLineCentered(x,y,width,height,clr,centerX,centerY,screenX,screenY)
+    centerX = centerX or 1
+    centerY = centerY or 0
+    screenX = screenX or 0
+    screenY = screenY or 0
+    x = x + centerX* self.centerX
+    y = y + centerY* self.centerY/2 -- center is half of 2 screens, center of center is half of 1 screen
+    self:drawLine(x,y,width,height,clr,screenX,screenY)
+end
+
 function Display:update()
+    self:cleanStaleLayers()
     if MemoryState.gameplayState == "Underground" then 
         self.screenY = {self.bottomScreenY,self.topScreenY} 
         return 
     end
     self.screenY = {self.topScreenY,self.bottomScreenY}
+end
+
+function Display:cleanStaleLayers()
+    gui.clearGraphics()
+    --gui.cleartext()
 end

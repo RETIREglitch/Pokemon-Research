@@ -16,9 +16,11 @@ dofile(gameFolder .. "/Game.lua")
 dofile(utilityFolder .. "/Input.lua")
 dofile(utilityFolder .. "/Memory.lua")
 dofile(utilityFolder .. "/Utility.lua")
+dofile(utilityFolder .. "/Image.lua")
 
 game = Game:new()
 game:detect()
+Display = Display:new()
 
 if game.game == 0 then
 	while true do

@@ -48,19 +48,18 @@ function Game:detect()
 end 
 
 function Game:runScript()
-    Display.setGameExtraPadding()
+    Display:setGameExtraPadding()
 
     dofile(self.script) -- extend Game class with detected game's features
     self:init()
 
 	while true do
 		collectgarbage()
-        self:displayGameInfo()
         self:main()
 		emu.frameadvance()
 	end
 end
 
 function Game:displayGameInfo()
-    gui.text(0,0,"Rom: " .. self.romName .. " - " .. self.language .. " " .. self.gameName)
+    gui.text(0,20,"Rom: " .. self.romName .. " - " .. self.language .. " " .. self.gameName)
 end 

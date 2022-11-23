@@ -44,5 +44,5 @@ function MemoryState:update()
 end
 
 function MemoryState:display()
-    gui.text(0,18,"Base: 0x" .. Utility:format(self.base,8) .. " - " .. self.gameplayState)
+    gui.text(0,38,"Base: 0x" .. Utility:format(self.base,8) .. " - " .. self.gameplayState)
 end
