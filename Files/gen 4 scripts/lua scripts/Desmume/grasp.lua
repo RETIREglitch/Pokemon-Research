@@ -56,11 +56,24 @@ local map_id_list = {
 	},
 	goal = {
 		color = '#f7bbf3',
-		ids = {333,332,251,392,393,86}
+		ids = {
+			--383, 386, 387, 406,40, 442, 450, 457, 499, 501,342, 406, 501, 502, 503
+			67, 68 , 28, --, 45
+			-- 224, 356, 362, 363, 366, 382, 433, 442,
+			-- 400, 401, 402, 403, 404, 405, 450, 469, 262,
+			-- 132, 276, 277,
+			-- 11, 12, 13, 14, 15, 16, 17,
+			-- 125, 126, 164, 393,
+			-- 188, 406, 407, 408, 409, 457, 470, 471, 473,
+			-- 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100,
+			-- 167,
+			-- 33, 320, 388, 260, 288,
+			-- 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100
+		}
 		},
 	chain = {
 		color = '#DfA',
-		ids = {205,8,186,187,28}
+		ids = {363,77,343,0xD8}
 	},
 
 	default = {
@@ -268,16 +281,6 @@ for k,v in pairs(tile_id_list) do
 	end
 end
 
-jump_script_commands = {
-	[0x16] = 0,
-	--[0x17] = 1, -- not implemented yet because it requires understanding what it checks as flag
-	--[0x18] = 1,
-	[0x19] = 1,
-	[0x1A] = 0,
-	[0x1C] = 1,
-	[0x1D] = 1,
-}
-
 script_commands = {
 	[0x0] = {color = '#222222', script_command = 'Nop', parameters = {}},
 	[0x1] = {color = '#444444', script_command = 'Dummy', parameters = {}},
@@ -301,14 +304,14 @@ script_commands = {
 	[0x13] = {color = '#5555FFF', script_command = 'VMMachineAdd', parameters = {'id', 'id'}},
 	[0x14] = {color = '#5555FFF', script_command = 'ChangeCommonScr', parameters = {'val', 'val'}},
 	[0x15] = {color = '#5555FFF', script_command = 'ChangeLocalScr', parameters = {}},
-	[0x16] = {color = '#00BB22', script_command = 'GlobalJump', parameters = {'pos', 'pos', 'pos', 'pos'}},
-	[0x17] = {color = '#00BB22', script_command = 'ObjIDJump', parameters = {'id', 'pos', 'pos', 'pos', 'pos'}},
-	[0x18] = {color = '#00BB22', script_command = 'BgIDJump', parameters = {'id', 'pos', 'pos', 'pos', 'pos'}},
-	[0x19] = {color = '#00BB22', script_command = 'PlayerDirJump', parameters = {'val', 'pos', 'pos', 'pos', 'pos'}},
-	[0x1a] = {color = '#00BB22', script_command = 'GlobalCall', parameters = {'val', 'val', 'val', 'val'}},
+	[0x16] = {color = '#00BB22', script_command = 'GlobalJump', parameters = {'pos', 'pos', 'pos', 'pos'}, jump = 1},
+	[0x17] = {color = '#00BB22', script_command = 'ObjIDJump', parameters = {'id', 'pos', 'pos', 'pos', 'pos'}, jump = 1},
+	[0x18] = {color = '#00BB22', script_command = 'BgIDJump', parameters = {'id', 'pos', 'pos', 'pos', 'pos'}, jump = 1},
+	[0x19] = {color = '#00BB22', script_command = 'PlayerDirJump', parameters = {'val', 'pos', 'pos', 'pos', 'pos'}, jump = 1},
+	[0x1a] = {color = '#00BB22', script_command = 'GlobalCall', parameters = {'val', 'val', 'val', 'val'}, jump = 1},
 	[0x1b] = {color = 'orange', script_command = 'Ret', parameters = {}},
-	[0x1c] = {color = '#00BB22', script_command = 'IfJump', parameters = {'r', 'pos', 'pos', 'pos', 'pos'}},
-	[0x1d] = {color = '#00BB22', script_command = 'IfCall', parameters = {'r', 'pos', 'pos', 'pos', 'pos'}},
+	[0x1c] = {color = '#00BB22', script_command = 'IfJump', parameters = {'r', 'pos', 'pos', 'pos', 'pos'}, jump = 1},
+	[0x1d] = {color = '#00BB22', script_command = 'IfCall', parameters = {'r', 'pos', 'pos', 'pos', 'pos'}, jump = 1},
 	[0x1e] = {color = '#5555FFF', script_command = 'FlagSet', parameters = {'flg', 'flg'}},
 	[0x1f] = {color = '#5555FFF', script_command = 'FlagReset', parameters = {'flg', 'flg'}},
 	[0x20] = {color = '#5555FFF', script_command = 'FlagCheck', parameters = {'flg', 'flg'}},
@@ -1278,6 +1281,64 @@ sprite_id_dp = {
 	[0xD0] = "Machop",
 }
 
+texture_data =	{
+	{map_ids = {0, 1}, offsets = {0xae2b8,0xafce4,0xb1710,0xb313c}},
+	{map_ids = {2}, offsets = {0xb97c8,0xbb1f4,0xbcc20,0xbe64c}},
+	{map_ids = {332, 333, 410, 466}, offsets = {0xa1ce8,0xa3714,0xa5140,0xa6b6c}},
+	{map_ids = {3, 206, 334, 342, 343, 344, 345, 391, 392, 411, 418, 467}, offsets = {0xaeb10,0xb053c,0xb1f68,0xb3994}},
+	{map_ids = {45, 350, 353}, offsets = {0x96f00,0x9892c,0x9a358,0x9bd84}},
+	{map_ids = {65, 200, 202, 204, 256, 346, 347, 349, 365, 426}, offsets = {0xa0c28,0xa2654,0xa4080,0xa5aac}},
+	{map_ids = {86, 252, 354}, offsets = {0x927dc,0x94208,0x95c34,0x97660}},
+	{map_ids = {224, 356, 362, 363, 366, 382, 433, 442}, offsets = {0x920dc,0x93b08,0x95534,0x96f60}},
+	{map_ids = {132, 276, 277}, offsets = {0x951b8,0x96be4,0x98610,0x9a03c}},
+	{map_ids = {120, 222, 367, 371, 287}, offsets = {0x8eedc,0x90908,0x92334,0x93d60}},
+	{map_ids = {150, 468, 172, 274, 399, 472}, offsets = {0x9310c,0x94b38,0x96564,0x97f90}},
+	{map_ids = {165, 210, 211, 243, 340, 383, 385, 317, 318}, offsets = {0x8ecf0,0x9071c,0x92148,0x93b74}},
+	{map_ids = {33, 320, 388, 260, 288}, offsets = {0x8f218,0x90c44,0x92670,0x9409c}},
+	{map_ids = {400, 401, 402, 403, 404, 405, 450, 469, 262}, offsets = {0x849e8,0x86414,0x87e40,0x8986c}},
+	{map_ids = {266, 336, 341, 373, 380, 395}, offsets = {0x8e904,0x90330,0x91d5c,0x93788}},
+	{map_ids = {188, 406, 407, 408, 409, 457, 470, 471, 473}, offsets = {0x8cf84,0x8e9b0,0x903dc,0x91e08}},
+	{map_ids = {41, 42, 43, 44, 58, 60, 64, 81, 82, 83, 84, 106, 115, 127, 128, 129, 130, 131, 145, 146, 147, 148, 158, 159, 160, 161, 162, 163, 170, 171, 194, 195, 196, 257, 275, 348, 355, 364, 372, 375, 384, 386, 387, 394, 396, 397, 412, 413, 414, 415, 416, 417, 422, 423, 424, 425, 431, 432, 438, 439, 440, 441, 445, 446, 447, 448, 454, 455, 456, 464, 465, 491, 498, 499, 500, 502, 503, 514, 5, 23, 31, 32, 85, 335}, offsets = {0x9ab8c,0x9c5b8,0x9dfe4,0x9fa10}},
+	{map_ids = {6, 7, 18, 36, 37, 48, 49, 69, 70, 101, 102, 105, 114, 123, 124, 134, 135, 142, 151, 152, 168, 169, 173, 174, 175, 189, 190, 327, 420, 421, 428, 429, 435, 436, 443, 444, 452, 453, 459, 460, 463, 474, 475, 476, 477, 478, 479, 480, 481, 482, 483, 484, 485, 486, 487, 488, 489, 490, 495, 496, 516}, offsets = {0x8cf34,0x8e960,0x9038c,0x91db8}},
+	{map_ids = {4, 34, 46, 66, 71, 87, 121, 136, 137, 138, 139, 140, 141, 144, 153, 166, 191, 419, 427, 430, 434, 437, 451, 458}, offsets = {0x943f0,0x95e1c,0x97848,0x99274}},
+	{map_ids = {122}, offsets = {0x776ac,0x790d8,0x7ab04,0x7c530}},
+	{map_ids = {35}, offsets = {0x7c9a8,0x7e3d4,0x7fe00,0x8182c}},
+	{map_ids = {47}, offsets = {0x7496c,0x76398,0x77dc4,0x797f0}},
+	{map_ids = {67, 68}, offsets = {0x74b64,0x76590,0x77fbc,0x799e8}},
+	{map_ids = {88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100}, offsets = {0x766f0,0x7811c,0x79b48,0x7b574}},
+	{map_ids = {167}, offsets = {0x75754,0x77180,0x78bac,0x7a5d8}},
+	{map_ids = {133}, offsets = {0x777ac,0x791d8,0x7ac04,0x7c630}},
+	{map_ids = {154, 155, 156}, offsets = {0x86514,0x87f40,0x8996c,0x8b398}},
+	{map_ids = {8, 9, 10, 19, 20, 21, 22, 24, 25, 26, 27, 29, 30, 38, 39, 40, 50, 51, 52, 53, 54, 55, 56, 57, 59, 61, 62, 63, 72, 73, 74, 75, 76, 77, 78, 79, 80, 103, 104, 107, 108, 109, 110, 111, 112, 113, 143, 149, 192, 193, 201, 351, 374, 381, 389, 390, 398, 501, 517, 304, 352}, offsets = {0xa2480,0xa3eac,0xa58d8,0xa7304}},
+	{map_ids = {117, 118, 558}, offsets = {0xaace0,0xac70c,0xae138,0xafb64}},
+	{map_ids = {324, 325, 326, 328, 329, 330, 331, 493}, offsets = {0xab830,0xad25c,0xaec88,0xb06b4}},
+	{map_ids = {11, 12, 13, 14, 15, 16, 17}, offsets = {0xacdbc,0xae7e8,0xb0214,0xb1c40}},
+	{map_ids = {119, 337, 338, 339, 368, 369, 370, 376, 377, 378, 379, 492}, offsets = {0xaadb4,0xac7e0,0xae20c,0xafc38}},
+	{map_ids = {176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187}, offsets = {0x7f81c,0x81248,0x82c74,0x846a0}},
+	{map_ids = {116}, offsets = {0xaae54,0xac880,0xae2ac,0xafcd8}},
+	{map_ids = {157, 461, 462}, offsets = {0xab534,0xacf60,0xae98c,0xb03b8}},
+	{map_ids = {125, 126, 164, 393}, offsets = {0xacdc8,0xae7f4,0xb0220,0xb1c4c}},
+	{map_ids = {28}, offsets = {0x7bb54,0x7d580,0x7efac,0x809d8}},
+	{map_ids = {323}, offsets = {0xaa53c,0xabf68,0xad994,0xaf3c0}},
+	{map_ids = {357, 358, 359, 360, 361}, offsets = {0xab32c,0xacd58,0xae784,0xb01b0}},
+	{map_ids = {207, 208, 209, 212, 213, 214, 215, 216, 217, 218, 219, 244, 245, 246, 247, 248, 249, 254, 258, 259, 284, 285, 286, 313, 316, 319, 512, 513}, offsets = {0x76204,0x77c30,0x7965c,0x7b088}},
+	{map_ids = {203, 261, 321, 255}, offsets = {0x531d8,0x54c04,0x55490,0x7c6ac}},
+	{map_ids = {198, 199, 289, 290, 291, 292, 293, 294, 197}, offsets = {0x7a550,0x7bf7c,0x7d9a8,0x7f3d4}},
+	{map_ids = {225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 268, 269, 270, 271, 272, 273, 449, 515, 518, 519, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529, 530, 531, 532, 533, 534, 535, 536, 537, 538, 539, 540, 541, 542, 543, 544, 545, 546, 547, 548, 549, 550, 551, 552, 553, 554, 555, 556, 557}, offsets = {0x7b8a8,0x7d2d4,0x7ed00,0x8072c}},
+	{map_ids = {263, 264, 265}, offsets = {0x742b4,0x75ce0,0x7770c,0x79138}},
+	{map_ids = {305, 306, 307, 308, 309, 310}, offsets = {0xb563c,0xb7068,0xb8a94,0xba4c0}},
+	{map_ids = {253}, offsets = {0x7ea04,0x80430,0x81e5c,0x83888}},
+	{map_ids = {220, 221, 510, 511}, offsets = {0x83cd4,0x85700,0x8712c,0x88b58}},
+	{map_ids = {251}, offsets = {0x51920,0x5334c,0x54d78,0x7b098}},
+	{map_ids = {267, 311, 312, 314, 315}, offsets = {0x51e40,0x5386c,0x55298,0x55b24}},
+	{map_ids = {223, 504, 505, 506, 507, 508, 509}, offsets = {0x55124,0x56b50,0x7c8f8,0x7e324}},
+	{map_ids = {322}, offsets = {0x7f498,0x80ec4,0x828f0,0x8431c}},
+	{map_ids = {278, 279, 280, 281, 282, 283}, offsets = {0x798b8,0x7b2e4,0x7cd10,0x7e73c}},
+	{map_ids = {295, 296, 297, 298, 299, 300, 301, 302, 303}, offsets = {0xaf5d0,0xb0ffc,0xb2a28,0xb4454}},
+	{map_ids = {205}, offsets = {0x78c48,0x7a674,0x7c0a0,0x7dacc}},
+	{map_ids = {494, 497}, offsets = {0xb53a4,0xb6dd0,0xb87fc,0xba228}}
+}
+
 --missing berries
 --signs
 
@@ -1286,6 +1347,7 @@ data_tables = {
 	{	
 		item_struct_offs = 0x838,
 		step_counter_offs = 0x1384,
+		menu_state_offs = 0x131F,
 
 		-- start of structure offsets/structure data
 		player_live_struct_offs = 0x1440,
@@ -2443,10 +2505,19 @@ collision_states = {
 	[0x1C20] = 0x1000
 }
 
-function switch_wtw_state()
+function toggle_wtw_state()
 	current_collision_state = readword(lang_data["collision_check_addr"])
 	writeword(lang_data["collision_check_addr"],collision_states[current_collision_state])
 end
+
+function toggle_menu_state()
+	menu_state = readbyte(base + data_table["menu_state_offs"])
+	if menu_state == 0x0 then
+		writebyte(base + data_table["menu_state_offs"],0x2)
+		return
+	end
+	writebyte(base + data_table["menu_state_offs"],0x0)
+end 
 
 function set_stepcounter(steps)
 	step_addr = base+live_struct["step_counter"]
@@ -2459,7 +2530,8 @@ function add_to_stepcounter(steps)
 end 
 
 function clear_stepcounter()
-	tap_touch_screen(115,120,1)
+	tap_touch_screen(115,120,2)
+
 end 
 
 function check_bike_state()
@@ -2508,7 +2580,7 @@ function up(steps,delay_before_reset,delay_after_reset,reset_stepcounter)
 	target = player_pos_y - steps
 
 	-- account for bike momentum
-	if check_bike_state() == 2 then
+	if check_bike_state() == 1 then
 		if steps > 3 then 
 			target = target + 2
 		end
@@ -2748,81 +2820,59 @@ function press_equal_sign()
 end 
 
 function auto_movement()
-	up(1,0,0,"false")
-	right(1,0,0,"false")
+	right(5,0,0,"false")
 	down(1,0,0,"false")
 	up(1,0,0,"false")
 	left(1,0,0,"false")
-	right(1,0,0,"false")
+	get_on_bike(1)
+	up(24,0,0,"false")
+	left(37,0,0,"false")
+	up(12,0,0,"false")
+	right(7,0,0,"false")
+	down(5,0,0,"false")
+	graphic_reload()
+	press_button("down",8)
+	wait_frames(160)
+	clear_stepcounter()
+	down(1,2,2,true)
+	left(17,2,2,true)
+	down(18,2,2,true)
+	press_button("Y",8)
+	wait_frames(8)
+	up(1,2,2,true)
+	graphic_reload()
+	left(415,2,2,true)
+	save_reset()
+	
+	right(1,2,2,true)
+	graphic_reload()
+	down(512,2,2,true)
+	left(1,2,2,"false")
+	left(1,2,2,true)
+	down(1,2,2,true)
+	wait_frames(8)
+	graphic_reload()
+	wait_frames(8)
+	up(1,2,2,true)
+	right(1,2,2,"false")
+	right(1,2,2,true)
+	up(190,2,2,true)
+	right(155,2,2,true)
 	down(1,0,0,"false")
-	left(1,0,0,"false")
-	right(1,0,0,"false")
-	left(1,0,0,"false")
-	up(1,0,0,"false")
-	right(1,0,0,"false")
-	down(1,0,0,"false")
-	up(1,0,0,"false")
-	left(1,0,0,"false")
-	down(1,0,0,"false")
-	right(1,0,0,"false")
-	left(1,0,0,"false")
-	
-	
-	--press_buttons({"B","down"},8)
-	--press_buttons({"B","right"},8)
-	--press_buttons({"B","down"},8)
-	--press_buttons({"B","left"},8)
-
-	--press_buttons({"B","up"},8)
-	
-	
-	
-	
-	
-	
-	
-	
-	-- show_steps=false
-	-- wait_frames(20)
-	-- left(1,0,0,"false")
-	-- down(1,0,0,"false")
-	-- right(1,0,0,"false")
-	-- left(1,0,0,"false")
-	-- up(1)
-	-- left(1,0,0,"false")
-	-- up(14,0,0,"false")
-	-- left(15,0,0,"false")
-	-- wait_frames(8)
-	-- mash_button("A",60)
-	-- clear_stepcounter()
-	-- show_steps=true
-	-- wait_frames(8)
-	-- up(5)
-	-- right(161)
-	-- down(25441)
-	-- right(32)
-
-	-- down(1344)
-	-- left(1)
-	-- down(1248)
-	-- right(1)
-	-- down(385)
-	-- left(1)
-	-- down(1152)
-	-- right(1)
-	-- down(159)
-	-- left(1)
-	-- down(1344)
-	-- right(1)
-	
-	-- down(12033)
-	-- right(27)
-	-- down(96) -- pal park cutscene
-	-- print("pal park reached!")
-	-- wait_frames(1200)
-	-- right(80) -- or 81 for map 332
-	-- print("map 332 reached!")
-	-- up(1) -- map 332/333
+	wait_frames(8)
+	ledgecancel()
+	up(1,2,2,true)
+	right(25,2,2,true)
+	down(1,2,2,true)
+	right(373,2,2,true)
+	up(80,2,2,true)
+	graphic_reload()
+	wait_frames(20)
+	press_button("up",16)
+	wait_frames(180)
+	up(7,0,0,"false")
+	wait_frames(20)
+	mash_button("A",200)
 end 
 
 function auto_calculate()
@@ -3612,6 +3662,75 @@ function show_chunk_position()
 	
 end 
 
+function search_tile_manip(req_tile)
+	req_tile = req_tile or 0xD8
+	found = 0
+	map_id_phys_32 =  readword(base + live_struct["map_id_32"])
+	print("Searching with map_id: "..map_id_phys_32)
+	for set_id,set in pairs(texture_data) do
+		for offs_id,offs in pairs(set["offsets"]) do
+			
+			for tile_offs = 0,0x26,2 do
+				tile_addr = base + (offs-0x26) + tile_offs
+				tile = memory.readbyte(tile_addr)
+				if tile == req_tile then
+					print("\n")
+					for map in pairs(set["map_ids"]) do
+						if map_id_phys_32 == set["map_ids"][map] then
+							for i = 0, 3 do
+								print("!!!!! Current map !!!!!")
+							end
+						end
+					end
+
+					print("Found tile at "..fmt(tile_addr,4))
+					print("Tile: "..(tile_offs/2)+13)
+					print("Set: "..set_id)
+					print("Maps: ")
+					print(set["map_ids"])
+					found = found + 1
+				end
+			end 
+		end
+	end 
+	print("Found "..found.." tiles for map " ..map_id_phys_32)
+end 
+
+map_ase_combos = {
+	[28] = {0x2A15E,0x2A1D6,0x2A18E,0x2A186,0x2A1F4,0x2A1B2,0x2A1EC,0x2A170,
+			0x2A99C,0x2AA18,0x2A9DE,0x2AA20,0x2A9B2,0x2A9BA,0x2AA02,0x2A98A,0x2A9D0},
+	[67] = {},
+	[68] = {0x2A130,0x2A164,0x2A11A,0x2A190,0x2A18E,0x2A148,0x2A13A,
+			0x2A95C,0x2A966,0x2A974,0x2A9BA,0x2A9BC,0x2A946,0x2A990}
+}
+-- order the lists above by offset
+
+map_ase_combos =  {
+	[28] = {0x2A15E,0x2A170,0x2A186,0x2A18E,0x2A1B2,0x2A1D6,0x2A1EC,0x2A1F4,
+			0x2A99C,0x2A9B2,0x2A9BA,0x2A9D0,0x2A9DE,0x2A98A,0x2AA02,0x2AA18,0x2AA20},
+	[67] = {},
+	[68] = {0x2A11A,0x2A130,0x2A13A,0x2A148,0x2A164,0x2A190,0x2A18E,
+			0x2A95C,0x2A946,0x2A966,0x2A974,0x2A990,0x2A9BA,0x2A9BC}
+}
+
+-- find the missing value in map 28's list, bottom row is correct, the 2 sequences have the same intervals
+
+
+function search_ase_manip()
+	for map_id,offsets in pairs(map_ase_combos) do
+		print("Searching for map "..map_id)
+		results = 0
+		for i = 1, #offsets-1 do
+			if memory.readword(offsets[i]+ base)  == map_id then
+				results = results + 1
+				print("Found map_id at "..fmt(offsets[i] + base,4))
+			end
+		end 
+		print("Found "..results.." map_ids for map "..map_id)
+	end
+end
+
+
 function show_chunks_battle_tower()
 end
 
@@ -3662,8 +3781,8 @@ function show_script_start()
 	script_array_pointer = base + 0x29574 + memory_shift-- this only accounts for normal RETIRE 
 	script_array_addr = readdword(script_array_pointer)
 
-	temp_script_offs_4_addr = script_array_addr + 4*3 -- 4th index, 4 bytes each (indexing from 0 instead of 1)
-	temp_script_execution_start_addr = temp_script_offs_4_addr + readdword(temp_script_offs_4_addr) + 0x4-- add the offset to its own address, add 4 bcs jump starts after the address
+	-- temp_script_offs_4_addr = script_array_addr + 4*3 -- 4th index, 4 bytes each (indexing from 0 instead of 1)
+	-- temp_script_execution_start_addr = temp_script_offs_4_addr + readdword(temp_script_offs_4_addr) + 0x4-- add the offset to its own address, add 4 bcs jump starts after the address
 
 	if script_array_addr == 0 then 
 		script_executed = false
@@ -3687,9 +3806,12 @@ function show_script_start()
 	end
 
 	if (script_executed and update_variables) then
-		script_offs_4_addr = temp_script_offs_4_addr
+		script_offs_4_addr = script_array_addr + 4*3
 		script_offs_4 = readdword(script_offs_4_addr)
-		script_execution_start_addr = temp_script_execution_start_addr
+		if (readword(base + live_struct["map_id_32"]) == 332 or readword(base + live_struct["map_id_32"]) == 333) and (script_offs_4 == 0x4652) then 
+			script_offs_4 = 0x5544 -- this is a hack because the header gets overwritten after 1 frame, so we need to manually set it to the correct value
+		end
+		script_execution_start_addr =script_offs_4_addr + script_offs_4 + 0x4
 		show_script = true
 		update_variables = false 
 	end 
@@ -3700,6 +3822,7 @@ function show_script_start()
 		print_to_screen(153,45,"Array:  0x"..fmt(script_array_addr,0),"#00f0f")
 		print_to_screen(153,55,"Offset: 0x"..fmt(script_offs_4,0),"#00f0f")
 		print_to_screen(153,65,"Exec:   0x"..fmt(script_execution_start_addr,0),"#00f0f")
+		print_to_screen(153,75,"RelExe: 0x"..fmt(script_execution_start_addr - base,0),"#00f0f")
 		show_script_memory()
 	else
 		print_to_screen(143,15,"No script loaded","#00f0f")
@@ -3735,25 +3858,6 @@ function shiftr(value,count)
 
 end 
 
-function check_jump_validity(scr_cmd,par)
-	if (scr_cmd == 0x16 or scr_cmd == 0x1A) then
-		return true 
-	end 
-	if (scr_cmd == 0x1C or scr_cmd == 0x1D) then 
-		if (par == 0x0 or par == 0x3 or par == 0x5) then 
-			return true
-		end
-		return
-	end 
-	if (scr_cmd == 0x19) then 
-		player_facing_direction = readbyte(base + player_struct["facing_dir_32"] + memory_shift)
-		if (par == player_facing_direction) then
-			return true
-		end 
-		return
-	end 
-end 
-
 param_color = "#80A09" --"#AACC44"
 addr_color = "#888888"
 
@@ -3761,9 +3865,9 @@ function readbyte_little_endian(addr)
 	return bor(shiftl(readbyte(addr+1),8),readbyte(addr))
 end 
 
-function print_to_grid(data,color,index) 
-	print_to_screen(46+(index%8)*26,2+math.floor(index/8)*10,data,color,2)
-end 
+-- function print_to_grid(data,color,index) 
+-- 	print_to_screen(46+(index%8)*26,2+math.floor(index/8)*10,data,color,2)
+-- end 
 
 function print_addr(addr)
 	print_to_screen(1,2+math.floor(index/8)*10,fmt(addr,7),addr_color,2)
@@ -3775,92 +3879,134 @@ function increment_index(index,count)
 	return index
 end 
 
-function show_script_memory()
-	draw_rectangle(0,0,256,200,"#000000ff","#000001888",2)
-	cur_sc_addr = script_execution_start_addr + scroll_vertical*0x10
-	cur_sc_id = bor(shiftl(readbyte(cur_sc_addr+1),8),readbyte(cur_sc_addr))
-	cur_sc_addr = cur_sc_addr - 2
-	cur_sc = script_commands[cur_sc_id]
-	param_length = 0
-	index = 0
-	jumps_shown = 0
+function read_n_bytes(addr,n)
+	local value = 0
+	for i = 0, n-1 do 
+		value = bor(value,shiftl(readbyte(addr+i),8*i))
+	end 
+	return value
+end
 
+function group_param_size(params)
+	-- if params is empty, return empty table
+	if #params == 0 then 
+		return {}
+	end
 
-	while cur_sc do
-		cur_sc_addr = cur_sc_addr + 2 + param_length
-		cur_sc_id = readbyte_little_endian(cur_sc_addr)
-		print_to_grid(fmt(cur_sc_id,4),scr_cmd_color(cur_sc_id),index)
-		cur_sc = script_commands[cur_sc_id]
-		if cur_sc then 
-			index = increment_index(index,0)
+	local grouped_params = {}
+	local prev_param = params[1]
+	local cur_param_size = 0
 
-			if halting_commands[cur_sc_id] then 
-				index = (index - index%8) + 8 -- new line
-				print_to_grid("EXECUTION HALTED: "..cur_sc['script_command'],"red",index)
-				break
-			end 
-			
-			param_count = #cur_sc['parameters']
-			if param_count > 0 then
-				jump_value = 0
-				jump_id = 0xFF
-				
-				if param_count%2 == 0 then
-					for i = 0, param_count-1,2 do 
-						cur_param_addr = cur_sc_addr + (2+i)
-						cur_param_id = readbyte_little_endian(cur_param_addr)
-						jump_value = bor(jump_value,shiftl(cur_param_id,8*i))
-						index = increment_index(index,1)
-						print_to_grid(fmt(cur_param_id,4),param_color,index)
-					end 
-					cur_sc_addr = cur_param_addr
-				else
-					for i = 0, param_count-2,2 do 
-						cur_param_addr = cur_sc_addr + (2+i)
-						cur_param_id = readbyte_little_endian(cur_param_addr)
-						if i ~= 0 then 
-							jump_value = bor(jump_value,shiftl(cur_param_id,8*(i-1)))
-						else
-							jump_value = readbyte(cur_param_addr+1)
-							jump_id = readbyte(cur_param_addr)
-						end 
-						index = increment_index(index,1)
-						print_to_grid(fmt(cur_param_id,4),param_color,index)
-					end 
-					cur_param_addr = cur_param_addr + 2
-					cur_param_id = readbyte(cur_param_addr)
-					jump_value = bor(jump_value,shiftl(cur_param_id,8*(param_count+2)))
-					index = increment_index(index,1)
-					print_to_screen(46+(index%8)*26,2+math.floor(index/8)*10,fmt(cur_param_id,2),param_color,2)
-					cur_sc_addr = cur_param_addr - 1
-				end	
+	for i=1,#params do 
+		if prev_param == params[i] then 
+			cur_param_size = cur_param_size + 1
+			prev_param = params[i]
+		else
+			table.insert(grouped_params,cur_param_size)
+			cur_param_size = 1
+			prev_param = params[i]
+		end
+	end
+	table.insert(grouped_params,cur_param_size)
+	return grouped_params
+end
+
+function ends_execution(cmd_id,cmd_data)
+	if cmd_data == nil then return true end
+	if (cmd_id == 0x2) or (cmd_id == 0xB0) then return true end
+	return false
+end
+
+function update_grid_pos(grid_pos,bytes,address)
+	local new_grid_pos = grid_pos
+	new_grid_pos.x = new_grid_pos.x + bytes -- + 1 to add a gap
+	if new_grid_pos.x >= 14 then 
+		new_grid_pos.x = 0
+		new_grid_pos.y = new_grid_pos.y + 1
+		print_to_screen(0,2+new_grid_pos.y*10,fmt(address,8),"grey",2)
+	end
+	return new_grid_pos
+end
+
+function print_to_grid(grid_pos,bytes,bytecount,color)
+	print_to_screen(52+grid_pos.x*13,2+grid_pos.y*10,fmt(bytes,bytecount),color,2)
+end 
+
+function is_valid_jump(cmd_id,flag) -- flag is conditional
+	if (cmd_id == 0x16 or cmd_id == 0x1A) then return true end 
+	if (cmd_id == 0x1C or cmd_id == 0x1D) and (flag == 0x0 or flag == 0x3 or flag == 0x5) then return true end
+	-- if (cmd_id == 17) and (notImplemented) then return true end
+	-- if (cmd_id == 18) and (notImplemented) then return true end
+	if (cmd_id == 0x19) and (flag == readbyte(base + player_struct["facing_dir_32"] + memory_shift)) then return true end
+	return false
+end 
+
+function show_script_memory ()
+	draw_rectangle(0,0,256,200,"#000000ff","#000000ff",2)
+
+	local offset = 0
+	local additional_offset = 0
+
+	local grid_pos = {x=0,y=0}
+	if scroll_vertical > 100000 then return end
+	while script_execution_start_addr + offset < script_execution_start_addr + scroll_vertical * 0xE do
+		cmd_id = read_n_bytes(script_execution_start_addr + offset + additional_offset,2)
+		offset = offset + 2
+		cmd_data = script_commands[cmd_id]
+		if not ends_execution(cmd_id,cmd_data) then
+			params = cmd_data['parameters']
+			params_grouped = group_param_size(params)
+			param_values_stored = {}
+
+			for i=1,#params_grouped do 
+				param_size = params_grouped[i]
+				param_value = read_n_bytes(script_execution_start_addr + offset + additional_offset,param_size)
+				table.insert(param_values_stored,param_value)
+				offset = offset + param_size
 			end
 
-		else 
-			index = (index - index%8) + 8
-			print_to_screen(46+(index%8)*26,2+math.floor(index/8)*10,"EXECUTION HALTED","red",2)
-			break
+			if is_valid_jump(cmd_id,param_values_stored[1]) then additional_offset = additional_offset + param_value end
+		end
+	end
+
+	while grid_pos.y < 18 do
+		if (grid_pos.y == 0 and grid_pos.x == 0) then print_to_screen(0,2+grid_pos.y*10,fmt(script_execution_start_addr + offset + additional_offset,8),"grey",2) end
+		cmd_id = read_n_bytes(script_execution_start_addr + offset + additional_offset,2)
+		offset = offset + 2
+		print_to_grid(grid_pos,cmd_id,4,scr_cmd_color(cmd_id))
+		grid_pos = update_grid_pos(grid_pos,2,script_execution_start_addr + offset + additional_offset) 
+
+		cmd_data = script_commands[cmd_id]
+		if not ends_execution(cmd_id,cmd_data) then -- remove 'not' and do break end to stop at end of script
+
+			-- cmd_name = cmd_data['script_command']
+			params = cmd_data['parameters']
+			params_grouped = group_param_size(params)
+			param_values_stored = {}
+
+			for i=1,#params_grouped do 
+				param_size = params_grouped[i]
+				-- param_id = params[i]
+				-- param_name = script_parameters[param_id]
+				param_value = read_n_bytes(script_execution_start_addr + offset + additional_offset,param_size)
+				table.insert(param_values_stored,param_value)
+				offset = offset + param_size
+				print_to_grid(grid_pos,param_value,param_size*2,param_color)
+				grid_pos = update_grid_pos(grid_pos,param_size,script_execution_start_addr + offset + additional_offset)
+			end
+
+			if is_valid_jump(cmd_id,param_values_stored[1]) then 
+				additional_offset = additional_offset + param_value
+				grid_pos.x = 0
+				print_to_screen(52+grid_pos.x*13,2+(grid_pos.y+1)*10,"jmp by 0x"..fmt(param_value,0).." to 0x"..fmt(script_execution_start_addr + offset + additional_offset,0),"green",2)
+				grid_pos.y = grid_pos.y + 2
+				print_to_screen(0,2+grid_pos.y*10,fmt(script_execution_start_addr + offset + additional_offset,8),"grey",2)
+			end		
 		end
 
-		if check_jump_validity(cur_sc_id,jump_id) then
-			print_to_screen(143,85+10*jumps_shown,"Jump"..(jumps_shown+1)..": 0x"..fmt(jump_value,0),"yellow")
-			index = (index - index%8) + 8
-			cur_sc_addr = cur_sc_addr + jump_value
-			print_to_screen(46+(index%8)*26,2+math.floor(index/8)*10,"Jump by 0x"..fmt(jump_value,0).." to 0x"..fmt(cur_sc_addr+2,8),"red",2)
-			index = index + 7
-			jumps_shown = jumps_shown + 1
-		end 
+	end
+end
 
-
-		if index > 142 then
-			break
-		end
-		index = index + 1
-	end 
-	if index == 0 then
-		print_to_screen(2,2,"First encountered script command invalid.","red",2)
-	end 
-end 
 
 scroll_vertical = 0
 scroll_horizontal = 0
@@ -4001,7 +4147,10 @@ function debug_set_map()
 end
 
 key_configuration = {
-	switch_wtw_state = {"W"},
+	search_tile_manip = {"shift","D"},
+	search_ase_manip = {"shift","S"},
+	toggle_wtw_state = {"W"},
+	toggle_menu_state = {"Q"},
 	toggle_map_editing = {"M"},
 	toggle_teleport_editing = {"J"},
 	toggle_hexview = {"control","H"},
@@ -4091,6 +4240,14 @@ function reset_for_base(base_end)
 	end 
 end 
 
+function show_gui()
+	show_boundary_lines()
+	show_menu(menu_id)
+
+	print_to_screen(5,15,"Base:"..fmt(base,8),'yellow')
+	show_player_data()
+end
+
 function main_gui()
 	base = readdword(lang_data["base_addr"]) -- check base every loop in case of reset
 	--base = readdword(readdword(0x2002848)-4)
@@ -4103,11 +4260,7 @@ function main_gui()
 	if bounding_view then 
 		show_bounding_boxes(memory_state)
 	end 
-	show_boundary_lines()
-	show_menu(menu_id)
-
-	print_to_screen(5,15,"Base:"..fmt(base,8),'yellow')
-	show_player_data()
+	show_gui()
 
 	-- print_to_screen(5,10,fmt(base,7),"yellow")
 	-- print_to_screen(5,20,memory_state,"red")
