@@ -767,7 +767,7 @@ function change_map_id()
 		if temp_map_id > 65535 then
 			temp_map_id = 65535
 		end 
-		memory.write_u16_le(base + live_struct["map_id_32"],temp_map_id)
+		mainmemory.write_u16_le(base + live_struct["map_id_32"] - 0x2000000,temp_map_id)
 		map_editing = false
 	end
 end 
@@ -1288,7 +1288,6 @@ key_configuration = {
 }
 
 function run_functions_on_keypress()
-	-- print(key)
 	for funct,config_keys in pairs(key_configuration) do
 		if check_keys(config_keys) == #config_keys then
 			loadstring(funct.."()")()
